@@ -3,6 +3,7 @@
 
 #define OFFSET 4
 
+
 int main (int argc, char const *argv[]) 
 {
     char buff[OFFSET] = "";
