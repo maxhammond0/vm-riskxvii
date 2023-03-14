@@ -22,8 +22,9 @@ void handle_file(const char *filename) {
         uint8_t op = 0u;
         for (int i = OFFSET; i >= 0; i--) {    /* print hex values */
             if (i < read) {
-                op |= (unsigned char)buff[i] << i*8;
+                op |= (unsigned char)buff[i] << (4-i)*8;
                 printf("%02hhx", (unsigned char)buff[i]);
+                // printf(" %d ", (unsigned char)buff[i]);
             }
         }
         printf(" %x", op);
