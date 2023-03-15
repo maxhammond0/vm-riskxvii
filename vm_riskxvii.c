@@ -5,8 +5,8 @@
 #include <fcntl.h>
 #include <stdint.h>
 
-void convert_hex_to_bin() {
-
+void convert_hex_to_bin(uint32_t hex) {
+    // char binary[33] = {0};
 }
 
 int main( int argc, char *argv[])
@@ -54,6 +54,7 @@ int main( int argc, char *argv[])
             op |= (unsigned int)*arg2 << 8;       // 0xaabbCC00
             op |= (unsigned int)*arg3;            // 0xaabbccDD
             printf("%08x\n", op);
+            // convert_hex_to_bin(op);
         }
     }
 
