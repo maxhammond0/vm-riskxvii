@@ -13,43 +13,15 @@
 #define U 55
 #define UJ 111
 
+// program counter
+int pc = 0;
+
 typedef uint32_t INSTRUCTION;
 
-const int R0 = 0;
-int R1 = 0;
-int R2 = 0;
-int R3 = 0;
-int R4 = 0;
-int R5 = 0;
-int R6 = 0;
-int R7 = 0;
-int R8 = 0;
-int R9 = 0;
-int R10 = 0;
-int R11 = 0;
-int R12 = 0;
-int R13 = 0;
-int R14 = 0;
-int R15 = 0;
-int R16 = 0;
-int R17 = 0;
-int R18 = 0;
-int R19 = 0;
-int R20 = 0;
-int R21 = 0;
-int R22 = 0;
-int R23 = 0;
-int R24 = 0;
-int R25 = 0;
-int R26 = 0;
-int R27 = 0;
-int R28 = 0;
-int R29 = 0;
-int R30 = 0;
-int R31 = 0;
-
+// General purpose registers
 int gpregisters[31] = {0};
 
+// helper function to check bit masking
 void print_binary(unsigned int number) {
     if (number >> 1) {
         print_binary(number >> 1);
@@ -105,7 +77,6 @@ void read_file(char *filepath, INSTRUCTION *instructions) {
 
 unsigned int mask(INSTRUCTION n, int i, int j) {
     // Return the ith to the jth bits of an INSTRUCTION
-    // int p = j - i;
     int p = j - i + 1;
     i++;
     return (((1 << p) - 1) & (n >> (i - 1)));
@@ -126,10 +97,6 @@ void addi(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
     int rs1 = mask(instruction, 15, 19);
     int immi = mask(instruction, 20, 31);
-    // printf("immi: ");
-    // print_binary(immi);
-    // printf("\n");
-    // printf("%d, %d, %d\n", rd, rs1, immi);
     gpregisters[rd-1] = rs1 + immi;
 }
 
@@ -138,7 +105,6 @@ void sub(INSTRUCTION instruction) {
     // opcode: 0110011
     // func3: 000
     // func7: 0100000
-
 }
 
 void lui(INSTRUCTION instruction) {
@@ -250,12 +216,12 @@ void lhu(INSTRUCTION instruction) {
 
 }
 
-void sb(INSTRUCTION instruction) {
-    // Type: S
-    // opcode: 0100011
-    // func3: 000
-
-}
+// void sb(INSTRUCTION instruction) {
+//     // Type: S
+//     // opcode: 0100011
+//     // func3: 000
+//
+// }
 
 void sh(INSTRUCTION instruction) {
     // Type: S
@@ -271,41 +237,106 @@ void sw(INSTRUCTION instruction) {
 
 }
 
-void inst_r(INSTRUCTION instruction) {
+void r(INSTRUCTION instruction) {
+    unsigned int rd = mask(instruction, 7, 11)-1;
+    unsigned int func3 = mask(instruction, 12, 14);
+    unsigned int rs1 = mask(instruction, 15, 19);
+    unsigned int rs2 = mask(instruction, 20, 24);
+    unsigned int func7 = mask(instruction, 25, 31);
 
+    if (func3 == 0 && func7 == 0) {  // add
+        gpregisters[rd] = gpregisters[rs1] + gpregisters[rs2];
+    } else if (func3 == 0 && func7 == 32) {  // sub
+        gpregisters[rd] = gpregisters[rs1] - gpregisters[rs2];
+    } else if (func3 == 4 && func7 == 0) {  // xor
+        gpregisters[rd] = gpregisters[rs1] ^ gpregisters[rs2];
+    } else if (func3 == 6 && func7 == 0) {  // or
+        gpregisters[rd] = gpregisters[rs1] | gpregisters[rs2];
+    } else if (func3 == 7 && func7 == 0) {  // and
+        gpregisters[rd] = gpregisters[rs1] & gpregisters[rs2];
+    } else if (func3 == 1 && func7 == 0) {  // sll
+        gpregisters[rd] = gpregisters[rs1] << gpregisters[rs2];
+    } else if (func3 == 5 && func7 == 0) {  // srl
+        gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
+    } else if (func3 == 5 && func7 == 32) {  // sra
+        gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
+    }
+}
+
+void i(INSTRUCTION instruction) {
+    unsigned int rd = mask(instruction, 7, 11) - 1;
+    unsigned int func3 = mask(instruction, 12, 14);
+    unsigned int rs1 = mask(instruction, 15, 19);
+    unsigned int imm = mask(instruction, 20, 31);
+
+    if (func3 == 0) {  // addi
+        gpregisters[rd] = gpregisters[rs1] + imm;
+    } else if (func3 == 4) {  // xori
+        gpregisters[rd] = gpregisters[rs1] ^ imm;
+    } else if (func3 == 6) {  // ori
+        gpregisters[rd] = gpregisters[rs1] | imm;
+    } else if (func3 == 7) {  // andi
+        gpregisters[rd] = gpregisters[rs1] & imm;
+    }
+}
+
+void s(INSTRUCTION instruction) {
+    // unsigned int opcode = mask(instruction, 0, 6);
+    // unsigned int imm1 = mask(instruction, 7, 11);
+    // unsigned int func3 = mask(instruction, 12, 14);
+    // unsigned int rs1 = mask(instruction, 15, 19);
+    // unsigned int rs2 = mask(instruction, 20, 24);
+    // unsigned int immi2 = mask(instruction, 25, 31);
+}
+
+void sb(INSTRUCTION instruction) {
+    // unsigned int opcode = mask(instruction, 0, 6);
+    // unsigned int imm1 = mask(instruction, 7, 11);
+    // unsigned int func3 = mask(instruction, 12, 14);
+    // unsigned int rs1 = mask(instruction, 15, 19);
+    // unsigned int rs2 = mask(instruction, 20, 24);
+    // unsigned int immi2 = mask(instruction, 25, 31);
+    
+}
+
+void u(INSTRUCTION instruction) {
+    // unsigned int opcode = mask(instruction, 0, 6);
+    // unsigned int id = mask(instruction, 7, 11)-1;
+    // unsigned int imm = mask(instruction, 12, 31);
+}
+
+void uj(INSTRUCTION instruction) {
+    printf("Instruction: ");
+    print_binary(instruction);
+    printf("\n");
+    unsigned int rd = mask(instruction, 7, 11)-1;
+    unsigned int imm = mask(instruction, 12, 31);
+    printf("imm: %d\n", imm);
+    gpregisters[rd] = pc*4 + 4;
+    pc = (pc * 4 + (imm*2)/4);
 }
 
 void process_instruction(INSTRUCTION instruction) {
     unsigned int opcode = mask(instruction, 0, 6);
-    unsigned int func3 = mask(instruction, 12, 14);
-    unsigned int func7 = mask(instruction, 25, 31);
-
-
-    // printf("instruction: ");
-    // print_binary(instruction);
-    // printf("\n");
-    // printf("opcode: ");
-    // print_binary(opcode);
-    // printf("\n");
 
     switch (opcode) {
         case R:
-            if (func3 == 0 && func7 == 0) {
-                add(instruction);
-            }
+            r(instruction);
             break;
         case I:
-            if (!func3) {
-                addi(instruction);
-            }
+            i(instruction);
             break;
         case S:
+            s(instruction);
             break;
         case SB:
+            sb(instruction);
             break;
         case U:
+            sb(instruction);
             break;
         case UJ:
+            uj(instruction);
             break;
     }
 }
@@ -330,7 +361,10 @@ int main( int argc, char *argv[]) {
     //     printf("%08x\n", instructions[i]);
     // }
 
-    process_instruction(instructions[0]);
+    for ( ; pc < 1024; pc++) {
+        printf("%d\n", pc);
+        process_instruction(instructions[pc]);
+    }
 
     for (int i = 0; i < 31; i++) {
         printf("register %02d: %d\n", i+1, gpregisters[i]);
