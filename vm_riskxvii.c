@@ -18,9 +18,8 @@ int pc = 0;
 
 typedef uint32_t INSTRUCTION;
 
-// 0 register
+// 0 register and 31 general purpose registers
 const int r0 = 0;
-// 31 general purpose registers
 int gpregisters[31] = {0};
 
 // helper function to check bit masking
