@@ -90,30 +90,40 @@ void r(INSTRUCTION instruction) {
     unsigned int rs2 = mask(instruction, 20, 24);
     unsigned int func7 = mask(instruction, 25, 31);
 
-    printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
 
     if (func3 == 0 && func7 == 0) {  // add
+        printf("add ");
         gpregisters[rd] = gpregisters[rs1] + gpregisters[rs2];
     } else if (func3 == 0 && func7 == 32) {  // sub
+        printf("sub ");
         gpregisters[rd] = gpregisters[rs1] - gpregisters[rs2];
     } else if (func3 == 4 && func7 == 0) {  // xor
+        printf("xor ");
         gpregisters[rd] = gpregisters[rs1] ^ gpregisters[rs2];
     } else if (func3 == 6 && func7 == 0) {  // or
+        printf("or ");
         gpregisters[rd] = gpregisters[rs1] | gpregisters[rs2];
     } else if (func3 == 7 && func7 == 0) {  // and
+        printf("and ");
         gpregisters[rd] = gpregisters[rs1] & gpregisters[rs2];
     } else if (func3 == 1 && func7 == 0) {  // sll
+        printf("sll ");
         gpregisters[rd] = gpregisters[rs1] << gpregisters[rs2];
     } else if (func3 == 5 && func7 == 0) {  // srl
+        printf("srl ");
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
     } else if (func3 == 5 && func7 == 32) {  // sra
+        printf("sra ");
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
     } else if (func3 == 2 && func7 == 0) {  // slt
+        printf("slt ");
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
     } else if (func3 == 3 && func7 == 0) {  // sltu
+        printf("sltu ");
         // TODO treat numbers as unsigned
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
     }
+    printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
 }
 
 void i(INSTRUCTION instruction) {
@@ -122,22 +132,28 @@ void i(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int imm = mask(instruction, 20, 31);
 
-    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 
     if (func3 == 0) {  // addi
+        printf("addi ");
         gpregisters[rd] = gpregisters[rs1] + imm;
     } else if (func3 == 4) {  // xori
+        printf("xori ");
         gpregisters[rd] = gpregisters[rs1] ^ imm;
     } else if (func3 == 6) {  // ori
+        printf("ori ");
         gpregisters[rd] = gpregisters[rs1] | imm;
     } else if (func3 == 7) {  // andi
+        printf("andi ");
         gpregisters[rd] = gpregisters[rs1] & imm;
     } else if (func3 == 2) {  // slti
+        printf("slti ");
         gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
     } else if (func3 == 3) {  // slti
+        printf("sltu ");
         // TODO treat numbers as unsigned
         gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
-    } //else if (func3 == 0)  // jalr
+    }
+    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 }
 
 void s(INSTRUCTION instruction) {
@@ -155,9 +171,8 @@ void s(INSTRUCTION instruction) {
         (imm5to10 << 5) |
         imm1to4;
 
+    printf("s instruction ");
     printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
-
-
 }
 
 void sb(INSTRUCTION instruction) {
@@ -170,35 +185,41 @@ void sb(INSTRUCTION instruction) {
 
     unsigned int imm = (imm5to11 << 5) | imm1to5;
 
-    printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
 
     if (func3 == 0) {  // beq
+        printf("beq ");
         if (gpregisters[rs1] == gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 1) {  // bne
+        printf("bne ");
         if (gpregisters[rs1] != gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 4) {  // blt
+        printf("blt ");
         if (gpregisters[rs1] < gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 6) {  // bltu
+        printf("bltu ");
         // TODO treat numbers as unsigned
         if (gpregisters[rs1] < gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 5) {  // bge
+        printf("bge ");
         if (gpregisters[rs1] > gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 7) {  // bgeu
+        printf("bgeu ");
         // TODO treat numbers as unsigned
         if (gpregisters[rs1] > gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     }
+    printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
 }
 
 void u(INSTRUCTION instruction) {
@@ -228,6 +249,7 @@ void uj(INSTRUCTION instruction) {
         (imm11 << 11) |
         imm10to1;
 
+    printf("jal ");
     printf("rd: %d, imm: %d", rd, imm);
 
     gpregisters[rd] = pc*4 + 4;
@@ -258,10 +280,20 @@ void process_instruction(INSTRUCTION instruction) {
             break;
         case 0:
             break;
+        case 103:
+            printf("jalr");
+            break;
         default:
             printf("opcode not found, ");
             printf("opcode was: ");
             print_binary(opcode);
+    }
+}
+
+void register_dump() {
+    printf("R00: %d\n", r0);
+    for (int i = 0; i < 31; i++) {
+        printf("R%02d: %d\n", i+1, gpregisters[i]);
     }
 }
 
@@ -281,9 +313,9 @@ int main( int argc, char *argv[]) {
     // printf("%d\n", mask(instructions[0], 0, 6));
 
     // Print out all instructions (for debugging)
-    for (int i = 0; i < 31; i++) {
-        printf("%08x\n", instructions[i]);
-    }
+    // for (int i = 0; i < 31; i++) {
+    //     printf("%08x\n", instructions[i]);
+    // }
 
     for ( ; pc < 32; pc++) {
         printf("pc: %02d, ", pc*4);
@@ -291,9 +323,7 @@ int main( int argc, char *argv[]) {
         printf("\n");
     }
 
-    for (int i = 0; i < 31; i++) {
-        printf("register %02d: %d\n", i+1, gpregisters[i]);
-    }
+    register_dump();
 
     return 0;
 }
