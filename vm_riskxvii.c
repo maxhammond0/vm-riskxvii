@@ -20,7 +20,7 @@ typedef uint32_t INSTRUCTION;
 
 // 0 register and 31 general purpose registers
 const int r0 = 0;
-int gpregisters[31] = {0};
+int gpregisters[32] = {0};
 
 // helper function to check bit masking
 void print_binary(unsigned int number) {
@@ -73,7 +73,7 @@ void read_file(char *filepath, INSTRUCTION *instructions) {
             i++;
         }
     }
-
+    gpregisters[0] = 0;
 }
 
 unsigned int mask(INSTRUCTION n, int i, int j) {
@@ -84,7 +84,7 @@ unsigned int mask(INSTRUCTION n, int i, int j) {
 }
 
 void r(INSTRUCTION instruction) {
-    unsigned int rd = mask(instruction, 7, 11)-1;
+    unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int rs2 = mask(instruction, 20, 24);
@@ -124,10 +124,11 @@ void r(INSTRUCTION instruction) {
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
     }
     printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
+    gpregisters[0] = 0;
 }
 
 void i(INSTRUCTION instruction) {
-    unsigned int rd = mask(instruction, 7, 11) - 1;
+    unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int imm = mask(instruction, 20, 31);
@@ -154,10 +155,11 @@ void i(INSTRUCTION instruction) {
         gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
     }
     printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
+    gpregisters[0] = 0;
 }
 
 void s(INSTRUCTION instruction) {
-    // unsigned int func3 = mask(instruction, 12, 14);
+    unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int rs2 = mask(instruction, 20, 24);
 
@@ -166,6 +168,17 @@ void s(INSTRUCTION instruction) {
     unsigned int imm11 = mask(instruction, 7, 7);
     unsigned int imm12 = mask(instruction, 31, 31);
 
+    // Virtual routines
+    // int write_c = 2048;
+    // int write_i = 2052;
+    // int write_ui = 2056;
+    // int halt = 2060;
+    // int read_c = 2066;
+    // int read_i = 2070;
+    // int dump_pc = 2080;
+    // int dump_gpr = 2084;
+    // int heap_banks = 2088;
+
     unsigned int imm = (imm12 << 12) |
         (imm11 << 11) |
         (imm5to10 << 5) |
@@ -173,6 +186,10 @@ void s(INSTRUCTION instruction) {
 
     printf("s instruction ");
     printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
+    if (func3 == 0) { // sb
+
+    }
+    gpregisters[0] = 0;
 }
 
 void sb(INSTRUCTION instruction) {
@@ -219,12 +236,13 @@ void sb(INSTRUCTION instruction) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     }
+    gpregisters[0] = 0;
     printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
 }
 
 void u(INSTRUCTION instruction) {
     // lui
-    unsigned int rd = mask(instruction, 7, 11)-1;
+    unsigned int rd = mask(instruction, 7, 11);
     unsigned int imm = mask(instruction, 12, 31);
     imm = (imm << 12);
 
@@ -235,7 +253,7 @@ void u(INSTRUCTION instruction) {
 
 void uj(INSTRUCTION instruction) {
     // jal
-    unsigned int rd = mask(instruction, 7, 11)-1;
+    unsigned int rd = mask(instruction, 7, 11);
 
     // bit fuckery
     unsigned int imm20 = mask(instruction, 31, 31);
@@ -253,7 +271,24 @@ void uj(INSTRUCTION instruction) {
     printf("rd: %d, imm: %d", rd, imm);
 
     gpregisters[rd] = pc*4 + 4;
-    pc = (pc*4 + (imm * 2))/4-1;
+    pc = (pc*4 + (imm * 2))/4;
+}
+
+void jalr(INSTRUCTION instruction) {
+    unsigned int rd = mask(instruction, 7, 11);
+    unsigned int func3 = mask(instruction, 12, 14);
+    unsigned int rs1 = mask(instruction, 15, 19);
+    unsigned int imm = mask(instruction, 20, 31);
+
+    printf("jalr, rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
+
+    if (func3) {
+        // TODO error, func3 != 000
+    }
+
+    gpregisters[rd] = pc*4 + 4;
+    pc = gpregisters[rs1] + imm; 
+    gpregisters[0] = 0;
 }
 
 void process_instruction(INSTRUCTION instruction) {
@@ -273,15 +308,15 @@ void process_instruction(INSTRUCTION instruction) {
             sb(instruction);
             break;
         case U:
-            sb(instruction);
+            u(instruction);
             break;
         case UJ:
             uj(instruction);
             break;
-        case 0:
-            break;
         case 103:
-            printf("jalr");
+            jalr(instruction);
+            break;
+        case 0:
             break;
         default:
             printf("opcode not found, ");
@@ -291,9 +326,8 @@ void process_instruction(INSTRUCTION instruction) {
 }
 
 void register_dump() {
-    printf("R00: %d\n", r0);
-    for (int i = 0; i < 31; i++) {
-        printf("R%02d: %d\n", i+1, gpregisters[i]);
+    for (int i = 0; i < 32; i++) {
+        printf("R%02d: %d\n", i, gpregisters[i]);
     }
 }
 
@@ -310,15 +344,9 @@ int main( int argc, char *argv[]) {
 
     read_file(argv[1], instructions);
 
-    // printf("%d\n", mask(instructions[0], 0, 6));
-
-    // Print out all instructions (for debugging)
-    // for (int i = 0; i < 31; i++) {
-    //     printf("%08x\n", instructions[i]);
-    // }
-
+    // Run program
     for ( ; pc < 32; pc++) {
-        printf("pc: %02d, ", pc*4);
+        printf("pc: %03x, ", pc*4);
         process_instruction(instructions[pc]);
         printf("\n");
     }
