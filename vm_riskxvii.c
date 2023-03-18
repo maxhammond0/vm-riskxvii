@@ -35,8 +35,9 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
+    printf("PC = 0x%08x\n", pc);
     for (int i = 0; i < 32; i++) {
-        printf("R%02d: %d\n", i, gpregisters[i]);
+        printf("R[%d] =  %08x\n", i, gpregisters[i]);
     }
 }
 
@@ -45,11 +46,11 @@ void read_file(char *filepath, INSTRUCTION *instructions) {
     int fd;
     int retval;
     int each = 0;
-    unsigned char buf[16] = {0};
-    unsigned char byte1[4] = {0};
-    unsigned char byte2[4] = {0};
-    unsigned char byte3[4] = {0};
-    unsigned char byte4[4] = {0};
+    uint8_t buf[16] = {0};
+    uint8_t byte1[4] = {0};
+    uint8_t byte2[4] = {0};
+    uint8_t byte3[4] = {0};
+    uint8_t byte4[4] = {0};
 
 
     // File can't be read
@@ -61,10 +62,10 @@ void read_file(char *filepath, INSTRUCTION *instructions) {
 
     int i = 0;
     // Read until EOF
-    while ( ( retval = read ( fd, &buf, 4)) > 0) {
+    while ((retval = read(fd, &buf, 4)) > 0) {
         // Read 4 bytes at a time
-        if ( retval == 4) {
-            for ( each = 0; each < 4; each++) {
+        if (retval == 4) {
+            for (each = 0; each < 4; each++) {
                 // Read in little endian byte at a time
                 byte4[each] = buf[each];
                 byte3[each] = buf[each + 1];
@@ -216,6 +217,8 @@ void s(INSTRUCTION instruction) {
             b = mask(gpregisters[rs2], 0, 15);
         } else if (func3 == 2) {
             b = mask(gpregisters[rs2], 0, 23);
+        } else {
+            // TODO error message
         }
         printf("\n%c\n", b);
     } else if (addy == write_i) {
@@ -250,6 +253,8 @@ void memory_load(INSTRUCTION instruction) {
         printf("lbu ");
     } else if (func3 == 5) {  // lhu
         printf("lhu");
+    } else {
+        // TODO error message
     }
 
     printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
@@ -303,10 +308,11 @@ void sb(INSTRUCTION instruction) {
         }
     } else if (func3 == 7) {  // bgeu
         printf("bgeu ");
-        // TODO treat numbers as unsigned
         if ((uint32_t)gpregisters[rs1] > (uint32_t)gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
+    } else {
+        // TODO error message
     }
     gpregisters[0] = 0;
     printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
