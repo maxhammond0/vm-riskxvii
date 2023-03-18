@@ -1,3 +1,7 @@
+// name: Max Hammond
+// unikey: mham5835
+// SID: 520477289
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -126,8 +130,10 @@ void r(INSTRUCTION instruction) {
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
     } else if (func3 == 3 && func7 == 0) {  // sltu
         printf("sltu ");
-        // TODO treat numbers as unsigned
-        gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
+        gpregisters[rd] = ((uint32_t)gpregisters[rs1] <
+            (uint32_t)gpregisters[rs2]) ?
+            1 :
+            0;
     }
     printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
     gpregisters[0] = 0;
@@ -139,6 +145,11 @@ void i(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int imm = mask(instruction, 20, 31);
 
+    uint32_t unsigned_imm = imm;
+    // Sign the immediate
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;  // 
+    }
 
     if (func3 == 0) {  // addi
         printf("addi ");
@@ -155,10 +166,9 @@ void i(INSTRUCTION instruction) {
     } else if (func3 == 2) {  // slti
         printf("slti ");
         gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
-    } else if (func3 == 3) {  // slti
-        printf("sltu ");
-        // TODO treat numbers as unsigned
-        gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
+    } else if (func3 == 3) {  // sltiu
+        printf("sltiu ");
+        gpregisters[rd] = ((uint32_t)gpregisters[rs1] < unsigned_imm) ? 1 : 0;
     }
     printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
     gpregisters[0] = 0;
@@ -173,9 +183,9 @@ void s(INSTRUCTION instruction) {
     unsigned int imm6to12 = mask(instruction, 25, 31);
 
     // Virtual routines
-    // int write_c = 2048;
-    // int write_i = 2052;
-    // int write_ui = 2056;
+    int write_c = 2048;
+    int write_i = 2052;
+    int write_ui = 2056;
     int halt = 2060;
     // int read_c = 2066;
     // int read_i = 2070;
@@ -183,41 +193,38 @@ void s(INSTRUCTION instruction) {
     // int dump_gpr = 2084;
     // int heap_banks = 2088;
 
-    uint8_t imm = (imm6to12 << 5) | imm1to5;
-    print_binary(imm);
-    printf("\n");
+    int32_t imm = (imm6to12 << 5) | imm1to5;
+
+    // sign the immediate
     if ((imm >> 11) & 1) {
-        print_binary(imm);
-        imm = ~imm;
-        imm++;
+        imm = imm | 4294965248;
     }
-    print_binary(imm);
-    printf("\n");
 
     unsigned int addy = (gpregisters[rs1] + imm);
-    printf("gpregister[%d]: %d ", rs1, gpregisters[rs1]);
-    printf("addy: %d, imm, %d ", addy, imm);
-
-    if (pc * 4 == 12) {
-        printf("Done\n");
-        exit(3);
-    }
 
     if (addy == halt) {
-        printf("CPU halt requested");
+        printf("CPU halt requested\n");
         register_dump();
         exit(2);
     }
 
-    if (func3 == 0) { // sb
-        printf("sb ");
-    } else if (func3 == 1) {  // sh
-        printf("sh ");
-    } else if (func3 == 2) {  // sw
-        printf("sw ");
+    if (addy == write_c) {
+        uint32_t b = 0;
+        if (func3 == 0) {
+            b = mask(gpregisters[rs2], 0, 7);
+        } else if (func3 == 1) {
+            b = mask(gpregisters[rs2], 0, 15);
+        } else if (func3 == 2) {
+            b = mask(gpregisters[rs2], 0, 23);
+        }
+        printf("\n%c\n", b);
+    } else if (addy == write_i) {
+
+    } else if (addy == write_ui) {
+        
     }
 
-    printf("rs1: %d, rs2: %d, imm: %d ", rs1, rs2, imm);
+    printf("func3: %d, rs1: %d, rs2: %d, imm: %d ", func3, rs1, rs2, imm);
     gpregisters[0] = 0;
 }
 
@@ -228,6 +235,10 @@ void memory_load(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int imm = mask(instruction, 20, 31);
 
+    // sign the immediate
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;
+    }
 
     if (func3 == 0) {  // lb
         printf("lb ");
@@ -255,10 +266,15 @@ void sb(INSTRUCTION instruction) {
     unsigned int imm5to10 = mask(instruction, 25, 30);
 
 
-    unsigned int imm = (imm12 << 11) |
+    int32_t imm = (imm12 << 11) |
         (imm11 << 10) |
         (imm5to10 << 4) |
         (imm1to4);
+
+    // sign the immediate
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;
+    }
 
     if (func3 == 0) {  // beq
         printf("beq ");
@@ -277,8 +293,7 @@ void sb(INSTRUCTION instruction) {
         }
     } else if (func3 == 6) {  // bltu
         printf("bltu ");
-        // TODO treat numbers as unsigned
-        if (gpregisters[rs1] < gpregisters[rs2]) {
+        if ((uint32_t)gpregisters[rs1] < (uint32_t)gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 5) {  // bge
@@ -289,7 +304,7 @@ void sb(INSTRUCTION instruction) {
     } else if (func3 == 7) {  // bgeu
         printf("bgeu ");
         // TODO treat numbers as unsigned
-        if (gpregisters[rs1] > gpregisters[rs2]) {
+        if ((uint32_t)gpregisters[rs1] > (uint32_t)gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     }
@@ -302,6 +317,11 @@ void u(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int imm = mask(instruction, 12, 31);
     imm = (imm << 12);
+
+    // sign the immediate
+    if ((imm >> 19) & 1) {
+        imm = imm | 4294965248;
+    }
 
     printf("rd: %d, imm: %d", rd, imm);
 
@@ -405,7 +425,7 @@ int main( int argc, char *argv[]) {
         printf("\n");
     }
 
-    register_dump();
+    // register_dump();
 
     return 0;
 }
