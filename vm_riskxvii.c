@@ -30,6 +30,12 @@ void print_binary(unsigned int number) {
     putc((number & 1) ? '1' : '0', stdout);
 }
 
+void register_dump() {
+    for (int i = 0; i < 32; i++) {
+        printf("R%02d: %d\n", i, gpregisters[i]);
+    }
+}
+
 void read_file(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
@@ -163,33 +169,72 @@ void s(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int rs2 = mask(instruction, 20, 24);
 
-    unsigned int imm1to4 = mask(instruction, 8, 11);
-    unsigned int imm5to10 = mask(instruction, 25, 30);
-    unsigned int imm11 = mask(instruction, 7, 7);
-    unsigned int imm12 = mask(instruction, 31, 31);
+    unsigned int imm1to5 = mask(instruction, 7, 11);
+    unsigned int imm6to12 = mask(instruction, 25, 31);
 
     // Virtual routines
     // int write_c = 2048;
     // int write_i = 2052;
     // int write_ui = 2056;
-    // int halt = 2060;
+    int halt = 2060;
     // int read_c = 2066;
     // int read_i = 2070;
     // int dump_pc = 2080;
     // int dump_gpr = 2084;
     // int heap_banks = 2088;
 
-    unsigned int imm = (imm12 << 12) |
-        (imm11 << 11) |
-        (imm5to10 << 5) |
-        imm1to4;
+    unsigned int imm = (imm6to12 << 5) | imm1to5;
 
-    printf("s instruction ");
-    printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
-    if (func3 == 0) { // sb
+    unsigned int addy = (gpregisters[rs1] + imm);
+    printf("addy: %d, ", addy);
+    printf("imm: %d, ", imm);
+    print_binary(imm);
+    printf(" ");
+    printf("instruction ");
+    print_binary(instruction);
+    printf("\n");
+    register_dump();
+    exit(1);
 
+    if (addy == halt) {
+        printf("CPU halt requested");
+        register_dump();
+        exit(2);
     }
+
+    if (func3 == 0) { // sb
+        printf("sb ");
+    } else if (func3 == 1) {  // sh
+        printf("sh ");
+    } else if (func3 == 2) {  // sw
+        printf("sw ");
+    }
+
+    printf("rs1: %d, rs2: %d, imm: %d ", rs1, rs2, imm);
     gpregisters[0] = 0;
+}
+
+void memory_load(INSTRUCTION instruction) {
+    // type I
+    unsigned int rd = mask(instruction, 7, 11);
+    unsigned int func3 = mask(instruction, 12, 14);
+    unsigned int rs1 = mask(instruction, 15, 19);
+    unsigned int imm = mask(instruction, 20, 31);
+
+
+    if (func3 == 0) {  // lb
+        printf("lb ");
+    } else if (func3 == 1) {  // lh
+        printf("lh ");
+    } else if (func3 == 2) {  // lw
+        printf("lw ");
+    } else if (func3 == 4) {  // lbu
+        printf("lbu ");
+    } else if (func3 == 5) {  // lhu
+        printf("lhu");
+    }
+
+    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 }
 
 void sb(INSTRUCTION instruction) {
@@ -197,11 +242,16 @@ void sb(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int rs2 = mask(instruction, 20, 24);
 
-    unsigned int imm1to5 = mask(instruction, 7, 11);
-    unsigned int imm5to11 = mask(instruction, 25, 31);
+    unsigned int imm11 = mask(instruction, 7, 7);
+    unsigned int imm1to4 = mask(instruction, 8, 11);
+    unsigned int imm12 = mask(instruction, 31, 31);
+    unsigned int imm5to10 = mask(instruction, 25, 30);
 
-    unsigned int imm = (imm5to11 << 5) | imm1to5;
 
+    unsigned int imm = (imm12 << 11) |
+        (imm11 << 10) |
+        (imm5to10 << 4) |
+        (imm1to4);
 
     if (func3 == 0) {  // beq
         printf("beq ");
@@ -271,7 +321,7 @@ void uj(INSTRUCTION instruction) {
     printf("rd: %d, imm: %d", rd, imm);
 
     gpregisters[rd] = pc*4 + 4;
-    pc = (pc*4 + (imm * 2))/4;
+    pc = (pc*4 + (imm * 2))/4-1;
 }
 
 void jalr(INSTRUCTION instruction) {
@@ -287,7 +337,7 @@ void jalr(INSTRUCTION instruction) {
     }
 
     gpregisters[rd] = pc*4 + 4;
-    pc = gpregisters[rs1] + imm; 
+    pc = ((gpregisters[rs1] + imm)/4)-1; 
     gpregisters[0] = 0;
 }
 
@@ -303,6 +353,9 @@ void process_instruction(INSTRUCTION instruction) {
             break;
         case S:
             s(instruction);
+            break;
+        case 3:
+            memory_load(instruction);
             break;
         case SB:
             sb(instruction);
@@ -325,12 +378,6 @@ void process_instruction(INSTRUCTION instruction) {
     }
 }
 
-void register_dump() {
-    for (int i = 0; i < 32; i++) {
-        printf("R%02d: %d\n", i, gpregisters[i]);
-    }
-}
-
 int main( int argc, char *argv[]) {
 
     // Wrong number of cmd line arguments
@@ -346,7 +393,7 @@ int main( int argc, char *argv[]) {
 
     // Run program
     for ( ; pc < 32; pc++) {
-        printf("pc: %03x, ", pc*4);
+        printf("pc: %03d, ", pc*4);
         process_instruction(instructions[pc]);
         printf("\n");
     }
