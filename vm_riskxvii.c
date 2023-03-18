@@ -183,18 +183,25 @@ void s(INSTRUCTION instruction) {
     // int dump_gpr = 2084;
     // int heap_banks = 2088;
 
-    unsigned int imm = (imm6to12 << 5) | imm1to5;
+    uint8_t imm = (imm6to12 << 5) | imm1to5;
+    print_binary(imm);
+    printf("\n");
+    if ((imm >> 11) & 1) {
+        print_binary(imm);
+        imm = ~imm;
+        imm++;
+    }
+    print_binary(imm);
+    printf("\n");
 
     unsigned int addy = (gpregisters[rs1] + imm);
-    printf("addy: %d, ", addy);
-    printf("imm: %d, ", imm);
-    print_binary(imm);
-    printf(" ");
-    printf("instruction ");
-    print_binary(instruction);
-    printf("\n");
-    register_dump();
-    exit(1);
+    printf("gpregister[%d]: %d ", rs1, gpregisters[rs1]);
+    printf("addy: %d, imm, %d ", addy, imm);
+
+    if (pc * 4 == 12) {
+        printf("Done\n");
+        exit(3);
+    }
 
     if (addy == halt) {
         printf("CPU halt requested");
