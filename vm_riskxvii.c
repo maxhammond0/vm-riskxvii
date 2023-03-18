@@ -312,9 +312,9 @@ void uj(INSTRUCTION instruction) {
     unsigned int imm19to12 = mask(instruction, 12, 19);
 
     // bit shift and logical oring all them together
-    unsigned int imm = (imm20 << 20) |
-        (imm19to12 << 12) |
-        (imm11 << 11) |
+    unsigned int imm = (imm20 << 19) |
+        (imm19to12 << 11) |
+        (imm11 << 10) |
         imm10to1;
 
     printf("jal ");
