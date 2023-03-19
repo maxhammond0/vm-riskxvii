@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <limits.h>
 
+typedef uint32_t INSTRUCTION;
+
 #define R 51
 #define I 19
 #define S 35
@@ -17,10 +19,17 @@
 #define U 55
 #define UJ 111
 
+#define INST_MEM_SIZE 256
+#define DATA_MEM_SIZE 256
+
+// dynamic memory implemented as a linked list
+struct dmem {
+    uint8_t data;  // 8 bytes of data storage
+    struct dmem *next;
+};
+
 // program counter
 int pc = 0;
-
-typedef uint32_t INSTRUCTION;
 
 // 0 register and 31 general purpose registers
 const int r0 = 0;
@@ -35,13 +44,13 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    printf("PC = 0x%08x\n", pc);
+    printf("PC = 0x%08x\n", pc*4);
     for (int i = 0; i < 32; i++) {
         printf("R[%d] =  %08x\n", i, gpregisters[i]);
     }
 }
 
-void read_file(char *filepath, INSTRUCTION *instructions) {
+void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
     int retval;
@@ -62,7 +71,8 @@ void read_file(char *filepath, INSTRUCTION *instructions) {
 
     int i = 0;
     // Read until EOF
-    while ((retval = read(fd, &buf, 4)) > 0) {
+    while (i < 256) {
+        retval = read(fd, &buf, 4);
         // Read 4 bytes at a time
         if (retval == 4) {
             for (each = 0; each < 4; each++) {
@@ -85,6 +95,10 @@ void read_file(char *filepath, INSTRUCTION *instructions) {
         }
     }
     gpregisters[0] = 0;
+}
+
+void get_data(char *filepath, INSTRUCTION *data_mem) {
+    // TODO
 }
 
 unsigned int mask(INSTRUCTION n, int i, int j) {
@@ -144,7 +158,7 @@ void i(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
-    unsigned int imm = mask(instruction, 20, 31);
+    uint32_t imm = mask(instruction, 20, 31);
 
     uint32_t unsigned_imm = imm;
     // Sign the immediate
@@ -180,8 +194,8 @@ void s(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int rs2 = mask(instruction, 20, 24);
 
-    unsigned int imm1to5 = mask(instruction, 7, 11);
-    unsigned int imm6to12 = mask(instruction, 25, 31);
+    uint32_t imm1to5 = mask(instruction, 7, 11);
+    int imm6to12 = mask(instruction, 25, 31);
 
     // Virtual routines
     int write_c = 2048;
@@ -201,7 +215,7 @@ void s(INSTRUCTION instruction) {
         imm = imm | 4294965248;
     }
 
-    unsigned int addy = (gpregisters[rs1] + imm);
+    uint32_t addy = (gpregisters[rs1] + imm);
 
     if (addy == halt) {
         printf("CPU halt requested\n");
@@ -210,21 +224,14 @@ void s(INSTRUCTION instruction) {
     }
 
     if (addy == write_c) {
-        uint32_t b = 0;
-        if (func3 == 0) {
-            b = mask(gpregisters[rs2], 0, 7);
-        } else if (func3 == 1) {
-            b = mask(gpregisters[rs2], 0, 15);
-        } else if (func3 == 2) {
-            b = mask(gpregisters[rs2], 0, 23);
-        } else {
-            // TODO error message
-        }
+        uint8_t b = mask(gpregisters[rs2], 0, 7);
         printf("\n%c\n", b);
     } else if (addy == write_i) {
-
+        int32_t b = gpregisters[rs2];
+        printf("\n%d\n", b);
     } else if (addy == write_ui) {
-        
+        uint32_t b = gpregisters[rs2];
+        printf("\n%d\n", b);
     }
 
     printf("func3: %d, rs1: %d, rs2: %d, imm: %d ", func3, rs1, rs2, imm);
@@ -236,14 +243,17 @@ void memory_load(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
-    unsigned int imm = mask(instruction, 20, 31);
+    uint32_t imm = mask(instruction, 20, 31);
 
     // sign the immediate
     if ((imm >> 11) & 1) {
         imm = imm | 4294965248;
     }
 
+    unsigned int addy = (gpregisters[rs1] + imm);
+
     if (func3 == 0) {  // lb
+        // TODO sign and extend 8 bit of addy
         printf("lb ");
     } else if (func3 == 1) {  // lh
         printf("lh ");
@@ -257,7 +267,7 @@ void memory_load(INSTRUCTION instruction) {
         // TODO error message
     }
 
-    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
+    printf("addy: %d, rd: %d, rs1: %d, imm: %d", addy, rd, rs1, imm);
 }
 
 void sb(INSTRUCTION instruction) {
@@ -265,11 +275,10 @@ void sb(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     unsigned int rs2 = mask(instruction, 20, 24);
 
-    unsigned int imm11 = mask(instruction, 7, 7);
-    unsigned int imm1to4 = mask(instruction, 8, 11);
-    unsigned int imm12 = mask(instruction, 31, 31);
-    unsigned int imm5to10 = mask(instruction, 25, 30);
-
+    uint32_t imm11 = mask(instruction, 7, 7);
+    uint32_t imm1to4 = mask(instruction, 8, 11);
+    uint32_t imm12 = mask(instruction, 31, 31);
+    uint32_t imm5to10 = mask(instruction, 25, 30);
 
     int32_t imm = (imm12 << 11) |
         (imm11 << 10) |
@@ -321,7 +330,7 @@ void sb(INSTRUCTION instruction) {
 void u(INSTRUCTION instruction) {
     // lui
     unsigned int rd = mask(instruction, 7, 11);
-    unsigned int imm = mask(instruction, 12, 31);
+    uint32_t imm = mask(instruction, 12, 31);
     imm = (imm << 12);
 
     // sign the immediate
@@ -339,16 +348,21 @@ void uj(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
 
     // bit fuckery
-    unsigned int imm20 = mask(instruction, 31, 31);
-    unsigned int imm10to1 = mask(instruction, 21, 30);
-    unsigned int imm11 = mask(instruction, 20, 20);
-    unsigned int imm19to12 = mask(instruction, 12, 19);
+    uint32_t imm20 = mask(instruction, 31, 31);
+    uint32_t imm10to1 = mask(instruction, 21, 30);
+    uint32_t imm11 = mask(instruction, 20, 20);
+    uint32_t imm19to12 = mask(instruction, 12, 19);
 
     // bit shift and logical oring all them together
-    unsigned int imm = (imm20 << 19) |
+    uint32_t imm = (imm20 << 19) |
         (imm19to12 << 11) |
         (imm11 << 10) |
         imm10to1;
+
+    // TODO sign the imm
+    if ((imm >> 19) & 1) {
+        imm = imm | 4294965248;
+    }
 
     printf("jal ");
     printf("rd: %d, imm: %d", rd, imm);
@@ -361,7 +375,7 @@ void jalr(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
-    unsigned int imm = mask(instruction, 20, 31);
+    int imm = mask(instruction, 20, 31);
 
     printf("jalr, rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 
@@ -420,12 +434,16 @@ int main( int argc, char *argv[]) {
         return 1;
     }
 
-    INSTRUCTION instructions[1024] = { 0 };
+    INSTRUCTION instructions[INST_MEM_SIZE] = { 0 };
+    // INSTRUCTION data_mem[DATA_MEM_SIZE] = { 0 };
 
-    read_file(argv[1], instructions);
+    get_instructions(argv[1], instructions);
+    for (int i = 0; i < INST_MEM_SIZE; i++) {
+        printf("%x\n", instructions[i]);
+    }
 
     // Run program
-    for ( ; pc < 32; pc++) {
+    for ( ; pc < INST_MEM_SIZE; pc++) {
         printf("pc: %03d, ", pc*4);
         process_instruction(instructions[pc]);
         printf("\n");
