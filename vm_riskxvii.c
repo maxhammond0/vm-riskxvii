@@ -40,9 +40,9 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    printf("PC = 0x%08d\n", pc*4);
+    printf("PC = %d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  %08d\n", i, gpregisters[i]);
+        printf("R[%d] =  %d\n", i, gpregisters[i]);
     }
 }
 
@@ -159,7 +159,7 @@ void i(INSTRUCTION instruction) {
     uint32_t unsigned_imm = imm;
     // Sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 4294965248;  // 
+        imm = imm | 4294965248;  //
     }
 
     if (func3 == 0) {  // addi
@@ -387,11 +387,11 @@ void jalr(INSTRUCTION instruction) {
     printf("jalr, rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 
     if (func3) {
-        // TODO error, func3 != 000
+        printf("jalr error\n!\n!\n!\n!");
     }
 
     gpregisters[rd] = pc*4 + 4;
-    pc = ((gpregisters[rs1] + imm)/4)-1; 
+    pc = ((gpregisters[rs1] + imm)/4)-1;
     gpregisters[0] = 0;
 }
 
