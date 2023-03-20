@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <limits.h>
 
+#include "hbank.h"
+
 typedef uint32_t INSTRUCTION;
 
 #define R 51
@@ -21,15 +23,6 @@ typedef uint32_t INSTRUCTION;
 
 #define INST_MEM_SIZE 256
 #define DATA_MEM_SIZE 256
-
-// heap bank
-struct hbank {
-    uint32_t address;  // integer address
-    uint64_t data;  // 8 bytes of data storage
-    struct hbank *next;
-};
-
-typedef struct hbank *node;
 
 // program counter
 int pc = 0;
@@ -51,31 +44,6 @@ void register_dump() {
     for (int i = 0; i < 32; i++) {
         printf("R[%d] =  %08d\n", i, gpregisters[i]);
     }
-}
-
- node create_node() {
-    node tmp;
-    tmp = (node)malloc(sizeof(struct hbank));
-    tmp->next = NULL;
-    return tmp;
-}
-
-node add_hbank(node head, uint64_t data) {
-    node tmp, p;
-    tmp = create_node();
-    tmp->data = data;
-
-    if (head == NULL) {
-        head = tmp;
-    } else {
-        p = head;
-        while (p->next != NULL) {
-            p = p->next;
-        }
-        p->next = tmp;
-    }
-
-    return head;
 }
 
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
