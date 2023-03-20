@@ -47,9 +47,9 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    printf("PC = 0x%08x\n", pc*4);
+    printf("PC = 0x%08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  %08x\n", i, gpregisters[i]);
+        printf("R[%d] =  %08d\n", i, gpregisters[i]);
     }
 }
 
@@ -235,6 +235,7 @@ void s(INSTRUCTION instruction) {
     // int dump_pc = 2080;
     // int dump_gpr = 2084;
     // int heap_banks = 2088;
+    printf("Type: S ");
 
     int32_t imm = (imm6to12 << 5) | imm1to5;
 
@@ -244,12 +245,23 @@ void s(INSTRUCTION instruction) {
     }
 
     uint32_t addy = (gpregisters[rs1] + imm);
+    printf("addy: %d ", addy);
 
     if (addy == halt) {
         printf("CPU halt requested\n");
         register_dump();
         exit(2);
     }
+
+    if (func3 == 0) {  // sb
+        printf("sb ");
+    } else if (func3 == 1) {  // sh
+        printf("sh ");
+    } else if (func3 == 2) {  // sw
+        printf("sw ");
+    }
+
+    printf("func3: %d, rs1: %d, rs2: %d, imm: %d ", func3, rs1, rs2, imm);
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
@@ -262,7 +274,6 @@ void s(INSTRUCTION instruction) {
         printf("\n%d\n", b);
     }
 
-    printf("func3: %d, rs1: %d, rs2: %d, imm: %d ", func3, rs1, rs2, imm);
     gpregisters[0] = 0;
 }
 
@@ -466,9 +477,9 @@ int main( int argc, char *argv[]) {
     // INSTRUCTION data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions);
-    for (int i = 0; i < INST_MEM_SIZE; i++) {
-        printf("%x\n", instructions[i]);
-    }
+    // for (int i = 0; i < INST_MEM_SIZE; i++) {
+    //     printf("%x\n", instructions[i]);
+    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
