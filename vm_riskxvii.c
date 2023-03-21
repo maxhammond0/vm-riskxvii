@@ -218,7 +218,12 @@ void s(INSTRUCTION instruction) {
     }
 
     uint32_t addy = (gpregisters[rs1] + imm);
-    printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ", func3, rs1, rs2, imm, addy);
+    printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ",
+           func3,
+           rs1,
+           rs2,
+           imm,
+           addy);
 
     if (addy == halt) {
         printf("\nCPU halt requested\n");
@@ -238,14 +243,14 @@ void s(INSTRUCTION instruction) {
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
         printf("write_c ");
-        printf("\n%c", b);
+        printf("\nb: %c", b);
     } else if (addy == write_i) {
         int32_t b = gpregisters[rs2];
         printf("write_i ");
-        printf("\n%d", b);
+        printf("\nb: %d", b);
     } else if (addy == write_ui) {
         uint32_t b = gpregisters[rs2];
-        printf("\n%d", b);
+        printf("\nb: %d", b);
     }
 
     gpregisters[0] = 0;
@@ -407,9 +412,9 @@ void jalr(INSTRUCTION instruction) {
 
 void process_instruction(INSTRUCTION instruction) {
     unsigned int opcode = mask(instruction, 0, 6);
-    printf(" ");
-    print_binary(instruction);
-    printf(" ");
+    // printf(" ");
+    // print_binary(instruction);
+    // printf(" ");
 
     switch (opcode) {
         case R:
