@@ -112,37 +112,37 @@ void r(INSTRUCTION instruction) {
     unsigned int func7 = mask(instruction, 25, 31);
 
     // debugging
-    // printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
+    printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
 
     if (func3 == 0 && func7 == 0) {  // add
-        // printf("add ");
+        printf("add ");
         gpregisters[rd] = gpregisters[rs1] + gpregisters[rs2];
     } else if (func3 == 0 && func7 == 32) {  // sub
-        // printf("sub ");
+        printf("sub ");
         gpregisters[rd] = gpregisters[rs1] - gpregisters[rs2];
     } else if (func3 == 4 && func7 == 0) {  // xor
-        // printf("xor ");
+        printf("xor ");
         gpregisters[rd] = gpregisters[rs1] ^ gpregisters[rs2];
     } else if (func3 == 6 && func7 == 0) {  // or
-        // printf("or ");
+        printf("or ");
         gpregisters[rd] = gpregisters[rs1] | gpregisters[rs2];
     } else if (func3 == 7 && func7 == 0) {  // and
-        // printf("and ");
+        printf("and ");
         gpregisters[rd] = gpregisters[rs1] & gpregisters[rs2];
     } else if (func3 == 1 && func7 == 0) {  // sll
-        // printf("sll ");
+        printf("sll ");
         gpregisters[rd] = gpregisters[rs1] << gpregisters[rs2];
     } else if (func3 == 5 && func7 == 0) {  // srl
-        // printf("srl ");
+        printf("srl ");
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
     } else if (func3 == 5 && func7 == 32) {  // sra
-        // printf("sra ");
+        printf("sra ");
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
     } else if (func3 == 2 && func7 == 0) {  // slt
-        // printf("slt ");
+        printf("slt ");
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
     } else if (func3 == 3 && func7 == 0) {  // sltu
-        // printf("sltu ");
+        printf("sltu ");
         gpregisters[rd] = ((uint32_t)gpregisters[rs1] <
             (uint32_t)gpregisters[rs2]) ?
             1 :
@@ -165,25 +165,25 @@ void i(INSTRUCTION instruction) {
     }
 
     // debugging
-    // printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
+    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 
     if (func3 == 0) {  // addi
-        // printf("addi ");
+        printf("addi ");
         gpregisters[rd] = gpregisters[rs1] + imm;
     } else if (func3 == 4) {  // xori
-        // printf("xori ");
+        printf("xori ");
         gpregisters[rd] = gpregisters[rs1] ^ imm;
     } else if (func3 == 6) {  // ori
-        // printf("ori ");
+        printf("ori ");
         gpregisters[rd] = gpregisters[rs1] | imm;
     } else if (func3 == 7) {  // andi
-        // printf("andi ");
+        printf("andi ");
         gpregisters[rd] = gpregisters[rs1] & imm;
     } else if (func3 == 2) {  // slti
-        // printf("slti ");
+        printf("slti ");
         gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
     } else if (func3 == 3) {  // sltiu
-        // printf("sltiu ");
+        printf("sltiu ");
         gpregisters[rd] = ((uint32_t)gpregisters[rs1] < unsigned_imm) ? 1 : 0;
     }
     gpregisters[0] = 0;
@@ -207,7 +207,7 @@ void s(INSTRUCTION instruction) {
     // int dump_pc = 2080;
     // int dump_gpr = 2084;
     // int heap_banks = 2088;
-    // printf("Type: S ");
+    printf("Type: S ");
 
     int32_t imm = (imm6to12 << 5) | imm1to5;
 
@@ -218,7 +218,7 @@ void s(INSTRUCTION instruction) {
     }
 
     uint32_t addy = (gpregisters[rs1] + imm);
-    // printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ", func3, rs1, rs2, imm, addy);
+    printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ", func3, rs1, rs2, imm, addy);
 
     if (addy == halt) {
         printf("\nCPU halt requested\n");
@@ -227,19 +227,21 @@ void s(INSTRUCTION instruction) {
     }
 
     if (func3 == 0) {  // sb
-        // printf("sb ");
+        printf("sb ");
     } else if (func3 == 1) {  // sh
-        // printf("sh ");
+        printf("sh ");
     } else if (func3 == 2) {  // sw
-        // printf("sw ");
+        printf("sw ");
     }
 
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
+        printf("write_c ");
         printf("\n%c", b);
     } else if (addy == write_i) {
         int32_t b = gpregisters[rs2];
+        printf("write_i ");
         printf("\n%d", b);
     } else if (addy == write_ui) {
         uint32_t b = gpregisters[rs2];
@@ -251,9 +253,9 @@ void s(INSTRUCTION instruction) {
 
 void memory_load(INSTRUCTION instruction) {
     // type I
-    // unsigned int rd = mask(instruction, 7, 11);
+    unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
-    // unsigned int rs1 = mask(instruction, 15, 19);
+    unsigned int rs1 = mask(instruction, 15, 19);
     uint32_t imm = mask(instruction, 20, 31);
 
     // sign the immediate
@@ -261,22 +263,22 @@ void memory_load(INSTRUCTION instruction) {
         imm = imm | 4294965248;
     }
 
-    // unsigned int addy = (gpregisters[rs1] + imm);
+    unsigned int addy = (gpregisters[rs1] + imm);
 
     // debugging
-    // printf("addy: %d, rd: %d, rs1: %d, imm: %d ", addy, rd, rs1, imm);
+    printf("addy: %d, rd: %d, rs1: %d, imm: %d ", addy, rd, rs1, imm);
 
     if (func3 == 0) {  // lb
         // TODO sign and extend 8 bit of addy
-        // printf("lb ");
+        printf("lb ");
     } else if (func3 == 1) {  // lh
-        // printf("lh ");
+        printf("lh ");
     } else if (func3 == 2) {  // lw
-        // printf("lw ");
+        printf("lw ");
     } else if (func3 == 4) {  // lbu
-        // printf("lbu ");
+        printf("lbu ");
     } else if (func3 == 5) {  // lhu
-        // printf("lhu");
+        printf("lhu");
     } else {
         // TODO error message
     }
@@ -304,35 +306,35 @@ void sb(INSTRUCTION instruction) {
     }
 
     // debugging
-    // printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
+    printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
 
     if (func3 == 0) {  // beq
-        // printf("beq ");
+        printf("beq ");
         if (gpregisters[rs1] == gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 1) {  // bne
-        // printf("bne ");
+        printf("bne ");
         if (gpregisters[rs1] != gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 4) {  // blt
-        // printf("blt ");
+        printf("blt ");
         if (gpregisters[rs1] < gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 6) {  // bltu
-        // printf("bltu ");
+        printf("bltu ");
         if ((uint32_t)gpregisters[rs1] < (uint32_t)gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 5) {  // bge
-        // printf("bge ");
+        printf("bge ");
         if (gpregisters[rs1] > gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 7) {  // bgeu
-        // printf("bgeu ");
+        printf("bgeu ");
         if ((uint32_t)gpregisters[rs1] > (uint32_t)gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
@@ -353,7 +355,7 @@ void u(INSTRUCTION instruction) {
         imm = imm | 4294965248;
     }
 
-    // printf("rd: %d, imm: %d", rd, imm);
+    printf("rd: %d, imm: %d", rd, imm);
 
     gpregisters[rd] = imm;
 }
@@ -379,8 +381,8 @@ void uj(INSTRUCTION instruction) {
         imm = imm | 4294965248;
     }
 
-    // printf("jal ");
-    // printf("rd: %d, imm: %d", rd, imm);
+    printf("jal ");
+    printf("rd: %d, imm: %d", rd, imm);
 
     gpregisters[rd] = pc*4 + 4;
     pc = (pc*4 + (imm * 2))/4-1;
@@ -392,10 +394,10 @@ void jalr(INSTRUCTION instruction) {
     unsigned int rs1 = mask(instruction, 15, 19);
     int imm = mask(instruction, 20, 31);
 
-    // printf("jalr, rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
+    printf("jalr, rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 
     if (func3) {
-        // printf("jalr error\n!\n!\n!\n!");
+        printf("jalr error\n!\n!\n!\n!");
     }
 
     gpregisters[rd] = pc*4 + 4;
