@@ -40,9 +40,9 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    printf("PC = %08x\n", pc*4);
+    printf("PC = %08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  %08x\n", i, gpregisters[i]);
+        printf("R[%d] =  %08d\n", i, gpregisters[i]);
     }
 }
 
@@ -221,7 +221,8 @@ void s(INSTRUCTION instruction) {
     printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ", func3, rs1, rs2, imm, addy);
 
     if (addy == halt) {
-        printf("CPU halt requested\n");
+        printf("\nCPU halt requested\n");
+        register_dump();
         exit(2);
     }
 
