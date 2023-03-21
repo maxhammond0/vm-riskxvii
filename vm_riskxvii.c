@@ -111,6 +111,8 @@ void r(INSTRUCTION instruction) {
     unsigned int rs2 = mask(instruction, 20, 24);
     unsigned int func7 = mask(instruction, 25, 31);
 
+    // debugging
+    printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
 
     if (func3 == 0 && func7 == 0) {  // add
         // printf("add ");
@@ -146,7 +148,6 @@ void r(INSTRUCTION instruction) {
             1 :
             0;
     }
-    // printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
     gpregisters[0] = 0;
 }
 
@@ -162,6 +163,9 @@ void i(INSTRUCTION instruction) {
     if ((imm >> 11) & 1) {
         imm = imm | 4294965248;  //
     }
+
+    // debugging
+    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
 
     if (func3 == 0) {  // addi
         printf("addi ");
@@ -182,7 +186,6 @@ void i(INSTRUCTION instruction) {
         printf("sltiu ");
         gpregisters[rd] = ((uint32_t)gpregisters[rs1] < unsigned_imm) ? 1 : 0;
     }
-    printf("rd: %d, rs1: %d, imm: %d", rd, rs1, imm);
     gpregisters[0] = 0;
 }
 
@@ -208,13 +211,14 @@ void s(INSTRUCTION instruction) {
 
     int32_t imm = (imm6to12 << 5) | imm1to5;
 
+
     // sign the immediate
     if ((imm >> 11) & 1) {
         imm = imm | 4294965248;
     }
 
     uint32_t addy = (gpregisters[rs1] + imm);
-    printf("addy: %d ", addy);
+    printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ", func3, rs1, rs2, imm, addy);
 
     if (addy == halt) {
         printf("CPU halt requested");
@@ -229,7 +233,6 @@ void s(INSTRUCTION instruction) {
         printf("sw ");
     }
 
-    printf("func3: %d, rs1: %d, rs2: %d, imm: %d ", func3, rs1, rs2, imm);
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
@@ -259,6 +262,9 @@ void memory_load(INSTRUCTION instruction) {
 
     unsigned int addy = (gpregisters[rs1] + imm);
 
+    // debugging
+    printf("addy: %d, rd: %d, rs1: %d, imm: %d ", addy, rd, rs1, imm);
+
     if (func3 == 0) {  // lb
         // TODO sign and extend 8 bit of addy
         printf("lb ");
@@ -274,7 +280,6 @@ void memory_load(INSTRUCTION instruction) {
         // TODO error message
     }
 
-    printf("addy: %d, rd: %d, rs1: %d, imm: %d", addy, rd, rs1, imm);
 }
 
 void sb(INSTRUCTION instruction) {
@@ -296,6 +301,9 @@ void sb(INSTRUCTION instruction) {
     if ((imm >> 11) & 1) {
         imm = imm | 4294965248;
     }
+
+    // debugging
+    printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
 
     if (func3 == 0) {  // beq
         printf("beq ");
@@ -331,7 +339,6 @@ void sb(INSTRUCTION instruction) {
         // TODO error message
     }
     gpregisters[0] = 0;
-    printf("rs1: %d, rs2: %d, imm: %d", rs1, rs2, imm);
 }
 
 void u(INSTRUCTION instruction) {
