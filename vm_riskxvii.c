@@ -113,40 +113,40 @@ void r(INSTRUCTION instruction) {
 
 
     if (func3 == 0 && func7 == 0) {  // add
-        printf("add ");
+        // printf("add ");
         gpregisters[rd] = gpregisters[rs1] + gpregisters[rs2];
     } else if (func3 == 0 && func7 == 32) {  // sub
-        printf("sub ");
+        // printf("sub ");
         gpregisters[rd] = gpregisters[rs1] - gpregisters[rs2];
     } else if (func3 == 4 && func7 == 0) {  // xor
-        printf("xor ");
+        // printf("xor ");
         gpregisters[rd] = gpregisters[rs1] ^ gpregisters[rs2];
     } else if (func3 == 6 && func7 == 0) {  // or
-        printf("or ");
+        // printf("or ");
         gpregisters[rd] = gpregisters[rs1] | gpregisters[rs2];
     } else if (func3 == 7 && func7 == 0) {  // and
-        printf("and ");
+        // printf("and ");
         gpregisters[rd] = gpregisters[rs1] & gpregisters[rs2];
     } else if (func3 == 1 && func7 == 0) {  // sll
-        printf("sll ");
+        // printf("sll ");
         gpregisters[rd] = gpregisters[rs1] << gpregisters[rs2];
     } else if (func3 == 5 && func7 == 0) {  // srl
-        printf("srl ");
+        // printf("srl ");
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
     } else if (func3 == 5 && func7 == 32) {  // sra
-        printf("sra ");
+        // printf("sra ");
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
     } else if (func3 == 2 && func7 == 0) {  // slt
-        printf("slt ");
+        // printf("slt ");
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
     } else if (func3 == 3 && func7 == 0) {  // sltu
-        printf("sltu ");
+        // printf("sltu ");
         gpregisters[rd] = ((uint32_t)gpregisters[rs1] <
             (uint32_t)gpregisters[rs2]) ?
             1 :
             0;
     }
-    printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
+    // printf("rd: %d, rs1: %d, rs2: %d", rd, rs1, rs2);
     gpregisters[0] = 0;
 }
 
@@ -217,7 +217,6 @@ void s(INSTRUCTION instruction) {
 
     if (addy == halt) {
         printf("CPU halt requested\n");
-        register_dump();
         exit(2);
     }
 
