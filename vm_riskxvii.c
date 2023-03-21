@@ -241,6 +241,23 @@ void s(INSTRUCTION instruction) {
 
     uint32_t addy = (gpregisters[rs1] + imm);
 
+
+    if (addy == halt) {
+        printf("\nCPU halt requested\n");
+        register_dump();
+        exit(2);
+    }
+
+    if (func3 == 0) {  // sb
+        printf("sb, ");
+    } else if (func3 == 1) {  // sh
+        printf("sh, ");
+    } else if (func3 == 2) {  // sw
+        printf("sw, ");
+    } else {
+        printf("Instruction not found, ");
+    }
+
     // debugging
     printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
            func3,
@@ -250,21 +267,6 @@ void s(INSTRUCTION instruction) {
            gpregisters[rs2],
            imm,
            addy);
-
-    if (addy == halt) {
-        printf("\nCPU halt requested\n");
-        register_dump();
-        exit(2);
-    }
-
-    if (func3 == 0) {  // sb
-        printf("sb ");
-    } else if (func3 == 1) {  // sh
-        printf("sh ");
-    } else if (func3 == 2) {  // sw
-        printf("sw ");
-    }
-
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
@@ -533,7 +535,7 @@ int main( int argc, char *argv[]) {
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
-        printf("pc: %08x, ", pc*4);
+        printf("pc: %08d, ", pc*4);
         process_instruction(instructions[pc]);
         printf("\n");
     }
