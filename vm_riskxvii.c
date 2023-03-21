@@ -157,10 +157,11 @@ void i(INSTRUCTION instruction) {
     uint32_t imm = mask(instruction, 20, 31);
 
     uint32_t unsigned_imm = imm;
+
     // Sign the immediate
-    // if ((imm >> 11) & 1) {
-    //     imm = imm | 4294965248;  //
-    // }
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;  //
+    }
 
     if (func3 == 0) {  // addi
         printf("addi ");
@@ -208,9 +209,9 @@ void s(INSTRUCTION instruction) {
     int32_t imm = (imm6to12 << 5) | imm1to5;
 
     // sign the immediate
-    // if ((imm >> 11) & 1) {
-    //     imm = imm | 4294965248;
-    // }
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;
+    }
 
     uint32_t addy = (gpregisters[rs1] + imm);
     printf("addy: %d ", addy);
@@ -252,9 +253,9 @@ void memory_load(INSTRUCTION instruction) {
     uint32_t imm = mask(instruction, 20, 31);
 
     // sign the immediate
-    // if ((imm >> 11) & 1) {
-    //     imm = imm | 4294965248;
-    // }
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;
+    }
 
     unsigned int addy = (gpregisters[rs1] + imm);
 
@@ -366,9 +367,9 @@ void uj(INSTRUCTION instruction) {
         imm10to1;
 
     // TODO sign the imm
-    // if ((imm >> 19) & 1) {
-    //     imm = imm | 4294965248;
-    // }
+    if ((imm >> 19) & 1) {
+        imm = imm | 4294965248;
+    }
 
     printf("jal ");
     printf("rd: %d, imm: %d", rd, imm);
