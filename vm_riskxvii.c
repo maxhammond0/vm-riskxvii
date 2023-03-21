@@ -233,7 +233,6 @@ void s(INSTRUCTION instruction) {
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
-        printf("write character\n");
         printf("\n%c", b);
     } else if (addy == write_i) {
         int32_t b = gpregisters[rs2];
