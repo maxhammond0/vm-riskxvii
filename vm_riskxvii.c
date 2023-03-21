@@ -397,6 +397,9 @@ void jalr(INSTRUCTION instruction) {
 
 void process_instruction(INSTRUCTION instruction) {
     unsigned int opcode = mask(instruction, 0, 6);
+    printf(" ");
+    print_binary(instruction);
+    printf(" ");
 
     switch (opcode) {
         case R:
