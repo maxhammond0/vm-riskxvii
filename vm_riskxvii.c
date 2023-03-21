@@ -217,7 +217,7 @@ void s(INSTRUCTION instruction) {
     printf("addy: %d ", addy);
 
     if (addy == halt) {
-        printf("CPU halt requested\n");
+        printf("CPU halt requested");
         exit(2);
     }
 
@@ -233,13 +233,14 @@ void s(INSTRUCTION instruction) {
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
-        printf("\n%c\n", b);
+        printf("write character\n");
+        printf("\n%c", b);
     } else if (addy == write_i) {
         int32_t b = gpregisters[rs2];
-        printf("\n%d\n", b);
+        printf("\n%d", b);
     } else if (addy == write_ui) {
         uint32_t b = gpregisters[rs2];
-        printf("\n%d\n", b);
+        printf("\n%d", b);
     }
 
     gpregisters[0] = 0;
