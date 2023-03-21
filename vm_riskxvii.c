@@ -221,7 +221,7 @@ void s(INSTRUCTION instruction) {
     printf("func3: %d, rs1: %d, rs2: %d, imm: %d, addy: %d ", func3, rs1, rs2, imm, addy);
 
     if (addy == halt) {
-        printf("CPU halt requested");
+        printf("CPU halt requested\n");
         exit(2);
     }
 
