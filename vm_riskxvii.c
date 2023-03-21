@@ -40,9 +40,9 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    printf("PC = %d\n", pc*4);
+    printf("PC = %08x\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  %d\n", i, gpregisters[i]);
+        printf("R[%d] =  %08x\n", i, gpregisters[i]);
     }
 }
 
@@ -451,7 +451,7 @@ int main( int argc, char *argv[]) {
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
-        printf("pc: %03d, ", pc*4);
+        printf("pc: %08x, ", pc*4);
         process_instruction(instructions[pc]);
         printf("\n");
     }
