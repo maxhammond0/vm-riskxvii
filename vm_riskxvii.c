@@ -249,13 +249,13 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
 
     if (func3 == 0) {  // sb
         printf("sb, ");
-        data_mem[addy] = gpregisters[rs2] & 0xFF;
+        // data_mem[addy] = gpregisters[rs2] & 0xFF;
     } else if (func3 == 1) {  // sh
         printf("sh, ");
-        data_mem[addy] = gpregisters[rs2] & 0xFFFF;
+        // data_mem[addy] = gpregisters[rs2] & 0xFFFF;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
-        data_mem[addy] = gpregisters[rs2];
+        // data_mem[addy] = gpregisters[rs2];
     } else {
         printf("Instruction not found, ");
     }
@@ -562,7 +562,9 @@ int main( int argc, char *argv[]) {
         printf("\n");
     }
 
-    // register_dump();
+    for (int i = 0; i < DATA_MEM_SIZE; i++) {
+        printf("%08d", data_mem[i]);
+    }
 
     return 0;
 }
