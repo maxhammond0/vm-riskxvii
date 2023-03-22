@@ -241,7 +241,7 @@ void s(INSTRUCTION instruction) {
 
 
     if (addy == halt) {
-        printf("%08x\n", instruction);
+        printf("\n%08x\n", instruction);
         printf("\nCPU halt requested\n");
         register_dump();
         exit(2);
@@ -511,8 +511,7 @@ void process_instruction(INSTRUCTION instruction) {
             s(instruction);
             break;
         case 3:
-            memory_load(instruction);rd opcode
-UJ im
+            memory_load(instruction);
             break;
         case SB:
             sb(instruction);
@@ -548,9 +547,9 @@ int main( int argc, char *argv[]) {
     // INSTRUCTION data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions);
-    // for (int i = 0; i < INST_MEM_SIZE; i++) {
-    //     printf("%x\n", instructions[i]);
-    // }
+    for (int i = 0; i < INST_MEM_SIZE; i++) {
+        printf("%04d: %08x\n", i*4, instructions[i]);
+    }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
