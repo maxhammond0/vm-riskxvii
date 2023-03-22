@@ -46,17 +46,10 @@ void register_dump() {
     }
 }
 
-void print_data_mem(INSTRUCTION* data_mem) {
-    printf("size of data_mem: %ld\n", sizeof(data_mem));
-    for (int i = 0; i < 32; i++) {
-        printf("%08d\n", data_mem[i]);
-    }
-}
-
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
-    uint8_t buf[4] = {0};
+    uint8_t buffer[4] = {0};
 
     // If file can't be read
     if ((fd = open(filepath, O_RDONLY)) < 0) {
@@ -68,12 +61,12 @@ void get_instructions(char *filepath, INSTRUCTION *instructions) {
     int i = 0;
     // Read first 256 instructions
     while (i < 256) {
-        read(fd, &buf, 4);  // store 4 bytes in buf
+        read(fd, &buffer, 4);  // store 4 bytes in buf
         INSTRUCTION op = 0u;
-        op |= buf[3] << 24;  // 0xAA000000
-        op |= buf[2] << 16;  // 0xaaBB0000
-        op |= buf[1] << 8;   // 0xaabbCC00
-        op |= buf[0];        // 0xaabbccDD
+        op |= buffer[3] << 24;  // 0xAA000000
+        op |= buffer[2] << 16;  // 0xaaBB0000
+        op |= buffer[1] << 8;   // 0xaabbCC00
+        op |= buffer[0];        // 0xaabbccDD
         instructions[i] = op;
         i++;
     }
