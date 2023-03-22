@@ -317,7 +317,8 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
     int read_i = 2070;
 
     // debugging
-    printf("addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
+    printf("func3: %d, addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
+           func3,
            addy,
            rd,
            gpregisters[rd],
