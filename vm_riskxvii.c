@@ -271,7 +271,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     }
 
     addy = addy - 1024;
-    if (1) {
+    if (addy < 0 || addy > INST_MEM_SIZE) {
         printf("\n%d\n", addy);
         printf("address out of bounds\n!\n!\n!\n!\n!");
         printf("exiting");
@@ -280,15 +280,24 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
     if (func3 == 0) {  // sb
         printf("sb, ");
-        uint16_t low8bits = gpregisters[rs2] & 0xFF;
+        uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
         data_mem[addy] = low8bits;
     } else if (func3 == 1) {  // sh
         printf("sh, ");
-        uint16_t low16bits = gpregisters[rs2] & 0xFFFF;
+        uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
+        uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
+        data_mem[addy+1] = low8bits;
         data_mem[addy] = low16bits;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
-        data_mem[addy] = gpregisters[rs2];
+        uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
+        uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
+        uint8_t low24bits = mask(gpregisters[rs2], 16, 23);
+        uint8_t low32bits = mask(gpregisters[rs2], 24, 31);
+        data_mem[addy+3] = low32bits;
+        data_mem[addy+2] = low24bits;
+        data_mem[addy+1] = low16bits;
+        data_mem[addy] = low8bits;
     } else {
         printf("Instruction not found, ");
     }
