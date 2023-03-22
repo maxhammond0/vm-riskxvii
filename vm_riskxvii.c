@@ -56,12 +56,9 @@ void print_data_mem(INSTRUCTION* data_mem) {
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
-    // int retval;
     uint8_t buf[4] = {0};
-    // uint8_t byte[4] = {0};
 
-
-    // File can't be read
+    // If file can't be read
     if ((fd = open(filepath, O_RDONLY)) < 0) {
         printf("Could not open file\n");
         printf("Exiting...\n");
@@ -71,7 +68,7 @@ void get_instructions(char *filepath, INSTRUCTION *instructions) {
     int i = 0;
     // Read first 256 instructions
     while (i < 256) {
-        read(fd, &buf, 4);
+        read(fd, &buf, 4);  // store 4 bytes in buf
         INSTRUCTION op = 0u;
         op |= buf[3] << 24;  // 0xAA000000
         op |= buf[2] << 16;  // 0xaaBB0000
@@ -79,28 +76,7 @@ void get_instructions(char *filepath, INSTRUCTION *instructions) {
         op |= buf[0];        // 0xaabbccDD
         instructions[i] = op;
         i++;
-
-        // for (int i = 0; i < 4; i++) {
-        //     printf("%d ", buf[i]);
-        // }
-        // printf("\n");
-        // // Read 4 bytes at a time
-        // if (retval == 4) {
-        //     for (int each = 0; each < 4; each++) {
-        //         // Read in little endian byte at a time
-        //         byte[each] = buf[each];
-        //     }
-        //     // for(int i = 0; i < 4; i++) {
-        //     //     printf("%d ", byte[i]);
-        //     // }
-        //     // printf("\n");
-        //
-        //     // Bit operations, get the little endianness of the
-        //     // 32bit instruction into a 32bit unsigned integer variable
-        //     INSTRUCTION op = 0u;
-        // }
     }
-    gpregisters[0] = 0;
 }
 
 void get_data(char *filepath, INSTRUCTION *data_mem) {
