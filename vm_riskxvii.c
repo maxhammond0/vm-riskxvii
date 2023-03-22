@@ -301,7 +301,7 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
            rs2,
            gpregisters[rs2],
            imm,
-           (addy/4)-0x400);
+           addy);
 
     gpregisters[0] = 0;
 }
@@ -338,6 +338,7 @@ void memory_load(INSTRUCTION instruction,
 
         addy = (addy-0x400)/4;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
+            printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!");
             printf("exiting");
             exit(3);
