@@ -209,7 +209,7 @@ void i(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void s(INSTRUCTION instruction) {
+void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
 
     printf("Type: S, ");
 
@@ -241,7 +241,7 @@ void s(INSTRUCTION instruction) {
 
 
     if (addy == halt) {
-        printf("\n%08x\n", instruction);
+        // printf("\n%08x\n", instruction);
         printf("\nCPU halt requested\n");
         register_dump();
         exit(2);
@@ -249,10 +249,13 @@ void s(INSTRUCTION instruction) {
 
     if (func3 == 0) {  // sb
         printf("sb, ");
+        data_mem[addy] = gpregisters[rs2] & 0xFF;
     } else if (func3 == 1) {  // sh
         printf("sh, ");
+        data_mem[addy] = gpregisters[rs2] & 0xFFFF;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
+        data_mem[addy] = gpregisters[rs2];
     } else {
         printf("Instruction not found, ");
     }
@@ -283,7 +286,7 @@ void s(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void memory_load(INSTRUCTION instruction) {
+void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
 
     printf("Type: I, ");
 
@@ -314,16 +317,20 @@ void memory_load(INSTRUCTION instruction) {
 
         // NOT GETTING USER INPUT
         if (func3 == 0) {  // lb
-            // TODO sign and extend 8 bit of addy
             printf("lb, ");
+            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 1) {  // lh
             printf("lh, ");
+            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 2) {  // lw
             printf("lw, ");
+            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 4) {  // lbu
             printf("lbu, ");
+            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 5) {  // lhu
             printf("lhu, ");
+            gpregisters[rd] = data_mem[addy];
         } else {
             // TODO error message
         }
@@ -494,11 +501,8 @@ void jalr(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void process_instruction(INSTRUCTION instruction) {
+void process_instruction(INSTRUCTION instruction, INSTRUCTION data_mem) {
     unsigned int opcode = mask(instruction, 0, 6);
-    // printf(" ");
-    // print_binary(instruction);
-    // printf(" ");
 
     switch (opcode) {
         case R:
@@ -508,10 +512,10 @@ void process_instruction(INSTRUCTION instruction) {
             i(instruction);
             break;
         case S:
-            s(instruction);
+            s(instruction, &data_mem);
             break;
         case 3:
-            memory_load(instruction);
+            memory_load(instruction, &data_mem);
             break;
         case SB:
             sb(instruction);
@@ -544,7 +548,7 @@ int main( int argc, char *argv[]) {
     }
 
     INSTRUCTION instructions[INST_MEM_SIZE] = { 0 };
-    // INSTRUCTION data_mem[DATA_MEM_SIZE] = { 0 };
+    INSTRUCTION data_mem[DATA_MEM_SIZE];
 
     get_instructions(argv[1], instructions);
     // for (int i = 0; i < INST_MEM_SIZE; i++) {
@@ -554,7 +558,7 @@ int main( int argc, char *argv[]) {
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
         printf("pc: %08d, ", pc*4);
-        process_instruction(instructions[pc]);
+        process_instruction(instructions[pc], *data_mem);
         printf("\n");
     }
 
