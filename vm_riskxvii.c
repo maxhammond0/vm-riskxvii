@@ -333,6 +333,14 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         gpregisters[rd] = input;
     } else {
         // NOT GETTING USER INPUT
+
+        // Checking address of stored loation
+        addy = addy - 0x400;
+        if (addy < 0 || addy > 0x7ff-0x400) {
+            printf("accessing memory out of bounds!\n!\n!\n");
+            printf("shutting down\n");
+            exit(3);
+        }
         if (func3 == 0) {  // lb
             printf("lb, ");
             gpregisters[rd] = data_mem[addy];
