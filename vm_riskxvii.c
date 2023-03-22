@@ -275,7 +275,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         printf("\n%d\n", addy);
         printf("address out of bounds\n!\n!\n!\n!\n!");
         printf("exiting");
-        exit(3);
+        return;
     }
 
     if (func3 == 0) {  // sb
