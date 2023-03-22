@@ -263,8 +263,19 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         return;
     }
 
-    addy = addy + 0x400;
-    if (addy < 0x400 || addy > 0x7ff) {
+    addy = addy - 0x400;
+
+    // debugging
+    printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
+           func3,
+           rs1,
+           gpregisters[rs1],
+           rs2,
+           gpregisters[rs2],
+           imm,
+           addy);
+
+    if (addy < 0 || addy > 0x7ff-0x400) {
         printf("accessing memory out of bounds!\n!\n!\n");
         printf("shutting down\n");
         exit(3);
@@ -281,17 +292,6 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
     } else {
         printf("Instruction not found, ");
     }
-
-    // debugging
-    printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
-           func3,
-           rs1,
-           gpregisters[rs1],
-           rs2,
-           gpregisters[rs2],
-           imm,
-           addy);
-
 
     gpregisters[0] = 0;
 }
