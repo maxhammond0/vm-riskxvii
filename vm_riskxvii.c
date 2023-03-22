@@ -310,7 +310,7 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         imm = imm | 4294965248;
     }
 
-    unsigned int addy = (gpregisters[rs1] + imm);
+    int addy = (gpregisters[rs1] + imm);
 
     // Load virtual routines
     int read_c = 2066;
