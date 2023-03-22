@@ -309,21 +309,23 @@ void memory_load(INSTRUCTION instruction) {
         scanf("%d", &input);
         printf("input: %d, ", input);
         gpregisters[rd] = input;
-    }
-
-    if (func3 == 0) {  // lb
-        // TODO sign and extend 8 bit of addy
-        printf("lb, ");
-    } else if (func3 == 1) {  // lh
-        printf("lh, ");
-    } else if (func3 == 2) {  // lw
-        printf("lw, ");
-    } else if (func3 == 4) {  // lbu
-        printf("lbu, ");
-    } else if (func3 == 5) {  // lhu
-        printf("lhu, ");
     } else {
-        // TODO error message
+
+        // NOT GETTING USER INPUT
+        if (func3 == 0) {  // lb
+            // TODO sign and extend 8 bit of addy
+            printf("lb, ");
+        } else if (func3 == 1) {  // lh
+            printf("lh, ");
+        } else if (func3 == 2) {  // lw
+            printf("lw, ");
+        } else if (func3 == 4) {  // lbu
+            printf("lbu, ");
+        } else if (func3 == 5) {  // lhu
+            printf("lhu, ");
+        } else {
+            // TODO error message
+        }
     }
 
     // debugging
