@@ -346,6 +346,7 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         if (addy < 0 || addy > (0x7ff-0x400)/4) {
             printf("accessing memory out of bounds!\n!\n!\n");
             printf("shutting down\n");
+            printf("size of data_mem: %ld", sizeof(&data_mem)/sizeof(data_mem[0]));
             print_data_mem(data_mem);
             exit(3);
         }
