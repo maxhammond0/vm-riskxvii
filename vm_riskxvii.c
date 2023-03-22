@@ -288,7 +288,7 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
            rs2,
            gpregisters[rs2],
            imm,
-           addy/4);
+           (addy/4)-0x400);
 
     gpregisters[0] = 0;
 }
