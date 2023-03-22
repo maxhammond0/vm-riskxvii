@@ -270,6 +270,13 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
         return;
     }
 
+    addy = (addy/4)-0x400;
+    if (addy < 0 || addy > DATA_MEM_SIZE) {
+        printf("address out of bounds\n!\n!\n!\n!\n!");
+        printf("exiting");
+        exit(3);
+    }
+
     if (func3 == 0) {  // sb
         printf("sb, ");
     } else if (func3 == 1) {  // sh
@@ -323,6 +330,13 @@ void memory_load(INSTRUCTION instruction,
     } else {
         // NOT GETTING USER INPUT
 
+        addy = (addy/4)-0x400;
+        if (addy < 0 || addy > DATA_MEM_SIZE) {
+            printf("address out of bounds\n!\n!\n!\n!\n!");
+            printf("exiting");
+            exit(3);
+        }
+
         if (func3 == 0) {  // lb
             printf("lb, ");
         } else if (func3 == 1) {  // lh
@@ -341,7 +355,7 @@ void memory_load(INSTRUCTION instruction,
     // debugging
     printf("func3: %d, addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
            func3,
-           addy/4,
+           addy,
            rd,
            gpregisters[rd],
            rs1,
@@ -555,6 +569,7 @@ int main( int argc, char *argv[]) {
     INSTRUCTION data_mem[DATA_MEM_SIZE];
 
     get_instructions(argv[1], instructions);
+    //
     // for (int i = 0; i < INST_MEM_SIZE; i++) {
     //     printf("%04d: %08x\n", i*4, instructions[i]);
     // }
