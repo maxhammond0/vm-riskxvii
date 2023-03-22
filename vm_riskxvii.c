@@ -307,11 +307,11 @@ void memory_load(INSTRUCTION instruction) {
     if (addy == read_c) {
         // TODO read character
         in = scanf("%d", &in);
-        printf("%c", in);
+        printf("input: %c, ", in);
     } else if (addy == read_i) {
         // TODO read integer
         in = scanf("%d", &in);
-        printf("%d", (int)in);
+        printf("input: %d, ", (int)in);
     }
 
     if (func3 == 0) {  // lb
