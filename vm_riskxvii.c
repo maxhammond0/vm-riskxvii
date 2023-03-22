@@ -263,6 +263,12 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         return;
     }
 
+    addy = addy + 0x400;
+    if (addy < 0x400 || addy > 0x7ff) {
+        printf("accessing memory out of bounds!\n!\n!\n");
+        printf("shutting down\n");
+        exit(3);
+    }
     if (func3 == 0) {  // sb
         printf("sb, ");
         data_mem[addy] = gpregisters[rs2] & 0xFF;
