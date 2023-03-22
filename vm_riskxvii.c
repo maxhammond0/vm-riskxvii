@@ -46,12 +46,12 @@ void register_dump() {
     }
 }
 
-// void print_data_mem(INSTRUCTION* data_mem) {
-//     printf("size of data_mem: %ld\n", sizeof(data_mem));
-//     for (int i = 0; i < 32; i++) {
-//         printf("%08d\n", data_mem[i]);
-//     }
-// }
+void print_data_mem(INSTRUCTION* data_mem) {
+    printf("size of data_mem: %ld\n", sizeof(data_mem));
+    for (int i = 0; i < 32; i++) {
+        printf("%08d\n", data_mem[i]);
+    }
+}
 
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
@@ -216,7 +216,7 @@ void i(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void s(INSTRUCTION instruction) {
+void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
 
     printf("Type: S, ");
 
@@ -288,12 +288,13 @@ void s(INSTRUCTION instruction) {
            rs2,
            gpregisters[rs2],
            imm,
-           addy);
+           addy/4);
 
     gpregisters[0] = 0;
 }
 
-void memory_load(INSTRUCTION instruction) {
+void memory_load(INSTRUCTION instruction,
+                 INSTRUCTION data_mem[DATA_MEM_SIZE]) {
 
     printf("Type: I, ");
 
@@ -340,7 +341,7 @@ void memory_load(INSTRUCTION instruction) {
     // debugging
     printf("func3: %d, addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
            func3,
-           addy,
+           addy/4,
            rd,
            gpregisters[rd],
            rs1,
@@ -503,7 +504,8 @@ void jalr(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void process_instruction(INSTRUCTION instruction) {
+void process_instruction(INSTRUCTION instruction,
+                         INSTRUCTION data_mem[DATA_MEM_SIZE]) {
     unsigned int opcode = mask(instruction, 0, 6);
 
     switch (opcode) {
@@ -514,10 +516,10 @@ void process_instruction(INSTRUCTION instruction) {
             i(instruction);
             break;
         case S:
-            s(instruction);
+            s(instruction, data_mem);
             break;
         case 3:
-            memory_load(instruction);
+            memory_load(instruction, data_mem);
             break;
         case SB:
             sb(instruction);
@@ -550,7 +552,7 @@ int main( int argc, char *argv[]) {
     }
 
     INSTRUCTION instructions[INST_MEM_SIZE] = { 0 };
-    // INSTRUCTION *data_mem[DATA_MEM_SIZE] = { 0 };
+    INSTRUCTION data_mem[DATA_MEM_SIZE];
 
     get_instructions(argv[1], instructions);
     // for (int i = 0; i < INST_MEM_SIZE; i++) {
@@ -560,7 +562,7 @@ int main( int argc, char *argv[]) {
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
         printf("pc: %08d, ", pc*4);
-        process_instruction(instructions[pc]);
+        process_instruction(instructions[pc], data_mem);
         printf("\n");
     }
 
