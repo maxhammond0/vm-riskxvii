@@ -220,16 +220,14 @@ void s(INSTRUCTION instruction) {
     uint32_t imm1to5 = mask(instruction, 7, 11);
     int imm6to12 = mask(instruction, 25, 31);
 
-    // Virtual routines
+    // Store virtual routines
     int write_c = 2048;
     int write_i = 2052;
     int write_ui = 2056;
     int halt = 2060;
-    // int read_c = 2066;
-    // int read_i = 2070;
+    // int heap_banks = 2088;
     // int dump_pc = 2080;
     // int dump_gpr = 2084;
-    // int heap_banks = 2088;
 
     int32_t imm = (imm6to12 << 5) | imm1to5;
 
@@ -300,17 +298,31 @@ void memory_load(INSTRUCTION instruction) {
 
     unsigned int addy = (gpregisters[rs1] + imm);
 
+    // Load virtual routines
+    int read_c = 2066;
+    int read_i = 2070;
+
+    uint32_t in = 0;
+
+    if (addy == read_c) {
+        // TODO read character
+        in = scanf("%d", &in);
+    } else if (addy == read_i) {
+        // TODO read integer
+        in = scanf("%d", &in);
+    }
+
     if (func3 == 0) {  // lb
         // TODO sign and extend 8 bit of addy
-        printf("lb ");
+        printf("lb, ");
     } else if (func3 == 1) {  // lh
-        printf("lh ");
+        printf("lh, ");
     } else if (func3 == 2) {  // lw
-        printf("lw ");
+        printf("lw, ");
     } else if (func3 == 4) {  // lbu
-        printf("lbu ");
+        printf("lbu, ");
     } else if (func3 == 5) {  // lhu
-        printf("lhu");
+        printf("lhu, ");
     } else {
         // TODO error message
     }
@@ -324,6 +336,7 @@ void memory_load(INSTRUCTION instruction) {
            gpregisters[rs1],
            imm);
 
+    gpregisters[0] = 0;
 }
 
 void sb(INSTRUCTION instruction) {
@@ -415,6 +428,7 @@ void u(INSTRUCTION instruction) {
            imm);
 
     gpregisters[rd] = imm;
+    gpregisters[0] = 0;
 }
 
 void uj(INSTRUCTION instruction) {
@@ -443,7 +457,7 @@ void uj(INSTRUCTION instruction) {
 
     gpregisters[rd] = pc*4 + 4;
 
-    pc = (pc*4 + (imm<<1))/4-1;
+    pc = ((pc*4 + (imm<<1))/4)-1;
 
     // debugging
     printf("jal, ");
@@ -451,6 +465,8 @@ void uj(INSTRUCTION instruction) {
            rd,
            gpregisters[rd],
            imm);
+
+    gpregisters[0] = 0;
 }
 
 void jalr(INSTRUCTION instruction) {
