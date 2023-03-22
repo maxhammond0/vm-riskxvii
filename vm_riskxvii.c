@@ -302,7 +302,7 @@ void memory_load(INSTRUCTION instruction) {
     int read_c = 2066;
     int read_i = 2070;
 
-    uint32_t in = 0;
+    int32_t in = 0;
 
     if (addy == read_c) {
         // TODO read character
