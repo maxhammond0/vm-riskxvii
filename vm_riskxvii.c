@@ -46,6 +46,12 @@ void register_dump() {
     }
 }
 
+void print_data_mem(INSTRUCTION* data_mem) {
+    for (int i = 0; i < DATA_MEM_SIZE; i++) {
+        printf("%08d", data_mem[i]);
+    }
+}
+
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
@@ -340,6 +346,7 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         if (addy < 0 || addy > (0x7ff-0x400)/4) {
             printf("accessing memory out of bounds!\n!\n!\n");
             printf("shutting down\n");
+            print_data_mem(data_mem);
             exit(3);
         }
         if (func3 == 0) {  // lb
