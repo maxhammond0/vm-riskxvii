@@ -263,7 +263,7 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         return;
     }
 
-    addy = addy - 0x400;
+    addy = (addy - 0x400)/4;
 
     // debugging
     printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
@@ -275,7 +275,7 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
            imm,
            addy);
 
-    if (addy < 0 || addy > 0x7ff-0x400) {
+    if (addy < 0 || addy > (0x7ff-0x400)/4) {
         printf("accessing memory out of bounds!\n!\n!\n");
         printf("shutting down\n");
         exit(3);
@@ -335,8 +335,8 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         // NOT GETTING USER INPUT
 
         // Checking address of stored loation
-        addy = addy - 0x400;
-        if (addy < 0 || addy > 0x7ff-0x400) {
+        addy = (addy - 0x400)/4;
+        if (addy < 0 || addy > (0x7ff-0x400)/4) {
             printf("accessing memory out of bounds!\n!\n!\n");
             printf("shutting down\n");
             exit(3);
