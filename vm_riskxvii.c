@@ -279,10 +279,15 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
 
     if (func3 == 0) {  // sb
         printf("sb, ");
+        uint16_t low8bits = gpregisters[rs2] & 0xFF;
+        data_mem[addy] = low8bits;
     } else if (func3 == 1) {  // sh
         printf("sh, ");
+        uint16_t low16bits = gpregisters[rs2] & 0xFFFF;
+        data_mem[addy] = low16bits;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
+        data_mem[addy] = gpregisters[rs2];
     } else {
         printf("Instruction not found, ");
     }
