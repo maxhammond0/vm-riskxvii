@@ -46,11 +46,12 @@ void register_dump() {
     }
 }
 
-void print_data_mem(INSTRUCTION* data_mem) {
-    for (int i = 0; i < DATA_MEM_SIZE; i++) {
-        printf("%08d", data_mem[i]);
-    }
-}
+// void print_data_mem(INSTRUCTION* data_mem) {
+//     printf("size of data_mem: %ld\n", sizeof(data_mem));
+//     for (int i = 0; i < 32; i++) {
+//         printf("%08d\n", data_mem[i]);
+//     }
+// }
 
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
@@ -215,7 +216,7 @@ void i(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
+void s(INSTRUCTION instruction) {
 
     printf("Type: S, ");
 
@@ -250,7 +251,7 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         // printf("\n%08x\n", instruction);
         printf("\nCPU halt requested\n");
         register_dump();
-        exit(2);
+        exit(0);
     }
 
     if (addy == write_c) {
@@ -288,13 +289,10 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
     }
     if (func3 == 0) {  // sb
         printf("sb, ");
-        data_mem[addy] = gpregisters[rs2] & 0xFF;
     } else if (func3 == 1) {  // sh
         printf("sh, ");
-        data_mem[addy] = gpregisters[rs2] & 0xFFFF;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
-        data_mem[addy] = gpregisters[rs2];
     } else {
         printf("Instruction not found, ");
     }
@@ -302,7 +300,7 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
     gpregisters[0] = 0;
 }
 
-void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
+void memory_load(INSTRUCTION instruction) {
 
     printf("Type: I, ");
 
@@ -346,25 +344,18 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         if (addy < 0 || addy > (0x7ff-0x400)/4) {
             printf("accessing memory out of bounds!\n!\n!\n");
             printf("shutting down\n");
-            printf("size of data_mem: %ld", sizeof(&data_mem)/sizeof(data_mem[0]));
-            print_data_mem(data_mem);
             exit(3);
         }
         if (func3 == 0) {  // lb
             printf("lb, ");
-            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 1) {  // lh
             printf("lh, ");
-            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 2) {  // lw
             printf("lw, ");
-            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 4) {  // lbu
             printf("lbu, ");
-            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 5) {  // lhu
             printf("lhu, ");
-            gpregisters[rd] = data_mem[addy];
         } else {
             // TODO error message
         }
@@ -527,7 +518,7 @@ void jalr(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void process_instruction(INSTRUCTION instruction, INSTRUCTION data_mem) {
+void process_instruction(INSTRUCTION instruction) {
     unsigned int opcode = mask(instruction, 0, 6);
 
     switch (opcode) {
@@ -538,10 +529,10 @@ void process_instruction(INSTRUCTION instruction, INSTRUCTION data_mem) {
             i(instruction);
             break;
         case S:
-            s(instruction, &data_mem);
+            s(instruction);
             break;
         case 3:
-            memory_load(instruction, &data_mem);
+            memory_load(instruction);
             break;
         case SB:
             sb(instruction);
@@ -574,7 +565,7 @@ int main( int argc, char *argv[]) {
     }
 
     INSTRUCTION instructions[INST_MEM_SIZE] = { 0 };
-    INSTRUCTION data_mem[DATA_MEM_SIZE];
+    // INSTRUCTION *data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions);
     // for (int i = 0; i < INST_MEM_SIZE; i++) {
@@ -584,12 +575,8 @@ int main( int argc, char *argv[]) {
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
         printf("pc: %08d, ", pc*4);
-        process_instruction(instructions[pc], *data_mem);
+        process_instruction(instructions[pc]);
         printf("\n");
-    }
-
-    for (int i = 0; i < DATA_MEM_SIZE; i++) {
-        printf("%08d", data_mem[i]);
     }
 
     return 0;
