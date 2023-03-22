@@ -22,7 +22,7 @@ typedef uint32_t INSTRUCTION;
 #define UJ 111
 
 #define INST_MEM_SIZE 256
-#define DATA_MEM_SIZE 256
+#define DATA_MEM_SIZE 1024
 
 // program counter
 int pc = 0;
@@ -216,7 +216,7 @@ void i(INSTRUCTION instruction) {
     gpregisters[0] = 0;
 }
 
-void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
+void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
     printf("Type: S, ");
 
@@ -270,7 +270,7 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
         return;
     }
 
-    addy = (addy-0x400)/4;
+    addy = (addy-0x400);
     if (addy < 0 || addy > DATA_MEM_SIZE) {
         printf("\n%d\n", addy);
         printf("address out of bounds\n!\n!\n!\n!\n!");
@@ -307,7 +307,7 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
 }
 
 void memory_load(INSTRUCTION instruction,
-                 INSTRUCTION data_mem[DATA_MEM_SIZE]) {
+                 uint8_t data_mem[DATA_MEM_SIZE]) {
 
     printf("Type: I, ");
 
@@ -336,7 +336,7 @@ void memory_load(INSTRUCTION instruction,
     } else {
         // NOT GETTING USER INPUT
 
-        addy = (addy-0x400)/4;
+        addy = (addy-0x400);
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!");
@@ -526,7 +526,7 @@ void jalr(INSTRUCTION instruction) {
 }
 
 void process_instruction(INSTRUCTION instruction,
-                         INSTRUCTION data_mem[DATA_MEM_SIZE]) {
+                         uint8_t data_mem[DATA_MEM_SIZE]) {
     unsigned int opcode = mask(instruction, 0, 6);
 
     switch (opcode) {
@@ -573,7 +573,7 @@ int main( int argc, char *argv[]) {
     }
 
     INSTRUCTION instructions[INST_MEM_SIZE] = { 0 };
-    INSTRUCTION data_mem[DATA_MEM_SIZE];
+    uint8_t data_mem[DATA_MEM_SIZE];
 
     get_instructions(argv[1], instructions);
     //
