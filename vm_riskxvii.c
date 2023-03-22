@@ -302,16 +302,12 @@ void memory_load(INSTRUCTION instruction) {
     int read_c = 2066;
     int read_i = 2070;
 
-    int32_t in = 0;
 
-    if (addy == read_c) {
+    if (addy == read_c || addy == read_i) {
         // TODO read character
-        in = scanf("%d", &in);
-        printf("input: %c, ", in);
-    } else if (addy == read_i) {
-        // TODO read integer
-        in = scanf("%d", &in);
-        printf("input: %d, ", (int)in);
+        uint32_t input;
+        scanf("%d", &input);
+        printf("%d ", input);
     }
 
     if (func3 == 0) {  // lb
