@@ -307,12 +307,8 @@ void memory_load(INSTRUCTION instruction) {
         // TODO read character
         uint32_t input;
         scanf("%d", &input);
-        if (addy == read_c) {
-            input = (char)input;
-        } else {
-            addy = (int)input;
-        }
         printf("input: %d, ", input);
+        gpregisters[rd] = input;
     }
 
     if (func3 == 0) {  // lb
