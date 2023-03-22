@@ -576,10 +576,11 @@ int main( int argc, char *argv[]) {
     uint8_t data_mem[DATA_MEM_SIZE];
 
     get_instructions(argv[1], instructions);
-    //
-    // for (int i = 0; i < INST_MEM_SIZE; i++) {
-    //     printf("%04d: %08x\n", i*4, instructions[i]);
-    // }
+
+    // print instructions for debugging
+    for (int i = 0; i < INST_MEM_SIZE; i++) {
+        printf("%04d: %08x\n", i*4, instructions[i]);
+    }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
