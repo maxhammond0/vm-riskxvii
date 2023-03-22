@@ -56,13 +56,9 @@ void print_data_mem(INSTRUCTION* data_mem) {
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
-    int retval;
-    int each = 0;
-    uint8_t buf[16] = {0};
-    uint8_t byte1[4] = {0};
-    uint8_t byte2[4] = {0};
-    uint8_t byte3[4] = {0};
-    uint8_t byte4[4] = {0};
+    // int retval;
+    uint8_t buf[4] = {0};
+    // uint8_t byte[4] = {0};
 
 
     // File can't be read
@@ -73,29 +69,36 @@ void get_instructions(char *filepath, INSTRUCTION *instructions) {
     }
 
     int i = 0;
-    // Read until EOF
+    // Read first 256 instructions
     while (i < 256) {
-        retval = read(fd, &buf, 4);
-        // Read 4 bytes at a time
-        if (retval == 4) {
-            for (each = 0; each < 4; each++) {
-                // Read in little endian byte at a time
-                byte4[each] = buf[each];
-                byte3[each] = buf[each + 1];
-                byte2[each] = buf[each + 2];
-                byte1[each] = buf[each + 3];
-            }
+        read(fd, &buf, 4);
+        INSTRUCTION op = 0u;
+        op |= buf[3] << 24;  // 0xAA000000
+        op |= buf[2] << 16;  // 0xaaBB0000
+        op |= buf[1] << 8;   // 0xaabbCC00
+        op |= buf[0];        // 0xaabbccDD
+        instructions[i] = op;
+        i++;
 
-            // Spooky bit operations, get the little endianness of the
-            // 32bit instruction into a 32bit unsigned integer variable
-            INSTRUCTION op = 0u;
-            op |= (unsigned int)*byte1 << 24;  // 0xAA000000
-            op |= (unsigned int)*byte2 << 16;  // 0xaaBB0000
-            op |= (unsigned int)*byte3 << 8;   // 0xaabbCC00
-            op |= (unsigned int)*byte4;        // 0xaabbccDD
-            instructions[i] = op;
-            i++;
-        }
+        // for (int i = 0; i < 4; i++) {
+        //     printf("%d ", buf[i]);
+        // }
+        // printf("\n");
+        // // Read 4 bytes at a time
+        // if (retval == 4) {
+        //     for (int each = 0; each < 4; each++) {
+        //         // Read in little endian byte at a time
+        //         byte[each] = buf[each];
+        //     }
+        //     // for(int i = 0; i < 4; i++) {
+        //     //     printf("%d ", byte[i]);
+        //     // }
+        //     // printf("\n");
+        //
+        //     // Bit operations, get the little endianness of the
+        //     // 32bit instruction into a 32bit unsigned integer variable
+        //     INSTRUCTION op = 0u;
+        // }
     }
     gpregisters[0] = 0;
 }
