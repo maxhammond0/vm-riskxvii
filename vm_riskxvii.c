@@ -272,6 +272,7 @@ void s(INSTRUCTION instruction, INSTRUCTION data_mem[DATA_MEM_SIZE]) {
 
     // addy = (addy/4)-0x400;
     if (addy < 0 || addy > DATA_MEM_SIZE) {
+        printf("\n%d\n", addy);
         printf("address out of bounds\n!\n!\n!\n!\n!");
         printf("exiting");
         exit(3);
