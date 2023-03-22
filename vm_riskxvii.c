@@ -316,6 +316,14 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
     int read_c = 2066;
     int read_i = 2070;
 
+    // debugging
+    printf("addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
+           addy,
+           rd,
+           gpregisters[rd],
+           rs1,
+           gpregisters[rs1],
+           imm);
 
     if (addy == read_c || addy == read_i) {
         // TODO read character
@@ -324,7 +332,6 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         printf("input: %d, ", input);
         gpregisters[rd] = input;
     } else {
-
         // NOT GETTING USER INPUT
         if (func3 == 0) {  // lb
             printf("lb, ");
@@ -346,14 +353,6 @@ void memory_load(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         }
     }
 
-    // debugging
-    printf("addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
-           addy,
-           rd,
-           gpregisters[rd],
-           rs1,
-           gpregisters[rs1],
-           imm);
 
     gpregisters[0] = 0;
 }
