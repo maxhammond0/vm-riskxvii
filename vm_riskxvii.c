@@ -247,15 +247,31 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
         exit(2);
     }
 
+    if (addy == write_c) {
+        uint8_t b = mask(gpregisters[rs2], 0, 7);
+        printf("write_c ");
+        printf("\nb: %c", b);
+        return;
+    } else if (addy == write_i) {
+        int32_t b = gpregisters[rs2];
+        printf("write_i ");
+        printf("\nb: %d", b);
+        return;
+    } else if (addy == write_ui) {
+        uint32_t b = gpregisters[rs2];
+        printf("\nb: %d", b);
+        return;
+    }
+
     if (func3 == 0) {  // sb
         printf("sb, ");
-        // data_mem[addy] = gpregisters[rs2] & 0xFF;
+        data_mem[addy] = gpregisters[rs2] & 0xFF;
     } else if (func3 == 1) {  // sh
         printf("sh, ");
-        // data_mem[addy] = gpregisters[rs2] & 0xFFFF;
+        data_mem[addy] = gpregisters[rs2] & 0xFFFF;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
-        // data_mem[addy] = gpregisters[rs2];
+        data_mem[addy] = gpregisters[rs2];
     } else {
         printf("Instruction not found, ");
     }
@@ -270,18 +286,6 @@ void s(INSTRUCTION instruction, INSTRUCTION *data_mem) {
            imm,
            addy);
 
-    if (addy == write_c) {
-        uint8_t b = mask(gpregisters[rs2], 0, 7);
-        printf("write_c ");
-        printf("\nb: %c", b);
-    } else if (addy == write_i) {
-        int32_t b = gpregisters[rs2];
-        printf("write_i ");
-        printf("\nb: %d", b);
-    } else if (addy == write_ui) {
-        uint32_t b = gpregisters[rs2];
-        printf("\nb: %d", b);
-    }
 
     gpregisters[0] = 0;
 }
