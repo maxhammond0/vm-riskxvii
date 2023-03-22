@@ -336,7 +336,7 @@ void memory_load(INSTRUCTION instruction,
     } else {
         // NOT GETTING USER INPUT
 
-        // addy = (addy-0x400);
+        addy = (addy+1-1024)-1;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!");
