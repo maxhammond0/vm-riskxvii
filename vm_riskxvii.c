@@ -547,9 +547,9 @@ int main( int argc, char *argv[]) {
     // INSTRUCTION data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions);
-    for (int i = 0; i < INST_MEM_SIZE; i++) {
-        printf("%04d: %08x\n", i*4, instructions[i]);
-    }
+    // for (int i = 0; i < INST_MEM_SIZE; i++) {
+    //     printf("%04d: %08x\n", i*4, instructions[i]);
+    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
