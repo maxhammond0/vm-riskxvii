@@ -307,7 +307,7 @@ void memory_load(INSTRUCTION instruction) {
         // TODO read character
         uint32_t input;
         scanf("%d", &input);
-        printf("%d ", input);
+        printf("input: %d, ", input);
     }
 
     if (func3 == 0) {  // lb
