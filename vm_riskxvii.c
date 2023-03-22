@@ -241,6 +241,7 @@ void s(INSTRUCTION instruction) {
 
 
     if (addy == halt) {
+        printf("%08x\n", instruction);
         printf("\nCPU halt requested\n");
         register_dump();
         exit(2);
@@ -510,7 +511,8 @@ void process_instruction(INSTRUCTION instruction) {
             s(instruction);
             break;
         case 3:
-            memory_load(instruction);
+            memory_load(instruction);rd opcode
+UJ im
             break;
         case SB:
             sb(instruction);
