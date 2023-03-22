@@ -341,7 +341,7 @@ void memory_load(INSTRUCTION instruction,
             printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!");
             printf("exiting");
-            exit(3);
+            // exit(3);
         }
 
         if (func3 == 0) {  // lb
