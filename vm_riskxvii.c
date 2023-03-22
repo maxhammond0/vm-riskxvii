@@ -270,7 +270,15 @@ void s(INSTRUCTION instruction) {
         return;
     }
 
-    addy = (addy - 0x400)/4;
+    if (func3 == 0) {  // sb
+        printf("sb, ");
+    } else if (func3 == 1) {  // sh
+        printf("sh, ");
+    } else if (func3 == 2) {  // sw
+        printf("sw, ");
+    } else {
+        printf("Instruction not found, ");
+    }
 
     // debugging
     printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
@@ -281,21 +289,6 @@ void s(INSTRUCTION instruction) {
            gpregisters[rs2],
            imm,
            addy);
-
-    if (addy < 0 || addy > (0x7ff-0x400)/4) {
-        printf("accessing memory out of bounds!\n!\n!\n");
-        printf("shutting down\n");
-        exit(3);
-    }
-    if (func3 == 0) {  // sb
-        printf("sb, ");
-    } else if (func3 == 1) {  // sh
-        printf("sh, ");
-    } else if (func3 == 2) {  // sw
-        printf("sw, ");
-    } else {
-        printf("Instruction not found, ");
-    }
 
     gpregisters[0] = 0;
 }
@@ -320,16 +313,6 @@ void memory_load(INSTRUCTION instruction) {
     int read_c = 2066;
     int read_i = 2070;
 
-    // debugging
-    printf("func3: %d, addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
-           func3,
-           addy,
-           rd,
-           gpregisters[rd],
-           rs1,
-           gpregisters[rs1],
-           imm);
-
     if (addy == read_c || addy == read_i) {
         // TODO read character
         uint32_t input;
@@ -339,13 +322,6 @@ void memory_load(INSTRUCTION instruction) {
     } else {
         // NOT GETTING USER INPUT
 
-        // Checking address of stored loation
-        addy = (addy - 0x400)/4;
-        if (addy < 0 || addy > (0x7ff-0x400)/4) {
-            printf("accessing memory out of bounds!\n!\n!\n");
-            printf("shutting down\n");
-            exit(3);
-        }
         if (func3 == 0) {  // lb
             printf("lb, ");
         } else if (func3 == 1) {  // lh
@@ -361,6 +337,15 @@ void memory_load(INSTRUCTION instruction) {
         }
     }
 
+    // debugging
+    printf("func3: %d, addy: %d, rd: %d: %d, rs1: %d: %d, imm: %d ",
+           func3,
+           addy,
+           rd,
+           gpregisters[rd],
+           rs1,
+           gpregisters[rs1],
+           imm);
 
     gpregisters[0] = 0;
 }
