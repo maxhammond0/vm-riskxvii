@@ -499,7 +499,7 @@ void uj(INSTRUCTION instruction) {
 
     gpregisters[rd] = pc*4 + 4;
 
-    pc = ((pc*4 + (imm<<1))/4)-1;
+    pc = ((pc*4 + (imm*2))/4)-1;
 
     // debugging
     printf("jal, ");
