@@ -270,7 +270,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         return;
     }
 
-    addy = addy - 1024;
+    // addy = addy - 1024;
     if (addy < 0 || addy > DATA_MEM_SIZE) {
         printf("\n%d\n", addy);
         printf("address out of bounds\n!\n!\n!\n!\n!");
@@ -336,7 +336,7 @@ void memory_load(INSTRUCTION instruction,
     } else {
         // NOT GETTING USER INPUT
 
-        addy = addy - 1024;
+        // addy = addy - 1024;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!");
