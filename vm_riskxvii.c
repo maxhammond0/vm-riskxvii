@@ -218,6 +218,9 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
     uint32_t addy = (gpregisters[rs1] + imm);
 
+    if (addy > 0x7ff) {
+        printf("addy > 0x7ff: %x ", addy);
+    }
 
     if (addy == halt) {
         // printf("\n%08x\n", instruction);
