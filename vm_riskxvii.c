@@ -10,8 +10,6 @@
 #include <stdint.h>
 #include <limits.h>
 
-#include "hbank.h"
-
 typedef uint32_t INSTRUCTION;
 
 #define R 51
@@ -22,7 +20,7 @@ typedef uint32_t INSTRUCTION;
 #define UJ 111
 
 #define INST_MEM_SIZE 256
-#define DATA_MEM_SIZE 2048
+#define DATA_MEM_SIZE 1024
 
 // program counter
 int pc = 0;
@@ -46,6 +44,42 @@ void register_dump() {
     }
 }
 
+unsigned int mask(INSTRUCTION n, int i, int j) {
+    // Return the ith to the jth bits of an INSTRUCTION
+    int p = j - i + 1;
+    i++;
+    return (((1 << p) - 1) & (n >> (i - 1)));
+}
+
+
+void process_r(INSTRUCTION instruction) {
+    // unsigned int rd = mask(instruction, 7, 11);
+    // unsigned int func3 = mask(instruction, 12, 14);
+    // unsigned int rs1 = mask(instruction, 15, 19);
+    // unsigned int rs2 = mask(instruction, 20, 24);
+    // unsigned int func7 = mask(instruction, 25, 31);
+}
+
+void process_i(INSTRUCTION instruction) {
+
+}
+
+void process_s(INSTRUCTION instruction) {
+
+}
+
+void process_sb(INSTRUCTION instruction) {
+
+}
+
+void process_u(INSTRUCTION instruction) {
+
+}
+
+void process_uj(INSTRUCTION instruction) {
+
+}
+
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
@@ -61,7 +95,7 @@ void get_instructions(char *filepath, INSTRUCTION *instructions) {
     int i = 0;
     // Read first 256 instructions
     while (i < 256) {
-        read(fd, &buffer, 4);  // store 4 bytes in buf
+        read(fd, &buffer, 4);
         INSTRUCTION op = 0u;
         op |= buffer[3] << 24;  // 0xAA000000
         op |= buffer[2] << 16;  // 0xaaBB0000
@@ -76,11 +110,33 @@ void get_data(char *filepath, INSTRUCTION *data_mem) {
     // TODO
 }
 
-unsigned int mask(INSTRUCTION n, int i, int j) {
-    // Return the ith to the jth bits of an INSTRUCTION
-    int p = j - i + 1;
-    i++;
-    return (((1 << p) - 1) & (n >> (i - 1)));
+void interpret_instructions(INSTRUCTION instruction) {
+    uint8_t opcode = mask(instruction, 0, 7);
+
+    switch (opcode) {
+        case R:
+            break;
+        case I:
+            break;
+        case S:
+            break;
+        case 3:
+            break;
+        case SB:
+            break;
+        case U:
+            break;
+        case UJ:
+            break;
+        case 103:
+            break;
+        case 0:
+            break;
+        default:
+            printf("opcode not found, ");
+            printf("opcode was: ");
+            print_binary(opcode);
+    }
 }
 
 void r(INSTRUCTION instruction) {
@@ -219,7 +275,6 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     uint32_t addy = (gpregisters[rs1] + imm);
 
     if (addy == halt) {
-        // printf("\n%08x\n", instruction);
         printf("\nCPU halt requested\n");
         register_dump();
         exit(0);
@@ -233,7 +288,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
            rs2,
            gpregisters[rs2],
            imm,
-           addy/4);
+           addy);
 
 
     if (addy == write_c) {
@@ -252,7 +307,8 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         return;
     }
 
-    addy = addy/4;
+    addy = addy /4;
+
     if (addy < 0 || addy > DATA_MEM_SIZE) {
         printf("\n%d\n", addy);
         printf("address out of bounds\n!\n");
@@ -267,18 +323,18 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         printf("sh, ");
         uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
         uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
-        data_mem[addy+1] = low8bits;
-        data_mem[addy] = low16bits;
+        data_mem[addy+0] = low8bits;
+        data_mem[addy+1] = low16bits;
     } else if (func3 == 2) {  // sw
         printf("sw, ");
         uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
         uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
         uint8_t low24bits = mask(gpregisters[rs2], 16, 23);
         uint8_t low32bits = mask(gpregisters[rs2], 24, 31);
-        data_mem[addy+3] = low8bits;
-        data_mem[addy+2] = low16bits;
-        data_mem[addy+1] = low24bits;
-        data_mem[addy] = low32bits;
+        data_mem[addy+0] = low8bits;
+        data_mem[addy+1] = low16bits;
+        data_mem[addy+2] = low24bits;
+        data_mem[addy+3] = low32bits;
     } else {
         printf("Instruction not found, ");
     }
@@ -314,8 +370,8 @@ void memory_load(INSTRUCTION instruction,
         gpregisters[rd] = input;
     } else {
         // NOT GETTING USER INPUT
+        addy = addy / 4;
 
-        addy = addy/4;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!\n");
@@ -328,7 +384,6 @@ void memory_load(INSTRUCTION instruction,
         } else if (func3 == 1) {  // lh
             printf("lh, ");
         } else if (func3 == 2) {  // lw
-            printf("lw, ");
             uint8_t byte1 = data_mem[addy+3];
             uint8_t byte2 = data_mem[addy+2];
             uint8_t byte3 = data_mem[addy+1];
@@ -337,15 +392,16 @@ void memory_load(INSTRUCTION instruction,
                 (byte2 << 16) |
                 (byte3 << 8) |
                 byte4;
+            printf("lw: %d, ", gpregisters[rd]);
         } else if (func3 == 4) {  // lbu
-            printf("lbu, ");
             gpregisters[rd] = data_mem[addy];
+            printf("lbu: %d, ", gpregisters[rd]);
         } else if (func3 == 5) {  // lhu
-            printf("lhu, ");
             uint8_t byte1 = data_mem[addy+1];
             uint8_t byte2 = data_mem[addy+0];
             gpregisters[rd] = (byte1 << 8) |
                 byte2;
+            printf("lhu: %d, ", gpregisters[rd]);
         } else {
             // TODO error message
         }
@@ -475,7 +531,7 @@ void uj(INSTRUCTION instruction) {
         (imm11 << 10) |
         imm10to1;
 
-    // TODO sign the imm
+    // sign the imm
     if ((imm >> 19) & 1) {
         imm = imm | 4294965248;
     }
