@@ -225,6 +225,17 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         exit(0);
     }
 
+    // debugging
+    printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
+           func3,
+           rs1,
+           gpregisters[rs1],
+           rs2,
+           gpregisters[rs2],
+           imm,
+           addy);
+
+
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
         printf("write_c ");
@@ -271,17 +282,6 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     } else {
         printf("Instruction not found, ");
     }
-
-    // debugging
-    printf("func3: %d, rs1: %d: %d, rs2: %d, %d, imm: %d, addy: %d ",
-           func3,
-           rs1,
-           gpregisters[rs1],
-           rs2,
-           gpregisters[rs2],
-           imm,
-           addy);
-
     gpregisters[0] = 0;
 }
 
