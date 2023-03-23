@@ -218,10 +218,6 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
     uint32_t addy = (gpregisters[rs1] + imm);
 
-    if (addy > 0x7ff) {
-        printf("addy > 0x7ff: %x ", addy);
-    }
-
     if (addy == halt) {
         // printf("\n%08x\n", instruction);
         printf("\nCPU halt requested\n");
@@ -318,10 +314,6 @@ void memory_load(INSTRUCTION instruction,
         gpregisters[rd] = input;
     } else {
         // NOT GETTING USER INPUT
-
-        if (addy > 0x7ff) {
-            printf("addy > 0x7ff: %x", addy);
-        }
 
         addy = addy/4;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
