@@ -233,7 +233,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
            rs2,
            gpregisters[rs2],
            imm,
-           addy);
+           addy/4);
 
 
     if (addy == write_c) {
@@ -275,10 +275,10 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
         uint8_t low24bits = mask(gpregisters[rs2], 16, 23);
         uint8_t low32bits = mask(gpregisters[rs2], 24, 31);
-        data_mem[addy+3] = low32bits;
-        data_mem[addy+2] = low24bits;
-        data_mem[addy+1] = low16bits;
-        data_mem[addy] = low8bits;
+        data_mem[addy+3] = low8bits;
+        data_mem[addy+2] = low16bits;
+        data_mem[addy+1] = low24bits;
+        data_mem[addy] = low32bits;
     } else {
         printf("Instruction not found, ");
     }
@@ -576,7 +576,7 @@ int main( int argc, char *argv[]) {
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
-        printf("pc: %08d, ", pc*4);
+        printf("pc: %04d, ", pc*4);
         process_instruction(instructions[pc], data_mem);
         printf("\n");
     }
