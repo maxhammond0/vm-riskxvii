@@ -2,6 +2,8 @@
 // unikey: mham5835
 // SID: 520477289
 
+int debug = 0;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,7 +29,7 @@ int pc = 0;
 
 // 0 register and 31 general purpose registers
 const int r0 = 0;
-int gpregisters[32] = {0};
+int reg[32] = {0};
 
 // helper function to check bit masking
 void print_binary(unsigned int number) {
@@ -38,9 +40,9 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    printf("PC = %08d\n", pc*4);
+    // printf("PC = %08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  %08d\n", i, gpregisters[i]);
+        printf("R[%d] =  %08d\n", i, reg[i]);
     }
 }
 
@@ -88,39 +90,49 @@ void r(INSTRUCTION instruction) {
 
 
     if (func3 == 0b000 && func7 == 0b0000000) {  // add
-        gpregisters[rd] = gpregisters[rs1] + gpregisters[rs2];
+        reg[rd] = reg[rs1] + reg[rs2];
+        if (debug) printf("add: r[%d] = r%d(%d) + r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
-        gpregisters[rd] = gpregisters[rs1] - gpregisters[rs2];
+        reg[rd] = reg[rs1] - reg[rs2];
+        if (debug) printf("sub: r[%d] = r%d(%d) - r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b100 && func7 == 0b0000000) {  // xor
-        gpregisters[rd] = gpregisters[rs1] ^ gpregisters[rs2];
+        reg[rd] = reg[rs1] ^ reg[rs2];
+        if (debug) printf("xor: r[%d] = r%d(%d) ^ r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b110 && func7 == 0b0000000) {  // or
-        gpregisters[rd] = gpregisters[rs1] | gpregisters[rs2];
+        reg[rd] = reg[rs1] | reg[rs2];
+        if (debug) printf("or: r[%d] = r%d(%d) | r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b111 && func7 == 0b0000000) {  // and
-        gpregisters[rd] = gpregisters[rs1] & gpregisters[rs2];
+        reg[rd] = reg[rs1] & reg[rs2];
+        if (debug) printf("and: r[%d] = r%d(%d) & r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b001 && func7 == 0b0000000) {  // sll
-        gpregisters[rd] = gpregisters[rs1] << gpregisters[rs2];
+        reg[rd] = reg[rs1] << reg[rs2];
+        if (debug) printf("sll: r[%d] = r%d(%d) << r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
-        gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
+        reg[rd] = reg[rs1] >> reg[rs2];
+        if (debug) printf("srl: r[%d] = r%d(%d) >> r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b101 && func7 == 0b0100000) {  // sra
-        gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
+        // TODO read spec and fix
+        reg[rd] = reg[rs1] >> reg[rs2];
+        if (debug) printf("sra: r[%d] = r%d(%d) >> r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
-        gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
+        reg[rd] = (reg[rs1] < reg[rs2]) ? 1 : 0;
+        if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
     else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
-        gpregisters[rd] = ((uint32_t)gpregisters[rs1] <
-            (uint32_t)gpregisters[rs2]) ?
+        reg[rd] = ((uint32_t)reg[rs1] <
+            (uint32_t)reg[rs2]) ?
             1 :
             0;
+        if (debug) printf("sltu: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
     }
-
 }
 
 void i(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
@@ -140,25 +152,32 @@ void i(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
     if (opcode == 0b0010011) {
         if (func3 == 0b000) {  // addi
-            gpregisters[rd] = gpregisters[rs1] + imm;
+            reg[rd] = reg[rs1] + imm;
+            if (debug) printf("addi: r[%d] = r%d(%d) + (%d)", rd, rs1, reg[rs1], imm);
         } else if (func3 == 0b100) {  // xori
-            gpregisters[rd] = gpregisters[rs1] ^ imm;
+            reg[rd] = reg[rs1] ^ imm;
+            if (debug) printf("xori: r[%d] = r%d(%d) ^ (%d)", rd, rs1, reg[rs1], imm);
         } else if (func3 == 0b110) {  // ori
-            gpregisters[rd] = gpregisters[rs1] | imm;
+            reg[rd] = reg[rs1] | imm;
+            if (debug) printf("andi: r[%d] = r%d(%d) | (%d)", rd, rs1, reg[rs1], imm);
         } else if (func3 == 0b111) {  // andi
-            gpregisters[rd] = gpregisters[rs1] & imm;
+            reg[rd] = reg[rs1] & imm;
+            if (debug) printf("slti: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
         } else if (func3 == 0b010) {  // slti
-            gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
+            reg[rd] = (reg[rs1] < imm) ? 1 : 0;
+            if (debug) printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
         } else if (func3 == 0b011) {  // sltiu
-            gpregisters[rd] = ((uint32_t)gpregisters[rs1] < unsigned_imm) ? 1 : 0;
+            reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
+            if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
-            gpregisters[rd] = pc*4 + 4;
-            pc = ((gpregisters[rs1] + imm)/4)-1;
+            reg[rd] = pc*4 + 4;
+            pc = ((reg[rs1] + imm)/4)-1;
+            if (debug) printf("jalr: r[%d] = PC(%d)+4; PC=(%d+%d)", rd, pc*4, reg[rs1], imm);
         }
     } else if (opcode == 0b0000011) {  // memory loading
-        int addy = (gpregisters[rs1] + imm);
+        int addy = (reg[rs1] + imm);
 
         // Load virtual routines
         int read_c = 2066;
@@ -166,28 +185,38 @@ void i(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
         if (addy == read_c || addy == read_i) {
             uint32_t input;
+            if (debug) {
+                if (addy == read_c) printf("Enter character: ");
+                else printf("Enter integer: ");
+            }
             scanf("%d", &input);
             if (addy == read_c) {
                 input = (char)input;
             } else {
                 input = (int)input;
             }
-            gpregisters[rd] = input;
+            reg[rd] = input;
         } else {
             addy = addy / 4;
             // printf("addy: %d", addy);
+            // TODO unsure if sexted properly
             if (func3 == 0b000) {  // lb
                 uint32_t load = data_mem[addy] & 0x000000FF;
-                gpregisters[rd] = load & 0xFFFFFF00;
+                reg[rd] = load & 0xFFFFFF00;
+                if (debug) printf("lb: r[%d] = %d & 0xFFFFFF00 = %d", rd, data_mem[addy], reg[rd]);
             } else if (func3 == 0b001) {  // lh
                 uint32_t load = data_mem[addy] & 0x0000FFFF;
-                gpregisters[rd] = load & 0xFFFF0000;
+                reg[rd] = load & 0xFFFF0000;
+                if (debug) printf("lh: r[%d] = %d & 0xFFFF0000 = %d", rd, data_mem[addy], reg[rd]);
             } else if (func3 == 0b010) {  // lw
-                gpregisters[rd] = data_mem[addy];
+                reg[rd] = data_mem[addy];
+                if (debug) printf("lw: r[%d] = %d", rd, reg[rd]);
             } else if (func3 == 0b100) {  // lbu
-                gpregisters[rd] = data_mem[addy] & 0x000000FF;
+                reg[rd] = data_mem[addy] & 0x000000FF;
+                if (debug) printf("lbu: r[%d] = %d & 0x000000FF = %d", rd, data_mem[addy], reg[rd]);
             } else if (func3 == 0b101) {  // lhu
-                gpregisters[rd] = data_mem[addy] & 0x0000FFFF;
+                reg[rd] = data_mem[addy] & 0x0000FFFF;
+                if (debug) printf("lw: r[%d] = %d & 0x0000FFFF = %d", rd, data_mem[addy], reg[rd]);
             }
         }
     }
@@ -217,7 +246,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         imm = imm | 4294965248;
     }
 
-    int addy = (gpregisters[rs1] + imm);
+    int addy = (reg[rs1] + imm);
 
     if (addy == halt) {
         printf("CPU Halt Requested\n");
@@ -226,20 +255,25 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     }
 
     if (addy == write_c) {
-        uint8_t b = mask(gpregisters[rs2], 0, 7);
+        uint8_t b = mask(reg[rs2], 0, 7);
+        if (debug) printf("write character: ");
         printf("%c", b);
         return;
     } else if (addy == write_i) {
-        int32_t b = gpregisters[rs2];
+        int32_t b = reg[rs2];
+        if (debug) printf("write integer: ");
         printf("%d", b);
         return;
     } else if (addy == write_ui) {
-        uint32_t b = gpregisters[rs2];
+        uint32_t b = reg[rs2];
+        if (debug) printf("write unsigned integer: ");
         printf("%d", b);
         return;
     } else if (addy == dump_pc) {
+        if (debug) printf("dump program counter: ");
         printf("%x", pc*4);
     } else if (addy == dump_gpr) {
+        if (debug) printf("dump registers: \n");
         register_dump();
     } else {
 
@@ -252,86 +286,28 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
             exit(4);
         }
 
-        if (func3 == 0) {  // sb
-            uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
+        if (func3 == 0b000) {  // sb
+            uint8_t low8bits = mask(reg[rs2], 0, 7);
             data_mem[addy] = low8bits;
-        } else if (func3 == 1) {  // sh
-            uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
-            uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
+            if (debug) printf("sb: data_mem[%d] = r%d(%d)", addy, rs2, reg[rs2]);
+        } else if (func3 == 0b001) {  // sh
+            uint8_t low8bits = mask(reg[rs2], 0, 7);
+            uint8_t low16bits = mask(reg[rs2], 8, 15);
             data_mem[addy+0] = low8bits;
             data_mem[addy+1] = low16bits;
-        } else if (func3 == 2) {  // sw
-            uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
-            uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
-            uint8_t low24bits = mask(gpregisters[rs2], 16, 23);
-            uint8_t low32bits = mask(gpregisters[rs2], 24, 31);
+            if (debug) printf("sh: data_mem[%d] = r%d(%d)", addy, rs2, reg[rs2]);
+        } else if (func3 == 0b010) {  // sw
+            uint8_t low8bits = mask(reg[rs2], 0, 7);
+            uint8_t low16bits = mask(reg[rs2], 8, 15);
+            uint8_t low24bits = mask(reg[rs2], 16, 23);
+            uint8_t low32bits = mask(reg[rs2], 24, 31);
             data_mem[addy+0] = low8bits;
             data_mem[addy+1] = low16bits;
             data_mem[addy+2] = low24bits;
             data_mem[addy+3] = low32bits;
+            if (debug) printf("sw: data_mem[%d] = r%d(%d)", addy, rs2, reg[rs2]);
         }
     }
-}
-
-void memory_load(INSTRUCTION instruction,
-                 uint8_t data_mem[DATA_MEM_SIZE]) {
-
-    unsigned int rd = mask(instruction, 7, 11);
-    unsigned int func3 = mask(instruction, 12, 14);
-    unsigned int rs1 = mask(instruction, 15, 19);
-    uint32_t imm = mask(instruction, 20, 31);
-
-    // sign the immediate
-    if ((imm >> 11) & 1) {
-        imm = imm | 4294965248;
-    }
-
-    int addy = (gpregisters[rs1] + imm);
-
-    // Load virtual routines
-    int read_c = 2066;
-    int read_i = 2070;
-
-    if (addy == read_c || addy == read_i) {
-        // TODO read character
-        uint32_t input;
-        scanf("%d", &input);
-        gpregisters[rd] = input;
-    } else {
-        // NOT GETTING USER INPUT
-        addy = addy / 4;
-
-        if (addy < 0 || addy > DATA_MEM_SIZE) {
-            printf("\n%d\n", addy);
-            printf("address out of bounds\n!\n!\n!\n!\n!\n");
-            // printf("exiting");
-            // exit(3);
-        }
-
-        if (func3 == 0) {  // lb
-        } else if (func3 == 1) {  // lh
-        } else if (func3 == 2) {  // lw
-            uint8_t byte1 = data_mem[addy+3];
-            uint8_t byte2 = data_mem[addy+2];
-            uint8_t byte3 = data_mem[addy+1];
-            uint8_t byte4 = data_mem[addy+0];
-            gpregisters[rd] = (byte1 << 24) |
-                (byte2 << 16) |
-                (byte3 << 8) |
-                byte4;
-        } else if (func3 == 4) {  // lbu
-            gpregisters[rd] = data_mem[addy];
-        } else if (func3 == 5) {  // lhu
-            uint8_t byte1 = data_mem[addy+1];
-            uint8_t byte2 = data_mem[addy+0];
-            gpregisters[rd] = (byte1 << 8) |
-                byte2;
-        } else {
-            // TODO error message
-        }
-    }
-
-    gpregisters[0] = 0;
 }
 
 void sb(INSTRUCTION instruction) {
@@ -357,27 +333,34 @@ void sb(INSTRUCTION instruction) {
 
 
     if (func3 == 0b000) {  // beq
-        if (gpregisters[rs1] == gpregisters[rs2]) {
-            pc = (pc*4 + (imm * 2))/4-1;
+        if (debug) printf("if (%d == %d) beq: PC = PC(%d) + %d", reg[rs1], reg[rs2], pc*4, imm << 1);
+        if (reg[rs1] == reg[rs2]) {
+            pc = (pc*4 + (imm << 1))/4-1;
         }
     } else if (func3 == 1) {  // bne
-        if (gpregisters[rs1] != gpregisters[rs2]) {
-            pc = (pc*4 + (imm * 2))/4-1;
+        if (debug) printf("if (%d != %d) bne: PC = PC(%d) + %d", reg[rs1], reg[rs2], pc*4, imm << 1);
+        if (reg[rs1] != reg[rs2]) {
+            pc = (pc*4 + (imm << 1))/4-1;
         }
     } else if (func3 == 4) {  // blt
-        if (gpregisters[rs1] < gpregisters[rs2]) {
+        if (debug) printf("if (%d < %d) blt: PC = PC(%d) + %d", reg[rs1], reg[rs2], pc*4, imm << 1);
+        if (reg[rs1] < reg[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 6) {  // bltu
-        if ((uint32_t)gpregisters[rs1] < (uint32_t)gpregisters[rs2]) {
+        if (debug) printf("if (%d < %d) bltu: PC = PC(%d) + %d", (uint32_t)reg[rs1], (uint32_t)reg[rs2], pc*4, imm << 1);
+        if ((uint32_t)reg[rs1] < (uint32_t)reg[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else if (func3 == 5) {  // bge
-        if (gpregisters[rs1] > gpregisters[rs2]) {
+        if (debug) printf("if (%d > %d) bltu: PC = PC(%d) + %d", reg[rs1], reg[rs2], pc*4, imm << 1);
+        if (reg[rs1] > reg[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
+            if (debug) printf("bge: PC = PC(%d) + %d", pc*4, imm << 1);
         }
     } else if (func3 == 7) {  // bgeu
-        if ((uint32_t)gpregisters[rs1] > (uint32_t)gpregisters[rs2]) {
+        if (debug) printf("if (%d > %d) bltu: PC = PC(%d) + %d", (uint32_t)reg[rs1], (uint32_t)reg[rs2], pc*4, imm << 1);
+        if ((uint32_t)reg[rs1] > (uint32_t)reg[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
     } else {
@@ -396,8 +379,8 @@ void u(INSTRUCTION instruction) {
     }
     imm = (imm << 12);
 
-    gpregisters[rd] = imm;
-    gpregisters[0] = 0;
+    reg[rd] = imm;
+    if (debug) printf("lui: r[%d] = %d", rd, imm);
 }
 
 void uj(INSTRUCTION instruction) {
@@ -421,8 +404,9 @@ void uj(INSTRUCTION instruction) {
         imm = imm | 4294965248;
     }
 
-    gpregisters[rd] = pc*4 + 4;
+    reg[rd] = pc*4 + 4;
     pc = ((pc*4 + (imm*2))/4)-1;
+    if (debug) printf("jal: r[%d] = %d + 4; pc = %d + %d", rd, pc*4, pc*4, imm << 1);
 }
 
 void process_instruction(INSTRUCTION instruction,
@@ -458,7 +442,7 @@ void process_instruction(INSTRUCTION instruction,
             printf("opcode was: ");
             print_binary(opcode);
     }
-    gpregisters[0] = 0;
+    reg[0] = 0;
 }
 
 int main( int argc, char *argv[]) {
@@ -477,9 +461,9 @@ int main( int argc, char *argv[]) {
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
-        // printf("pc: %04d, ", pc*4);
+        if (debug) printf("pc: %04d, ", pc*4);
         process_instruction(instructions[pc], data_mem);
-        // printf("\n");
+        if (debug) printf("\n");
     }
 
     return 0;
