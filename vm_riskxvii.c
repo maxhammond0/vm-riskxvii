@@ -242,7 +242,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     uint32_t addy = (gpregisters[rs1] + imm);
 
     if (addy == halt) {
-        printf("CPU halt requested\n");
+        printf("CPU Halt Requested\n");
         // register_dump();
         exit(0);
     }
