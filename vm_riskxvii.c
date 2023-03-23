@@ -22,7 +22,7 @@ typedef uint32_t INSTRUCTION;
 #define UJ 111
 
 #define INST_MEM_SIZE 256
-#define DATA_MEM_SIZE 1024
+#define DATA_MEM_SIZE 2048
 
 // program counter
 int pc = 0;
@@ -245,7 +245,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         return;
     }
 
-    addy = addy - 1024;
+    // addy = addy - 1024;
     if (addy < 0 || addy > DATA_MEM_SIZE) {
         printf("\n%d\n", addy);
         printf("address out of bounds\n!\n");
@@ -324,7 +324,7 @@ void memory_load(INSTRUCTION instruction,
             printf("addy > 0x7ff: %x", addy);
         }
 
-        addy = addy - 1024;
+        // addy = addy - 1024;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\n%d\n", addy);
             printf("address out of bounds\n!\n!\n!\n!\n!");
