@@ -52,34 +52,6 @@ unsigned int mask(INSTRUCTION n, int i, int j) {
 }
 
 
-void process_r(INSTRUCTION instruction) {
-    // unsigned int rd = mask(instruction, 7, 11);
-    // unsigned int func3 = mask(instruction, 12, 14);
-    // unsigned int rs1 = mask(instruction, 15, 19);
-    // unsigned int rs2 = mask(instruction, 20, 24);
-    // unsigned int func7 = mask(instruction, 25, 31);
-}
-
-void process_i(INSTRUCTION instruction) {
-
-}
-
-void process_s(INSTRUCTION instruction) {
-
-}
-
-void process_sb(INSTRUCTION instruction) {
-
-}
-
-void process_u(INSTRUCTION instruction) {
-
-}
-
-void process_uj(INSTRUCTION instruction) {
-
-}
-
 void get_instructions(char *filepath, INSTRUCTION *instructions) {
     // Reads file and loads instructions into the instructions array
     int fd;
@@ -106,39 +78,6 @@ void get_instructions(char *filepath, INSTRUCTION *instructions) {
     }
 }
 
-void get_data(char *filepath, INSTRUCTION *data_mem) {
-    // TODO
-}
-
-void interpret_instructions(INSTRUCTION instruction) {
-    uint8_t opcode = mask(instruction, 0, 7);
-
-    switch (opcode) {
-        case R:
-            break;
-        case I:
-            break;
-        case S:
-            break;
-        case 3:
-            break;
-        case SB:
-            break;
-        case U:
-            break;
-        case UJ:
-            break;
-        case 103:
-            break;
-        case 0:
-            break;
-        default:
-            printf("opcode not found, ");
-            printf("opcode was: ");
-            print_binary(opcode);
-    }
-}
-
 void r(INSTRUCTION instruction) {
 
     unsigned int rd = mask(instruction, 7, 11);
@@ -148,39 +87,45 @@ void r(INSTRUCTION instruction) {
     unsigned int func7 = mask(instruction, 25, 31);
 
 
-    if (func3 == 0 && func7 == 0) {  // add
+    if (func3 == 0b000 && func7 == 0b0000000) {  // add
         gpregisters[rd] = gpregisters[rs1] + gpregisters[rs2];
-    } else if (func3 == 0 && func7 == 32) {  // sub
+    }
+    else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
         gpregisters[rd] = gpregisters[rs1] - gpregisters[rs2];
-    } else if (func3 == 4 && func7 == 0) {  // xor
+    }
+    else if (func3 == 0b100 && func7 == 0b0000000) {  // xor
         gpregisters[rd] = gpregisters[rs1] ^ gpregisters[rs2];
-    } else if (func3 == 6 && func7 == 0) {  // or
+    }
+    else if (func3 == 0b110 && func7 == 0b0000000) {  // or
         gpregisters[rd] = gpregisters[rs1] | gpregisters[rs2];
-    } else if (func3 == 7 && func7 == 0) {  // and
+    }
+    else if (func3 == 0b111 && func7 == 0b0000000) {  // and
         gpregisters[rd] = gpregisters[rs1] & gpregisters[rs2];
-    } else if (func3 == 1 && func7 == 0) {  // sll
+    }
+    else if (func3 == 0b001 && func7 == 0b0000000) {  // sll
         gpregisters[rd] = gpregisters[rs1] << gpregisters[rs2];
-    } else if (func3 == 5 && func7 == 0) {  // srl
+    }
+    else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
-    } else if (func3 == 5 && func7 == 32) {  // sra
+    }
+    else if (func3 == 0b101 && func7 == 0b0100000) {  // sra
         gpregisters[rd] = gpregisters[rs1] >> gpregisters[rs2];
-    } else if (func3 == 2 && func7 == 0) {  // slt
+    }
+    else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         gpregisters[rd] = (gpregisters[rs1] < gpregisters[rs2]) ? 1 : 0;
-    } else if (func3 == 3 && func7 == 0) {  // sltu
+    }
+    else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
         gpregisters[rd] = ((uint32_t)gpregisters[rs1] <
             (uint32_t)gpregisters[rs2]) ?
             1 :
             0;
     }
 
-    // debugging
-
-    gpregisters[0] = 0;
 }
 
-void i(INSTRUCTION instruction) {
+void i(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
-
+    uint8_t opcode = mask(instruction, 0, 6);
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
@@ -193,61 +138,92 @@ void i(INSTRUCTION instruction) {
         imm = imm | 4294965248;  //
     }
 
-    if (func3 == 0) {  // addi
-        gpregisters[rd] = gpregisters[rs1] + imm;
-    } else if (func3 == 4) {  // xori
-        gpregisters[rd] = gpregisters[rs1] ^ imm;
-    } else if (func3 == 6) {  // ori
-        gpregisters[rd] = gpregisters[rs1] | imm;
-    } else if (func3 == 7) {  // andi
-        gpregisters[rd] = gpregisters[rs1] & imm;
-    } else if (func3 == 2) {  // slti
-        gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
-    } else if (func3 == 3) {  // sltiu
-        gpregisters[rd] = ((uint32_t)gpregisters[rs1] < unsigned_imm) ? 1 : 0;
+    if (opcode == 0b0010011) {
+        if (func3 == 0b000) {  // addi
+            gpregisters[rd] = gpregisters[rs1] + imm;
+        } else if (func3 == 0b100) {  // xori
+            gpregisters[rd] = gpregisters[rs1] ^ imm;
+        } else if (func3 == 0b110) {  // ori
+            gpregisters[rd] = gpregisters[rs1] | imm;
+        } else if (func3 == 0b111) {  // andi
+            gpregisters[rd] = gpregisters[rs1] & imm;
+        } else if (func3 == 0b010) {  // slti
+            gpregisters[rd] = (gpregisters[rs1] < imm) ? 1 : 0;
+        } else if (func3 == 0b011) {  // sltiu
+            gpregisters[rd] = ((uint32_t)gpregisters[rs1] < unsigned_imm) ? 1 : 0;
+        }
+    } else if (opcode == 0b1100111) {
+        if (func3 == 0b000) {  // jalr
+            gpregisters[rd] = pc*4 + 4;
+            pc = ((gpregisters[rs1] + imm)/4)-1;
+        }
+    } else if (opcode == 0b0000011) {  // memory loading
+        int addy = (gpregisters[rs1] + imm);
+
+        // Load virtual routines
+        int read_c = 2066;
+        int read_i = 2070;
+
+        if (addy == read_c || addy == read_i) {
+            uint32_t input;
+            scanf("%d", &input);
+            if (addy == read_c) {
+                input = (char)input;
+            } else {
+                input = (int)input;
+            }
+            gpregisters[rd] = input;
+        } else {
+            addy = addy / 4;
+            // printf("addy: %d", addy);
+            if (func3 == 0b000) {  // lb
+                uint32_t load = data_mem[addy] & 0x000000FF;
+                gpregisters[rd] = load & 0xFFFFFF00;
+            } else if (func3 == 0b001) {  // lh
+                uint32_t load = data_mem[addy] & 0x0000FFFF;
+                gpregisters[rd] = load & 0xFFFF0000;
+            } else if (func3 == 0b010) {  // lw
+                gpregisters[rd] = data_mem[addy];
+            } else if (func3 == 0b100) {  // lbu
+                gpregisters[rd] = data_mem[addy] & 0x000000FF;
+            } else if (func3 == 0b101) {  // lhu
+                gpregisters[rd] = data_mem[addy] & 0x0000FFFF;
+            }
+        }
     }
-
-    // debugging
-
-    gpregisters[0] = 0;
 }
 
 void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
 
+    uint32_t func3 = mask(instruction, 12, 14);
+    uint32_t rs1 = mask(instruction, 15, 19);
+    uint32_t rs2 = mask(instruction, 20, 24);
 
-    unsigned int func3 = mask(instruction, 12, 14);
-    unsigned int rs1 = mask(instruction, 15, 19);
-    unsigned int rs2 = mask(instruction, 20, 24);
-
-    uint32_t imm1to5 = mask(instruction, 7, 11);
-    int imm6to12 = mask(instruction, 25, 31);
+    int imm0to4 = mask(instruction, 7, 11);
+    int imm5to11 = mask(instruction, 25, 31);
 
     // Store virtual routines
-    int write_c = 2048;
-    int write_i = 2052;
-    int write_ui = 2056;
-    int halt = 2060;
+    int write_c = 0x800;
+    int write_i = 0x804;
+    int write_ui = 0x808;
+    int halt = 0x80c;
+    int dump_pc = 0x820;
+    int dump_gpr = 0x824;
     // int heap_banks = 2088;
-    // int dump_pc = 2080;
-    // int dump_gpr = 2084;
 
-    int32_t imm = (imm6to12 << 5) | imm1to5;
-
-
+    int imm = (imm5to11 << 5) | imm0to4;
     // sign the immediate
     if ((imm >> 11) & 1) {
         imm = imm | 4294965248;
     }
 
-    uint32_t addy = (gpregisters[rs1] + imm);
+    int addy = (gpregisters[rs1] + imm);
 
     if (addy == halt) {
         printf("CPU Halt Requested\n");
         // register_dump();
         exit(0);
     }
-
-
 
     if (addy == write_c) {
         uint8_t b = mask(gpregisters[rs2], 0, 7);
@@ -261,41 +237,44 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         uint32_t b = gpregisters[rs2];
         printf("%d", b);
         return;
-    }
-
-    addy = addy /4;
-
-    if (addy < 0 || addy > DATA_MEM_SIZE) {
-        printf("\n%d\n", addy);
-        printf("address out of bounds\n!\n");
-        return;
-    }
-
-    if (func3 == 0) {  // sb
-        uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
-        data_mem[addy] = low8bits;
-    } else if (func3 == 1) {  // sh
-        uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
-        uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
-        data_mem[addy+0] = low8bits;
-        data_mem[addy+1] = low16bits;
-    } else if (func3 == 2) {  // sw
-        uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
-        uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
-        uint8_t low24bits = mask(gpregisters[rs2], 16, 23);
-        uint8_t low32bits = mask(gpregisters[rs2], 24, 31);
-        data_mem[addy+0] = low8bits;
-        data_mem[addy+1] = low16bits;
-        data_mem[addy+2] = low24bits;
-        data_mem[addy+3] = low32bits;
+    } else if (addy == dump_pc) {
+        printf("%x", pc*4);
+    } else if (addy == dump_gpr) {
+        register_dump();
     } else {
+
+        addy = addy / 4;
+
+        if (addy < 0 || addy > DATA_MEM_SIZE) {
+            printf("\naddy: %d\n", addy);
+            printf("address out of bounds\n!\n");
+            register_dump();
+            exit(4);
+        }
+
+        if (func3 == 0) {  // sb
+            uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
+            data_mem[addy] = low8bits;
+        } else if (func3 == 1) {  // sh
+            uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
+            uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
+            data_mem[addy+0] = low8bits;
+            data_mem[addy+1] = low16bits;
+        } else if (func3 == 2) {  // sw
+            uint8_t low8bits = mask(gpregisters[rs2], 0, 7);
+            uint8_t low16bits = mask(gpregisters[rs2], 8, 15);
+            uint8_t low24bits = mask(gpregisters[rs2], 16, 23);
+            uint8_t low32bits = mask(gpregisters[rs2], 24, 31);
+            data_mem[addy+0] = low8bits;
+            data_mem[addy+1] = low16bits;
+            data_mem[addy+2] = low24bits;
+            data_mem[addy+3] = low32bits;
+        }
     }
-    gpregisters[0] = 0;
 }
 
 void memory_load(INSTRUCTION instruction,
                  uint8_t data_mem[DATA_MEM_SIZE]) {
-
 
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
@@ -352,13 +331,10 @@ void memory_load(INSTRUCTION instruction,
         }
     }
 
-    // debugging
-
     gpregisters[0] = 0;
 }
 
 void sb(INSTRUCTION instruction) {
-
 
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
@@ -380,7 +356,7 @@ void sb(INSTRUCTION instruction) {
     }
 
 
-    if (func3 == 0) {  // beq
+    if (func3 == 0b000) {  // beq
         if (gpregisters[rs1] == gpregisters[rs2]) {
             pc = (pc*4 + (imm * 2))/4-1;
         }
@@ -407,24 +383,18 @@ void sb(INSTRUCTION instruction) {
     } else {
         // TODO error message
     }
-    // debugging
-
-    gpregisters[0] = 0;
 }
 
 void u(INSTRUCTION instruction) {
     // lui
-
     unsigned int rd = mask(instruction, 7, 11);
     uint32_t imm = mask(instruction, 12, 31);
-    imm = (imm << 12);
 
     // sign the immediate
     if ((imm >> 19) & 1) {
         imm = imm | 4294965248;
     }
-
-    // debugging
+    imm = (imm << 12);
 
     gpregisters[rd] = imm;
     gpregisters[0] = 0;
@@ -432,8 +402,6 @@ void u(INSTRUCTION instruction) {
 
 void uj(INSTRUCTION instruction) {
     // jal
-
-
     unsigned int rd = mask(instruction, 7, 11);
 
     // bit fuckery
@@ -442,42 +410,24 @@ void uj(INSTRUCTION instruction) {
     uint32_t imm11 = mask(instruction, 20, 20);
     uint32_t imm19to12 = mask(instruction, 12, 19);
 
-    // bit shift and logical oring all them together
+    // bit shift and logical 'or'ing all them together
     uint32_t imm = (imm20 << 19) |
         (imm19to12 << 11) |
         (imm11 << 10) |
         imm10to1;
 
-    // sign the imm
+    // sign the immediate
     if ((imm >> 19) & 1) {
         imm = imm | 4294965248;
     }
 
     gpregisters[rd] = pc*4 + 4;
-
     pc = ((pc*4 + (imm*2))/4)-1;
-
-
-    gpregisters[0] = 0;
-}
-
-void jalr(INSTRUCTION instruction) {
-
-
-    unsigned int rd = mask(instruction, 7, 11);
-    // unsigned int func3 = mask(instruction, 12, 14);
-    unsigned int rs1 = mask(instruction, 15, 19);
-    int imm = mask(instruction, 20, 31);
-
-    gpregisters[rd] = pc*4 + 4;
-    pc = ((gpregisters[rs1] + imm)/4)-1;
-
-
-    gpregisters[0] = 0;
 }
 
 void process_instruction(INSTRUCTION instruction,
                          uint8_t data_mem[DATA_MEM_SIZE]) {
+
     unsigned int opcode = mask(instruction, 0, 6);
 
     switch (opcode) {
@@ -485,13 +435,12 @@ void process_instruction(INSTRUCTION instruction,
             r(instruction);
             break;
         case I:
-            i(instruction);
+        case 3:  // memory load
+        case 103:  // jalr
+            i(instruction, data_mem);
             break;
         case S:
             s(instruction, data_mem);
-            break;
-        case 3:
-            memory_load(instruction, data_mem);
             break;
         case SB:
             sb(instruction);
@@ -502,9 +451,6 @@ void process_instruction(INSTRUCTION instruction,
         case UJ:
             uj(instruction);
             break;
-        case 103:
-            jalr(instruction);
-            break;
         case 0:
             break;
         default:
@@ -512,6 +458,7 @@ void process_instruction(INSTRUCTION instruction,
             printf("opcode was: ");
             print_binary(opcode);
     }
+    gpregisters[0] = 0;
 }
 
 int main( int argc, char *argv[]) {
@@ -527,11 +474,6 @@ int main( int argc, char *argv[]) {
     uint8_t data_mem[DATA_MEM_SIZE];
 
     get_instructions(argv[1], instructions);
-
-    // print instructions for debugging
-    // for (int i = 0; i < INST_MEM_SIZE; i++) {
-    //     printf("%04d: %08x\n", i*4, instructions[i]);
-    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc++) {
