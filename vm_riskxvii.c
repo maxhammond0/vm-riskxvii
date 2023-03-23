@@ -320,6 +320,10 @@ void memory_load(INSTRUCTION instruction,
     } else {
         // NOT GETTING USER INPUT
 
+        if (addy > 0x7ff) {
+            printf("addy > 0x7ff: %x", addy);
+        }
+
         addy = addy - 1024;
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\n%d\n", addy);
