@@ -141,8 +141,6 @@ void interpret_instructions(INSTRUCTION instruction) {
 
 void r(INSTRUCTION instruction) {
 
-    printf("Type: R, ");
-
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
