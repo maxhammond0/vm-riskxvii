@@ -337,10 +337,23 @@ void memory_load(INSTRUCTION instruction,
             printf("lh, ");
         } else if (func3 == 2) {  // lw
             printf("lw, ");
+            uint8_t byte1 = data_mem[addy+3];
+            uint8_t byte2 = data_mem[addy+2];
+            uint8_t byte3 = data_mem[addy+1];
+            uint8_t byte4 = data_mem[addy+0];
+            gpregisters[rd] = (byte1 << 24) |
+                (byte2 << 16) |
+                (byte3 << 8) |
+                byte4;
         } else if (func3 == 4) {  // lbu
             printf("lbu, ");
+            gpregisters[rd] = data_mem[addy];
         } else if (func3 == 5) {  // lhu
             printf("lhu, ");
+            uint8_t byte1 = data_mem[addy+1];
+            uint8_t byte2 = data_mem[addy+0];
+            gpregisters[rd] = (byte1 << 8) |
+                byte2;
         } else {
             // TODO error message
         }
