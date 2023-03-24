@@ -69,10 +69,10 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     // Read first 1024 bytes
     while (i < INST_MEM_SIZE/4) {
         read(fd, &buffer, 4);
-        instructions[i*4] = buffer[3];
-        instructions[(i*4)+1] = buffer[2];
-        instructions[(i*4)+2] = buffer[1];
-        instructions[(i*4)+3] = buffer[0];
+        instructions[i*4] = buffer[0];
+        instructions[(i*4)+1] = buffer[1];
+        instructions[(i*4)+2] = buffer[2];
+        instructions[(i*4)+3] = buffer[3];
         i++;
     }
 
@@ -153,7 +153,6 @@ void i(INSTRUCTION instruction,
     unsigned int rs1 = mask(instruction, 15, 19);
     uint32_t imm = mask(instruction, 20, 31);
 
-
     uint32_t unsigned_imm = imm;
 
     // Sign the immediate
@@ -217,6 +216,10 @@ void i(INSTRUCTION instruction,
             if (addy < 0x3ff) {
                 // address points to instruction memory
                 location = instruction_mem;
+                // de-little endian the data
+                if (addy % 4 == 0) {
+
+                }
             } else {
                 addy = addy - 0x400;
             }
@@ -478,10 +481,10 @@ void uj(INSTRUCTION instruction) {
 }
 
 void process_instruction(uint8_t instructions[INST_MEM_SIZE], 
-                         uint8_t byte1,
-                         uint8_t byte2,
-                         uint8_t byte3,
                          uint8_t byte4,
+                         uint8_t byte3,
+                         uint8_t byte2,
+                         uint8_t byte1,
                          uint8_t data_mem[DATA_MEM_SIZE]) {
 
     INSTRUCTION instruction = byte1 << 24 |
