@@ -221,7 +221,7 @@ void i(INSTRUCTION instruction,
 
                 }
             } else {
-                addy = addy - 0x3ff;
+                addy = addy - 0x400;
             }
 
 
