@@ -476,7 +476,7 @@ void uj(INSTRUCTION instruction) {
         imm = imm | 4294965248;
     }
 
-    if (debug) printf("jal: r[%d] = %d + 4; pc = %d + %d", rd, pc*4, pc*4, imm << 1);
+    if (debug) printf("jal: r[%d] = %d + 4; pc = %d + %d", rd, pc, pc, imm << 1);
     reg[rd] = pc + 4;
     pc = pc + (imm<<1) - 4;
 }
