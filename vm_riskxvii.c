@@ -205,6 +205,7 @@ void i(INSTRUCTION instruction,
             } else {
                 input = (int)input;
             }
+            printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else {
 
