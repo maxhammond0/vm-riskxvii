@@ -519,8 +519,8 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
         case 0:
             break;
         default:
-            printf("Instruction Not Implemented: %08x", instruction);
-            printf("PC: %08x;", pc);
+            printf("Instruction Not Implemented: %08x\n", instruction);
+            printf("PC: %08x;\n", pc);
             register_dump();
     }
 
