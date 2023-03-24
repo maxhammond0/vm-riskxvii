@@ -314,7 +314,7 @@ void s(INSTRUCTION instruction,
         return;
     } else if (addy == write_ui) {
         uint32_t b = reg[rs2];
-        if (debug) printf("write unsigned int from r%d(%d): ", rs2, reg[rs2]);
+        if (debug) printf("write unsigned int from r%d(%d): ", rs2, (unsigned)reg[rs2]);
         printf("%d", b);
         return;
     } else if (addy == dump_pc) {
