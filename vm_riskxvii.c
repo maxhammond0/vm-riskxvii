@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 0;
+int debug = 1;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -470,7 +470,7 @@ void uj(INSTRUCTION instruction) {
 
     // sign the immediate
     if ((imm >> 19) & 1) {
-        imm = imm | 4294965248;
+        imm = imm | 0b11111111111100000000000000000000;
     }
 
     if (debug) printf("jal: r[%d] = %d + 4; pc = %d + %d", rd, pc, pc, imm << 1);
