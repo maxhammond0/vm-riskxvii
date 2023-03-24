@@ -270,7 +270,7 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     if (addy == write_c) {
         uint8_t b = mask(reg[rs2], 0, 7);
         if (debug) printf("write character in r%d(%d): ", rs2, reg[rs2]);
-        printf("%d", b);
+        printf("%c", b);
         return;
     } else if (addy == write_i) {
         int32_t b = reg[rs2];
