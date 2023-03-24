@@ -304,17 +304,17 @@ void s(INSTRUCTION instruction,
 
     if (addy == write_c) {
         uint8_t b = mask(reg[rs2], 0, 7);
-        if (debug) printf("write character in r%d(%d): ", rs2, reg[rs2]);
+        if (debug) printf("write character from r%d(%d): ", rs2, reg[rs2]);
         printf("%c", b);
         return;
     } else if (addy == write_i) {
         int32_t b = reg[rs2];
-        if (debug) printf("write character in r%d(%d): ", rs2, reg[rs2]);
+        if (debug) printf("write integer from r%d(%d): ", rs2, reg[rs2]);
         printf("%d", b);
         return;
     } else if (addy == write_ui) {
         uint32_t b = reg[rs2];
-        if (debug) printf("write character in r%d(%d): ", rs2, reg[rs2]);
+        if (debug) printf("write unsigned int from r%d(%d): ", rs2, reg[rs2]);
         printf("%d", b);
         return;
     } else if (addy == dump_pc) {
