@@ -205,7 +205,7 @@ void i(INSTRUCTION instruction,
             } else {
                 input = (int)input;
             }
-            printf("r%d(%d) = %d", rd, reg[rd], input);
+            if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else {
 
@@ -282,7 +282,7 @@ void s(INSTRUCTION instruction,
     int imm = (imm5to11 << 5) | imm0to4;
     // sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 0b11111111111111111111100000000000;  //
+        imm = imm | 0b11111111111111111111100000000000;
     }
 
     // Store virtual routines
@@ -393,14 +393,14 @@ void sb(INSTRUCTION instruction) {
     uint32_t imm12 = mask(instruction, 31, 31);
     uint32_t imm5to10 = mask(instruction, 25, 30);
 
-    int32_t imm = (imm12 << 12) |
-        (imm11 << 11) |
-        (imm5to10 << 5) |
+    int32_t imm = (imm12 << 11) |
+        (imm11 << 10) |
+        (imm5to10 << 4) |
         (imm1to4);
 
     // sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 0b11111111111111111111000000000001;
+        imm = imm | 0b11111111111111111111100000000000;
     }
 
 
@@ -446,6 +446,9 @@ void u(INSTRUCTION instruction) {
     uint32_t imm = mask(instruction, 12, 31);
 
     // sign the immediate
+    if ((imm >> 19) & 1) {
+        imm = imm | 4294965248;
+    }
     imm = (imm << 12);
 
     reg[rd] = imm;
