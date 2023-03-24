@@ -42,7 +42,7 @@ void print_binary(unsigned int number) {
 void register_dump() {
     // printf("PC = %08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  0x%08x;\n", i, reg[i]);
+        printf("R[%d] = 0x%08x;\n", i, reg[i]);
     }
 }
 
@@ -519,7 +519,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
         case 0:
             break;
         default:
-            printf("Instruction Not Implemented: %08x\n", instruction);
+            printf("Instruction Not Implemented: 0x%08x\n", instruction);
             printf("PC = 0x%08x;\n", pc);
             register_dump();
     }
