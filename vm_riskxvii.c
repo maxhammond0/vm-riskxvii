@@ -22,7 +22,7 @@ typedef uint32_t INSTRUCTION;
 #define UJ 111
 
 #define INST_MEM_SIZE 256
-#define DATA_MEM_SIZE 2048
+#define DATA_MEM_SIZE 1024
 
 // program counter
 int pc = 0;
@@ -42,7 +42,7 @@ void print_binary(unsigned int number) {
 void register_dump() {
     // printf("PC = %08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%d] =  %08d\n", i, reg[i]);
+        printf("R[%02d] =  %08d\n", i, reg[i]);
     }
 }
 
@@ -197,26 +197,39 @@ void i(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
             }
             reg[rd] = input;
         } else {
-            // addy = addy / 4;
-            // printf("addy: %d", addy);
-            // TODO unsure if sexted properly
+
+            // TODO sign and extend address
+
+            // location varaible ? 1 : 0 decides where to look for load
+            // instructions
+            // int location = 1;
+
+            // TODO clean store address 
+            // if (addy < 0x3ff) {
+            //     // address points to instruction memory
+            //     // int location = 0;
+            // } else {
+            //     // location points to data memory
+            //     addy = addy - 0x3ff;
+            // }
+
             if (func3 == 0b000) {  // lb
-                if (debug) printf("lb: r[%d] = %d & 0xFFFFFF00 = %d", rd, data_mem[addy], reg[rd]);
+                if (debug) printf("lb: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
                 uint32_t load = data_mem[addy] & 0x000000FF;
                 reg[rd] = load & 0xFFFFFF00;
             } else if (func3 == 0b001) {  // lh
-                if (debug) printf("lh: r[%d] = %d & 0xFFFF0000 = %d", rd, data_mem[addy], reg[rd]);
+                if (debug) printf("lh: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
                 uint32_t load = data_mem[addy] & 0x0000FFFF;
                 reg[rd] = load & 0xFFFF0000;
             } else if (func3 == 0b010) {  // lw
-                if (debug) printf("lw: r[%d] = %d", rd, data_mem[addy]);
+                if (debug) printf("lw: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
                 reg[rd] = data_mem[addy];
             } else if (func3 == 0b100) {  // lbu
-                if (debug) printf("lbu: r[%d] = %d & 0x000000FF = %d", rd, data_mem[addy], reg[rd] & 0x000000FF);
-                reg[rd] = data_mem[addy] & 0x000000FF;
+                if (debug) printf("lbu: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                reg[rd] = data_mem[addy];
             } else if (func3 == 0b101) {  // lhu
-                if (debug) printf("lw: r[%d] = %d & 0x0000FFFF = %d", rd, data_mem[addy], reg[rd] & 0x000000FF);
-                reg[rd] = data_mem[addy] & 0x0000FFFF;
+                if (debug) printf("lhu: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                reg[rd] = data_mem[addy];
             }
         }
     }
@@ -287,17 +300,17 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
         }
 
         if (func3 == 0b000) {  // sb
-            if (debug) printf("sb: data_mem[%d] = r%d(%d)", addy, rs2, reg[rs2]);
+            if (debug) printf("sb: data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             data_mem[addy] = low8bits;
         } else if (func3 == 0b001) {  // sh
-            if (debug) printf("sh: data_mem[%d] = r%d(%d)", addy, rs2, reg[rs2]);
+            if (debug) printf("sh: data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             data_mem[addy+0] = low8bits;
             data_mem[addy+1] = low16bits;
         } else if (func3 == 0b010) {  // sw
-            if (debug) printf("sw: data_mem[%d] = r%d(%d)", addy, rs2, reg[rs2]);
+            if (debug) printf("sw: data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             uint8_t low24bits = mask(reg[rs2], 16, 23);
