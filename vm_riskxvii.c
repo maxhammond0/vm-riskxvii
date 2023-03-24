@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 0;
+int debug = 1;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +66,7 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     }
 
     int i = 0;
-    // Read first 1024 bytes
+    // Read first 1024 bytes into instruction memory
     while (i < INST_MEM_SIZE/4) {
         read(fd, &buffer, 4);
         instructions[i*4] = buffer[0];
@@ -77,7 +77,7 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     }
 
     i = 0;
-    // Read first 1024 bytes
+    // Read nexx 1024 bytes into datamemory
     while (i < DATA_MEM_SIZE/4) {
         read(fd, &buffer, 4);
         data_mem[i*4] = buffer[0];
@@ -543,15 +543,6 @@ int main( int argc, char *argv[]) {
     uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions, data_mem);
-
-    // print instructions
-    // for (int i = 0; i < INST_MEM_SIZE; i+=4) {
-    //     printf("%02x ", instructions[i]);
-    //     printf("%02x ", instructions[i+1]);
-    //     printf("%02x ", instructions[i+2]);
-    //     printf("%02x", instructions[i+3]);
-    //     printf("\n");
-    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
