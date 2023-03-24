@@ -157,7 +157,7 @@ void i(INSTRUCTION instruction,
 
     // Sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 0b11111111111111111111000000000000;  //
+        imm = imm | 0b11111111111111111111100000000000;  //
     }
 
     if (opcode == 0b0010011) {
@@ -282,7 +282,7 @@ void s(INSTRUCTION instruction,
     int imm = (imm5to11 << 5) | imm0to4;
     // sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 4294965248;
+        imm = imm | 0b11111111111111111111100000000000;  //
     }
 
     // Store virtual routines
@@ -400,7 +400,7 @@ void sb(INSTRUCTION instruction) {
 
     // sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 4294965248;
+        imm = imm | 0b11111111111111111111000000000001;
     }
 
 
