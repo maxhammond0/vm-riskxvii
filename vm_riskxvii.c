@@ -80,10 +80,10 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     // Read first 1024 bytes
     while (i < DATA_MEM_SIZE/4) {
         read(fd, &buffer, 4);
-        data_mem[i*4] = buffer[3];
-        data_mem[(i*4)+1] = buffer[2];
-        data_mem[(i*4)+2] = buffer[1];
-        data_mem[(i*4)+3] = buffer[0];
+        data_mem[i*4] = buffer[0];
+        data_mem[(i*4)+1] = buffer[1];
+        data_mem[(i*4)+2] = buffer[2];
+        data_mem[(i*4)+3] = buffer[3];
         i++;
     }
 }
