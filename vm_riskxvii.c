@@ -157,7 +157,7 @@ void i(INSTRUCTION instruction,
 
     // Sign the immediate
     if ((imm >> 11) & 1) {
-        imm = imm | 4294965248;  //
+        imm = imm | 0b11111111111111111111000000000000;  //
     }
 
     if (opcode == 0b0010011) {
@@ -446,9 +446,6 @@ void u(INSTRUCTION instruction) {
     uint32_t imm = mask(instruction, 12, 31);
 
     // sign the immediate
-    // if ((imm >> 19) & 1) {
-    //     imm = imm | 4294965248;
-    // }
     imm = (imm << 12);
 
     reg[rd] = imm;
@@ -461,15 +458,15 @@ void uj(INSTRUCTION instruction) {
 
     // bit fuckery
     uint32_t imm20 = mask(instruction, 31, 31);
-    uint32_t imm1to10 = mask(instruction, 21, 30);
+    uint32_t imm10to1 = mask(instruction, 21, 30);
     uint32_t imm11 = mask(instruction, 20, 20);
-    uint32_t imm11to19 = mask(instruction, 12, 19);
+    uint32_t imm19to12 = mask(instruction, 12, 19);
 
     // bit shift and logical 'or'ing all them together
-    uint32_t imm = (imm20 << 20) |
-        (imm11to19 << 12) |
-        (imm11 << 11) |
-        imm1to10;
+    uint32_t imm = (imm20 << 19) |
+        (imm19to12 << 11) |
+        (imm11 << 10) |
+        imm10to1;
 
     // sign the immediate
     if ((imm >> 19) & 1) {
