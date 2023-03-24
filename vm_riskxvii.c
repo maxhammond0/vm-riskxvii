@@ -69,12 +69,6 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     // Read first 1024 bytes
     while (i < INST_MEM_SIZE/4) {
         read(fd, &buffer, 4);
-        // INSTRUCTION op = 0u;
-        // op |= buffer[3] << 24;  // 0xAA000000
-        // op |= buffer[2] << 16;  // 0xaaBB0000
-        // op |= buffer[1] << 8;   // 0xaabbCC00
-        // op |= buffer[0];        // 0xaabbccDD
-        // instructions[i] = op;
         instructions[i*4] = buffer[3];
         instructions[(i*4)+1] = buffer[2];
         instructions[(i*4)+2] = buffer[1];
@@ -217,39 +211,62 @@ void i(INSTRUCTION instruction,
 
             // TODO sign and extend address
 
-            // uint8_t location = *data_mem; 
+            uint8_t *location = data_mem;
 
             // TODO clean store address 
             if (addy < 0x3ff) {
                 // address points to instruction memory
-                // location = *instruction_mem;
+                location = instruction_mem;
+            } else {
+                addy = addy - 0x400;
             }
 
-            addy = addy - 0x400;
 
             if (func3 == 0b000) {  // lb
-                if (debug) printf("lb: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
-                uint32_t load = data_mem[addy] & 0x000000FF;
+                if (debug) {
+                    printf("lb: ");
+                    if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                    else printf("r[%d] = instruction_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                }
+                uint32_t load = location[addy] & 0x000000FF;
                 reg[rd] = load & 0xFFFFFF00;
             } else if (func3 == 0b001) {  // lh
-                if (debug) printf("lh: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
-                uint32_t load = data_mem[addy] & 0x0000FFFF;
+                if (debug) {
+                    printf("lh ");
+                    if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                    else printf("r[%d] = location_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                }
+                uint32_t load = location[addy] & 0x0000FFFF;
                 reg[rd] = load & 0xFFFF0000;
             } else if (func3 == 0b010) {  // lw
-                if (debug) printf("lw: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
-                reg[rd] = data_mem[addy];
+                if (debug) {
+                    printf("lw ");
+                    if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                    else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                }
+                reg[rd] = location[addy];
             } else if (func3 == 0b100) {  // lbu
-                if (debug) printf("lbu: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
-                reg[rd] = data_mem[addy];
+                if (debug) {
+                    printf("lbu ");
+                    if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                    else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                }
+                reg[rd] = location[addy];
             } else if (func3 == 0b101) {  // lhu
-                if (debug) printf("lhu: r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
-                reg[rd] = data_mem[addy];
+                if (debug) {
+                    printf("lhu ");
+                    if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                    else printf("r[%d] = data_mem[r%d(%d) + %d = %d)]", rd, rs1, reg[rs1], imm, reg[rs1]+imm);
+                }
+                reg[rd] = location[addy];
             }
         }
     }
 }
 
-void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
+void s(INSTRUCTION instruction,
+       uint8_t instruction_mem[INST_MEM_SIZE],
+       uint8_t data_mem[DATA_MEM_SIZE]) {
 
     uint32_t func3 = mask(instruction, 12, 14);
     uint32_t rs1 = mask(instruction, 15, 19);
@@ -305,6 +322,17 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     } else {
 
         // addy = addy / 4;
+        uint8_t *location = data_mem;
+        // printf("addy: %d", addy);
+
+        // TODO clean store address 
+        if (addy < 0x400) {
+            // address points to instruction memory
+            printf("INSTRUCTION MEM");
+            location = instruction_mem;
+        }
+
+        addy = addy - 0x400;
 
         if (addy < 0 || addy > DATA_MEM_SIZE) {
             printf("\naddy: %d\n", addy);
@@ -313,26 +341,39 @@ void s(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
             exit(4);
         }
 
+        //  TODO might not need to store in little endian
         if (func3 == 0b000) {  // sb
-            if (debug) printf("sb: data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+            if (debug) {
+                printf("sb: ");
+                if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+            }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
-            data_mem[addy] = low8bits;
+            location[addy] = low8bits;
         } else if (func3 == 0b001) {  // sh
-            if (debug) printf("sh: data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+            if (debug) {
+                printf("sh: ");
+                if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+            }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
-            data_mem[addy+0] = low8bits;
-            data_mem[addy+1] = low16bits;
+            location[addy+0] = low8bits;
+            location[addy+1] = low16bits;
         } else if (func3 == 0b010) {  // sw
-            if (debug) printf("sw: data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+            if (debug) {
+                printf("sw: ");
+                if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+            }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             uint8_t low24bits = mask(reg[rs2], 16, 23);
             uint8_t low32bits = mask(reg[rs2], 24, 31);
-            data_mem[addy+0] = low8bits;
-            data_mem[addy+1] = low16bits;
-            data_mem[addy+2] = low24bits;
-            data_mem[addy+3] = low32bits;
+            location[addy+0] = low8bits;
+            location[addy+1] = low16bits;
+            location[addy+2] = low24bits;
+            location[addy+3] = low32bits;
         }
     }
 }
@@ -360,33 +401,33 @@ void sb(INSTRUCTION instruction) {
 
 
     if (func3 == 0b000) {  // beq
-        if (debug) printf("if (r%d(%d) == r%d(%d)) beq: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc*4, imm << 1);
+        if (debug) printf("if (r%d(%d) == r%d(%d)) beq: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if (reg[rs1] == reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 1) {  // bne
-        if (debug) printf("if (r%d(%d) != r%d(%d)) bne: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc*4, imm << 1);
+        if (debug) printf("if (r%d(%d) != r%d(%d)) bne: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if (reg[rs1] != reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 4) {  // blt
-        if (debug) printf("if (r%d(%d) < r%d(%d)) blt: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc*4, imm << 1);
+        if (debug) printf("if (r%d(%d) < r%d(%d)) blt: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if (reg[rs1] < reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 6) {  // bltu
-        if (debug) printf("if (r%d(%d) < r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc*4, imm << 1);
+        if (debug) printf("if (r%d(%d) < r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
         if ((uint32_t)reg[rs1] < (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 5) {  // bge
-        if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc*4, imm << 1);
+        if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if (reg[rs1] > reg[rs2]) {
             pc = pc + (imm << 1) - 4;
             if (debug) printf("bge: PC = PC(%d) + %d", pc*4, imm << 1);
         }
     } else if (func3 == 7) {  // bgeu
-        if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc*4, imm << 1);
+        if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
         if ((uint32_t)reg[rs1] > (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
@@ -463,7 +504,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
             i(instruction, instructions, data_mem);
             break;
         case S:
-            s(instruction, data_mem);
+            s(instruction, instructions, data_mem);
             break;
         case SB:
             sb(instruction);
