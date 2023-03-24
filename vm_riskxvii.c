@@ -142,6 +142,7 @@ void i(INSTRUCTION instruction, uint8_t data_mem[DATA_MEM_SIZE]) {
     unsigned int rs1 = mask(instruction, 15, 19);
     uint32_t imm = mask(instruction, 20, 31);
 
+
     uint32_t unsigned_imm = imm;
 
     // Sign the immediate
