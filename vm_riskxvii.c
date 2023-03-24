@@ -42,7 +42,7 @@ void print_binary(unsigned int number) {
 void register_dump() {
     // printf("PC = %08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
-        printf("R[%02d] =  %08d\n", i, reg[i]);
+        printf("R[%d] =  %08x;\n", i, reg[i]);
     }
 }
 
@@ -445,7 +445,7 @@ void u(INSTRUCTION instruction) {
     unsigned int rd = mask(instruction, 7, 11);
     uint32_t imm = mask(instruction, 12, 31);
 
-    // sign the immediate
+    // bit shift the immediate
     imm = (imm << 12);
 
     reg[rd] = imm;
@@ -519,10 +519,9 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
         case 0:
             break;
         default:
-            printf("opcode not found, ");
-            printf("opcode was: ");
-            print_binary(opcode);
-            printf("\n");
+            printf("Instruction Not Implemented: %08x", instruction);
+            printf("PC: %08x;", pc);
+            register_dump();
     }
 
     reg[0] = 0;
