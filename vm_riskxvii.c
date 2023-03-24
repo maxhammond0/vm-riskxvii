@@ -522,6 +522,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
             printf("Instruction Not Implemented: 0x%08x\n", instruction);
             printf("PC = 0x%08x;\n", pc);
             register_dump();
+            exit(3);
     }
 
     reg[0] = 0;
