@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 1;
+int debug = 0;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -279,6 +279,12 @@ void s(INSTRUCTION instruction,
     int imm0to4 = mask(instruction, 7, 11);
     int imm5to11 = mask(instruction, 25, 31);
 
+    int imm = (imm5to11 << 5) | imm0to4;
+    // sign the immediate
+    if ((imm >> 11) & 1) {
+        imm = imm | 4294965248;
+    }
+
     // Store virtual routines
     int write_c = 0x800;
     int write_i = 0x804;
@@ -287,12 +293,6 @@ void s(INSTRUCTION instruction,
     int dump_pc = 0x820;
     int dump_gpr = 0x824;
     // int heap_banks = 2088;
-
-    int imm = (imm5to11 << 5) | imm0to4;
-    // sign the immediate
-    if ((imm >> 11) & 1) {
-        imm = imm | 4294965248;
-    }
 
     int addy = (reg[rs1] + imm);
 
@@ -393,9 +393,9 @@ void sb(INSTRUCTION instruction) {
     uint32_t imm12 = mask(instruction, 31, 31);
     uint32_t imm5to10 = mask(instruction, 25, 30);
 
-    int32_t imm = (imm12 << 11) |
-        (imm11 << 10) |
-        (imm5to10 << 4) |
+    int32_t imm = (imm12 << 12) |
+        (imm11 << 11) |
+        (imm5to10 << 5) |
         (imm1to4);
 
     // sign the immediate
@@ -446,9 +446,9 @@ void u(INSTRUCTION instruction) {
     uint32_t imm = mask(instruction, 12, 31);
 
     // sign the immediate
-    if ((imm >> 19) & 1) {
-        imm = imm | 4294965248;
-    }
+    // if ((imm >> 19) & 1) {
+    //     imm = imm | 4294965248;
+    // }
     imm = (imm << 12);
 
     reg[rd] = imm;
@@ -461,15 +461,15 @@ void uj(INSTRUCTION instruction) {
 
     // bit fuckery
     uint32_t imm20 = mask(instruction, 31, 31);
-    uint32_t imm10to1 = mask(instruction, 21, 30);
+    uint32_t imm1to10 = mask(instruction, 21, 30);
     uint32_t imm11 = mask(instruction, 20, 20);
-    uint32_t imm19to12 = mask(instruction, 12, 19);
+    uint32_t imm11to19 = mask(instruction, 12, 19);
 
     // bit shift and logical 'or'ing all them together
-    uint32_t imm = (imm20 << 19) |
-        (imm19to12 << 11) |
-        (imm11 << 10) |
-        imm10to1;
+    uint32_t imm = (imm20 << 20) |
+        (imm11to19 << 12) |
+        (imm11 << 11) |
+        imm1to10;
 
     // sign the immediate
     if ((imm >> 19) & 1) {
