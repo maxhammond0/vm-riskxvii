@@ -217,12 +217,12 @@ void i(INSTRUCTION instruction,
 
             // TODO sign and extend address
 
-            uint8_t location = *data_mem; 
+            // uint8_t location = *data_mem; 
 
             // TODO clean store address 
             if (addy < 0x3ff) {
                 // address points to instruction memory
-                location = *instruction_mem;
+                // location = *instruction_mem;
             }
 
             addy = addy - 0x400;
