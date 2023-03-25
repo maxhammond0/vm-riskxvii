@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 0;
+int debug = 1;
 
 #include <stdio.h>
 #include <stdlib.h>
