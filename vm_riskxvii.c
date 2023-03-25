@@ -193,7 +193,7 @@ void i(INSTRUCTION instruction,
         int read_i = 2070;
 
         if (addy == read_i) {
-            uint32_t input;
+            int32_t input;
             if (debug) printf("Enter integer: ");
             scanf("%d", &input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
