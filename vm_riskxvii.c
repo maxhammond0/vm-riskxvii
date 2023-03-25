@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 1;
+int debug = 0;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -318,7 +318,7 @@ void s(INSTRUCTION instruction,
     } else if (addy == write_ui) {
         uint32_t b = reg[rs2];
         if (debug) printf("write unsigned int from r%d(%u): ", rs2, (unsigned)reg[rs2]);
-        printf("%08x", b);
+        printf("%x", b);
         return;
     } else if (addy == dump_pc) {
         if (debug) printf("dump program counter: ");
