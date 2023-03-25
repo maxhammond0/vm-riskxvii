@@ -53,9 +53,7 @@ unsigned int mask(INSTRUCTION n, int i, int j) {
 }
 
 void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) {
-    // Reads file and loads instructions into the instructions array
     int fd;
-    uint8_t buffer[4] = {0};
 
     // If file can't be read
     if ((fd = open(filepath, O_RDONLY)) < 0) {
@@ -64,27 +62,8 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
         exit(2);
     }
 
-    int i = 0;
-    // Read first 1024 bytes into instruction memory 4 bytes at a time
-    while (i < INST_MEM_SIZE/4) {
-        read(fd, &buffer, 4);
-        instructions[i*4] = buffer[0];
-        instructions[(i*4)+1] = buffer[1];
-        instructions[(i*4)+2] = buffer[2];
-        instructions[(i*4)+3] = buffer[3];
-        i++;
-    }
-
-    i = 0;
-    // Read nexx 1024 bytes into datamemory
-    while (i < DATA_MEM_SIZE/4) {
-        read(fd, &buffer, 4);
-        data_mem[i*4] = buffer[0];
-        data_mem[(i*4)+1] = buffer[1];
-        data_mem[(i*4)+2] = buffer[2];
-        data_mem[(i*4)+3] = buffer[3];
-        i++;
-    }
+    read(fd, instructions, INST_MEM_SIZE);
+    read(fd, data_mem, DATA_MEM_SIZE);
 }
 
 void r(INSTRUCTION instruction) {
