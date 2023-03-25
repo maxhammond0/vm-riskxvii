@@ -318,7 +318,7 @@ void s(INSTRUCTION instruction,
     } else if (addy == write_ui) {
         uint32_t b = reg[rs2];
         if (debug) printf("write unsigned int from r%d(%u): ", rs2, (unsigned)reg[rs2]);
-        printf("%x", b);
+        printf("%ux", b);
         return;
     } else if (addy == dump_pc) {
         if (debug) printf("dump program counter: ");
