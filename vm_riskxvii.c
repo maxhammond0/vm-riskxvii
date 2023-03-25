@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 1;
+int debug = 0;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,27 +99,27 @@ void r(INSTRUCTION instruction) {
 
     if (func3 == 0b000 && func7 == 0b0000000) {  // add
         if (debug) printf("add: r[%d] = r%d(%d) + r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = reg[rs1] + reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] + (uint32_t)reg[rs2];
     }
     else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
         if (debug) printf("sub: r[%d] = r%d(%d) - r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = reg[rs1] - reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] - (uint32_t)reg[rs2];
     }
     else if (func3 == 0b100 && func7 == 0b0000000) {  // xor
         if (debug) printf("xor: r[%d] = r%d(%d) ^ r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = reg[rs1] ^ reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] ^ (uint32_t)reg[rs2];
     }
     else if (func3 == 0b110 && func7 == 0b0000000) {  // or
         if (debug) printf("or: r[%d] = r%d(%d) | r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = reg[rs1] | reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] | (uint32_t)reg[rs2];
     }
     else if (func3 == 0b111 && func7 == 0b0000000) {  // and
         if (debug) printf("and: r[%d] = r%d(%d) & r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = reg[rs1] & reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] & (uint32_t)reg[rs2];
     }
     else if (func3 == 0b001 && func7 == 0b0000000) {  // sll
         if (debug) printf("sll: r[%d] = r%d(%u) << r%d(%u) = %d", rd, rs1, reg[rs1], rs2, reg[rs2], reg[rs1] << reg[rs2]);
-        reg[rd] = reg[rs1] << reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] << (uint32_t)reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
         if (debug) printf("srl: r[%d] = r%d(%u) >> r%d(%u)", rd, rs1, reg[rs1], rs2, reg[rs2]);
