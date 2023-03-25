@@ -199,7 +199,8 @@ void i(INSTRUCTION instruction,
                 else printf("Enter integer: ");
             }
             scanf("%d", &input);
-            printf("%d", input);
+            printf("|%d|\n", input);
+            exit(5);
             if (addy == read_c) {
                 input = (char)input;
             } else {
