@@ -192,20 +192,18 @@ void i(INSTRUCTION instruction,
         int read_c = 2066;
         int read_i = 2070;
 
-        if (addy == read_c || addy == read_i) {
+        if (addy == read_i) {
             uint32_t input;
-            if (debug) {
-                if (addy == read_c) printf("Enter character: ");
-                else printf("Enter integer: ");
-            }
-            // if (addy == read_c) {
-            //     input = (char)input;
-            // } else {
-            //     input = (uint32_t)input;
-            // }
+            if (debug) printf("Enter integer: ");
+            scanf("%d", &input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
-            scanf("%d", &reg[rd]);
+        } else if (addy == read_c) {
+            char input;
+            if (debug) printf("Enter character: ");
+            scanf("%c", &input);
+            if (debug) printf("r%d(%d) = %c", rd, reg[rd], input);
+            reg[rd] = input;
         } else {
 
             // TODO sign and extend address
