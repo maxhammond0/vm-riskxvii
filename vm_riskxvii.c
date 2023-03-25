@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 0;
+int debug = 1;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -178,7 +178,7 @@ void i(INSTRUCTION instruction,
             reg[rd] = (reg[rs1] < imm) ? 1 : 0;
         } else if (func3 == 0b011) {  // sltiu
             if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
-            reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
+            reg[rd] = (reg[rs1] < unsigned_imm) ? 1 : 0;
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
@@ -203,7 +203,7 @@ void i(INSTRUCTION instruction,
             if (addy == read_c) {
                 input = (char)input;
             } else {
-                input = (int)input;
+                input = (uint32_t)input;
             }
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
