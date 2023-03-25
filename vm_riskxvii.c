@@ -300,7 +300,6 @@ void s(INSTRUCTION instruction,
 
     if (addy == halt) {
         printf("CPU Halt Requested\n");
-        printf("%d", pc);
         if (debug) register_dump();
         exit(0);
     }
