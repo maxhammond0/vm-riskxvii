@@ -545,18 +545,26 @@ int main( int argc, char *argv[]) {
     uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions, data_mem);
+    
+    // print(instructions)
+    for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
+        printf("%x %x %x %x\n", instructions[i*4],
+               instructions[(i*4)+1],
+               instructions[(i*4)+2],
+               instructions[(i*4)+3]);
+    }
 
     // Run program
-    for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
-        if (debug) printf("pc: %04d, ", pc);
-        process_instruction(instructions,
-                            instructions[pc],
-                            instructions[pc+1],
-                            instructions[pc+2],
-                            instructions[pc+3],
-                            data_mem);
-        if (debug) printf("\n");
-    }
+    // for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
+    //     if (debug) printf("pc: %04d, ", pc);
+    //     process_instruction(instructions,
+    //                         instructions[pc],
+    //                         instructions[pc+1],
+    //                         instructions[pc+2],
+    //                         instructions[pc+3],
+    //                         data_mem);
+    //     if (debug) printf("\n");
+    // }
 
     return 0;
 }
