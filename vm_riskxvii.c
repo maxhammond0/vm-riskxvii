@@ -233,6 +233,7 @@ void i(INSTRUCTION instruction,
                     printf("lb: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        printf("\n");
                 }
                 uint32_t load = location[addy] & 0x000000FF;
                 reg[rd] = load & 0xFFFFFF00;
@@ -241,6 +242,7 @@ void i(INSTRUCTION instruction,
                     printf("lh: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        printf("\n");
                 }
                 uint32_t load = location[addy] & 0x0000FFFF;
                 reg[rd] = load & 0xFFFF0000;
@@ -249,6 +251,7 @@ void i(INSTRUCTION instruction,
                     printf("lw: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        printf("\n");
                 }
                 reg[rd] = location[addy];
             } else if (func3 == 0b100) {  // lbu
@@ -256,6 +259,7 @@ void i(INSTRUCTION instruction,
                     printf("lbu: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        printf("\n");
                 }
                 reg[rd] = location[addy];
             } else if (func3 == 0b101) {  // lhu
@@ -263,6 +267,7 @@ void i(INSTRUCTION instruction,
                     printf("lhu: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        printf("\n");
                 }
                 reg[rd] = location[addy];
             }
