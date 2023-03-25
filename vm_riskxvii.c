@@ -410,17 +410,17 @@ void sb(INSTRUCTION instruction) {
 
     if (func3 == 0b000) {  // beq
         if (debug) printf("if (r%d(%d) == r%d(%d)) beq: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
-        if (reg[rs1] == reg[rs2]) {
+        if ((int32_t)reg[rs1] == (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 1) {  // bne
         if (debug) printf("if (r%d(%d) != r%d(%d)) bne: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
-        if (reg[rs1] != reg[rs2]) {
+        if ((int32_t)reg[rs1] != (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 4) {  // blt
         if (debug) printf("if (r%d(%d) < r%d(%d)) blt: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
-        if (reg[rs1] < reg[rs2]) {
+        if ((int32_t)reg[rs1] < (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 6) {  // bltu
@@ -429,10 +429,9 @@ void sb(INSTRUCTION instruction) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 5) {  // bge
-        if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
-        if (reg[rs1] > reg[rs2]) {
+        if (debug) printf("if (r%d(%d) > r%d(%d)) bge: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
+        if ((int32_t)reg[rs1] > (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
-            if (debug) printf("bge: PC = PC(%d) + %d", pc*4, imm << 1);
         }
     } else if (func3 == 7) {  // bgeu
         if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
