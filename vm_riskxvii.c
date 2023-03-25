@@ -123,7 +123,7 @@ void r(INSTRUCTION instruction) {
     }
     else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
         if (debug) printf("srl: r[%d] = r%d(%u) >> r%d(%u)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = reg[rs1] >> reg[rs2];
+        reg[rd] = (uint32_t)reg[rs1] >> (uint32_t)reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0100000) {  // sra
         // TODO read spec and fix
