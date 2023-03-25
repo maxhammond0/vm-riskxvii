@@ -57,8 +57,7 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
 
     // If file can't be read
     if ((fd = open(filepath, O_RDONLY)) < 0) {
-        printf("Could not open file\n");
-        printf("Exiting...\n");
+        printf("Please provide a valid file path\n");
         exit(2);
     }
 
@@ -209,23 +208,25 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                uint32_t load = location[addy] & 0x000000FF;
-                reg[rd] = load & 0xFFFFFF00;
+                reg[rd] = location[addy];
             } else if (func3 == 0b001) {  // lh
                 if (debug) {
                     printf("lh: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                uint32_t load = location[addy] & 0x0000FFFF;
-                reg[rd] = load & 0xFFFF0000;
+                reg[rd] = location[addy] |
+                    location[addy+1] << 8;
             } else if (func3 == 0b010) {  // lw
                 if (debug) {
                     printf("lw: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy];
+                reg[rd] = location[addy] |
+                    location[addy+1] << 8 |
+                    location[addy+2] << 16 |
+                    location[addy+3] << 24;
             } else if (func3 == 0b100) {  // lbu
                 if (debug) {
                     printf("lbu: ");
@@ -239,7 +240,8 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy];
+                reg[rd] = location[addy] |
+                    location[addy+1] << 8;
             }
         }
     }
@@ -309,20 +311,20 @@ void s(INSTRUCTION instruction,
         // TODO clean store address 
         if (addy < 0x400) {
             // address points to instruction memory
-            printf("INSTRUCTION MEM\n");
-            printf("%d\n", addy);
+            // printf("INSTRUCTION MEM\n");
+            // printf("%u\n", addy);
             location = instruction_mem;
         } else {
             addy = addy - 0x400;
         }
 
-        if (addy < 0 || addy > DATA_MEM_SIZE) {
-            printf("address out of bounds on store instruction");
-            printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
-            printf("address out of bounds\n!\n");
-            register_dump();
-            exit(4);
-        }
+        // if (addy < 0 || addy > DATA_MEM_SIZE) {
+        //     printf("address out of bounds on store instruction");
+        //     printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
+        //     printf("address out of bounds\n!\n");
+        //     register_dump();
+        //     exit(4);
+        // }
 
         if (func3 == 0b000) {  // sb
             if (debug) {
@@ -340,8 +342,8 @@ void s(INSTRUCTION instruction,
             }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
-            location[addy+0] = low8bits;
-            location[addy+1] = low16bits;
+            location[addy+1] = low8bits;
+            location[addy+0] = low16bits;
         } else if (func3 == 0b010) {  // sw
             if (debug) {
                 printf("sw: ");
@@ -352,10 +354,10 @@ void s(INSTRUCTION instruction,
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             uint8_t low24bits = mask(reg[rs2], 16, 23);
             uint8_t low32bits = mask(reg[rs2], 24, 31);
-            location[addy+0] = low8bits;
-            location[addy+1] = low16bits;
-            location[addy+2] = low24bits;
-            location[addy+3] = low32bits;
+            location[addy+3] = low8bits;
+            location[addy+2] = low16bits;
+            location[addy+1] = low24bits;
+            location[addy+0] = low32bits;
         }
     }
 }
@@ -380,7 +382,6 @@ void sb(INSTRUCTION instruction) {
     if ((imm >> 11) & 1) {
         imm = imm | 0b11111111111111111111100000000000;
     }
-
 
     if (func3 == 0b000) {  // beq
         if (debug) printf("if (r%d(%d) == r%d(%d)) beq: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
@@ -515,14 +516,6 @@ int main( int argc, char *argv[]) {
     uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions, data_mem);
-    
-    // print(instructions)
-    // for (int i = 0; i < INST_MEM_SIZE; i+=4) {
-    //     printf("%x %x %x %x\n", instructions[i*4],
-    //            instructions[(i*4)+1],
-    //            instructions[(i*4)+2],
-    //            instructions[(i*4)+3]);
-    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
