@@ -206,11 +206,8 @@ void i(INSTRUCTION instruction,
             reg[rd] = input;
         } else {
 
-            // TODO sign and extend address
-
             uint8_t *location = data_mem;
 
-            // TODO clean store address 
             if (addy < 0x400) {
                 location = instruction_mem;
             } else {
@@ -223,8 +220,7 @@ void i(INSTRUCTION instruction,
                 printf("address out of bounds\n!\n");
                 register_dump();
                 exit(4);
-        }
-
+            }
 
             if (func3 == 0b000) {  // lb
                 if (debug) {
@@ -347,7 +343,6 @@ void s(INSTRUCTION instruction,
             exit(4);
         }
 
-        //  TODO might not need to store in little endian
         if (func3 == 0b000) {  // sb
             if (debug) {
                 printf("sb: ");
@@ -411,29 +406,29 @@ void sb(INSTRUCTION instruction) {
         if ((int32_t)reg[rs1] == (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
-    } else if (func3 == 1) {  // bne
+    } else if (func3 == 0b001) {  // bne
         if (debug) printf("if (r%d(%d) != r%d(%d)) bne: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if ((int32_t)reg[rs1] != (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
-    } else if (func3 == 4) {  // blt
+    } else if (func3 == 0b100) {  // blt
         if (debug) printf("if (r%d(%d) < r%d(%d)) blt: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if ((int32_t)reg[rs1] < (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
-    } else if (func3 == 6) {  // bltu
+    } else if (func3 == 0b110) {  // bltu
         if (debug) printf("if (r%d(%d) < r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
-        if (reg[rs1] < reg[rs2]) {
+        if ((uint32_t)reg[rs1] < (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
-    } else if (func3 == 5) {  // bge
-        if (debug) printf("if (r%d(%d) > r%d(%d)) bge: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
-        if ((int32_t)reg[rs1] > (int32_t)reg[rs2]) {
+    } else if (func3 == 0b101) {  // bge
+        if (debug) printf("if (r%d(%d) >= r%d(%d)) bge: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
+        if ((int32_t)reg[rs1] >= (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
-    } else if (func3 == 7) {  // bgeu
-        if (debug) printf("if (r%d(%d) > r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
-        if (reg[rs1] > reg[rs2]) {
+    } else if (func3 == 0b111) {  // bgeu
+        if (debug) printf("if (r%d(%d) >= r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
+        if ((uint32_t)reg[rs1] >= reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else {
