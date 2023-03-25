@@ -118,7 +118,7 @@ void r(INSTRUCTION instruction) {
         reg[rd] = reg[rs1] & reg[rs2];
     }
     else if (func3 == 0b001 && func7 == 0b0000000) {  // sll
-        if (debug) printf("sll: r[%d] = r%d(%d) << r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        if (debug) printf("sll: r[%d] = r%d(%u) << r%d(%u) = %d", rd, rs1, reg[rs1], rs2, reg[rs2], reg[rs1] << reg[rs2]);
         reg[rd] = reg[rs1] << reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
