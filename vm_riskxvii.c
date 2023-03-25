@@ -66,7 +66,7 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     }
 
     int i = 0;
-    // Read first 1024 bytes into instruction memory
+    // Read first 1024 bytes into instruction memory 4 bytes at a time
     while (i < INST_MEM_SIZE/4) {
         read(fd, &buffer, 4);
         instructions[i*4] = buffer[0];
@@ -215,15 +215,18 @@ void i(INSTRUCTION instruction,
 
             // TODO clean store address 
             if (addy < 0x3ff) {
-                // address points to instruction memory
                 location = instruction_mem;
-                // de-little endian the data
-                if (addy % 4 == 0) {
-
-                }
             } else {
                 addy = addy - 0x400;
             }
+
+            if (addy < 0 || addy > DATA_MEM_SIZE) {
+                printf("Address out of bounds on load instruction");
+                printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
+                printf("address out of bounds\n!\n");
+                register_dump();
+                exit(4);
+        }
 
 
             if (func3 == 0b000) {  // lb
@@ -236,7 +239,7 @@ void i(INSTRUCTION instruction,
                 reg[rd] = load & 0xFFFFFF00;
             } else if (func3 == 0b001) {  // lh
                 if (debug) {
-                    printf("lh ");
+                    printf("lh: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
@@ -244,21 +247,21 @@ void i(INSTRUCTION instruction,
                 reg[rd] = load & 0xFFFF0000;
             } else if (func3 == 0b010) {  // lw
                 if (debug) {
-                    printf("lw ");
+                    printf("lw: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
                 reg[rd] = location[addy];
             } else if (func3 == 0b100) {  // lbu
                 if (debug) {
-                    printf("lbu ");
+                    printf("lbu: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
                 reg[rd] = location[addy];
             } else if (func3 == 0b101) {  // lhu
                 if (debug) {
-                    printf("lhu ");
+                    printf("lhu: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
@@ -314,8 +317,8 @@ void s(INSTRUCTION instruction,
         return;
     } else if (addy == write_ui) {
         uint32_t b = reg[rs2];
-        if (debug) printf("write unsigned int from r%d(%d): ", rs2, (unsigned)reg[rs2]);
-        printf("%d", b);
+        if (debug) printf("write unsigned int from r%d(%u): ", rs2, (unsigned)reg[rs2]);
+        printf("%u", b);
         return;
     } else if (addy == dump_pc) {
         if (debug) printf("dump program counter: ");
@@ -334,12 +337,13 @@ void s(INSTRUCTION instruction,
             // address points to instruction memory
             printf("INSTRUCTION MEM");
             location = instruction_mem;
+        } else {
+            addy = addy - 0x400;
         }
 
-        addy = addy - 0x400;
-
         if (addy < 0 || addy > DATA_MEM_SIZE) {
-            printf("\naddy: %d\n", addy);
+            printf("address out of bounds on store instruction");
+            printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
             printf("address out of bounds\n!\n");
             register_dump();
             exit(4);
