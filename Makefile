@@ -2,8 +2,8 @@ TARGET = vm_riskxvii
 
 CC = gcc
 
-CFLAGS     = -Os
-ASAN_FLAGS =
+CFLAGS     = -c -Wall -Wvla -Werror -O0 -g -std=c11 -Os
+ASAN_FLAGS = -fsanitize=address
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
