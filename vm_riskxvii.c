@@ -2,12 +2,11 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 0;
+int debug = 1;
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <limits.h>
@@ -301,6 +300,7 @@ void s(INSTRUCTION instruction,
 
     if (addy == halt) {
         printf("CPU Halt Requested\n");
+        printf("%d", pc);
         if (debug) register_dump();
         exit(0);
     }
@@ -335,7 +335,8 @@ void s(INSTRUCTION instruction,
         // TODO clean store address 
         if (addy < 0x400) {
             // address points to instruction memory
-            printf("INSTRUCTION MEM");
+            printf("INSTRUCTION MEM\n");
+            printf("%d\n", addy);
             location = instruction_mem;
         } else {
             addy = addy - 0x400;
