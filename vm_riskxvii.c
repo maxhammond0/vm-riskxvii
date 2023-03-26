@@ -208,14 +208,23 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy];
+                // sext
+                uint32_t byte = location[addy];
+                if (byte >> 7 == 1) {
+                    byte = byte | 0b11111111111111111111111110000000;
+                }
+                reg[rd] = byte;
             } else if (func3 == 0b001) {  // lh
                 if (debug) {
                     printf("lh: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy] | location[addy] << 8;
+                uint32_t byte2 = location[addy] | location[addy+1] << 8;
+                if (byte2 >> 15 == 1) {
+                    byte2 = byte2 | 0b11111111111111111000000000000000;
+                }
+                reg[rd] = byte2;
             } else if (func3 == 0b010) {  // lw
                 if (debug) {
                     printf("lw: ");
