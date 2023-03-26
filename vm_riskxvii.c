@@ -215,8 +215,7 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy] |
-                    location[addy+1] << 8;
+                reg[rd] = location[addy] | location[addy] << 8;
             } else if (func3 == 0b010) {  // lw
                 if (debug) {
                     printf("lw: ");
@@ -226,7 +225,7 @@ void i(INSTRUCTION instruction,
                 reg[rd] = location[addy] |
                     location[addy+1] << 8 |
                     location[addy+2] << 16 |
-                    location[addy+3] << 24;
+                    location[addy+3];
             } else if (func3 == 0b100) {  // lbu
                 if (debug) {
                     printf("lbu: ");
@@ -240,8 +239,7 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy] |
-                    location[addy+1] << 8;
+                reg[rd] = location[addy] | location[addy] << 8;
             }
         }
     }
@@ -304,15 +302,13 @@ void s(INSTRUCTION instruction,
         register_dump();
     } else {
 
-        // addy = addy / 4;
         uint8_t *location = data_mem;
-        // printf("addy: %d", addy);
 
         // TODO clean store address 
         if (addy < 0x400) {
             // address points to instruction memory
-            // printf("INSTRUCTION MEM\n");
-            // printf("%u\n", addy);
+            printf("INSTRUCTION MEM\n");
+            printf("%d\n", addy);
             location = instruction_mem;
         } else {
             addy = addy - 0x400;
@@ -342,8 +338,8 @@ void s(INSTRUCTION instruction,
             }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
-            location[addy+1] = low8bits;
-            location[addy+0] = low16bits;
+            location[addy+0] = low8bits;
+            location[addy+1] = low16bits;
         } else if (func3 == 0b010) {  // sw
             if (debug) {
                 printf("sw: ");
@@ -354,10 +350,10 @@ void s(INSTRUCTION instruction,
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             uint8_t low24bits = mask(reg[rs2], 16, 23);
             uint8_t low32bits = mask(reg[rs2], 24, 31);
-            location[addy+3] = low8bits;
-            location[addy+2] = low16bits;
-            location[addy+1] = low24bits;
-            location[addy+0] = low32bits;
+            location[addy+0] = low8bits;
+            location[addy+1] = low16bits;
+            location[addy+2] = low24bits;
+            location[addy+3] = low32bits;
         }
     }
 }
