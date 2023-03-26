@@ -316,8 +316,8 @@ void s(INSTRUCTION instruction,
         // TODO clean store address 
         if (addy < 0x400) {
             // address points to instruction memory
-            printf("INSTRUCTION MEM\n");
-            printf("%d\n", addy);
+            // printf("INSTRUCTION MEM\n");
+            // printf("%d\n", addy);
             location = instruction_mem;
         } else {
             addy = addy - 0x400;
