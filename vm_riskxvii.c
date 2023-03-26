@@ -108,7 +108,6 @@ void r(INSTRUCTION instruction) {
         uint32_t runoff = mask(reg[rs1], 0, reg[rs2]) << (32 - reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
         reg[rd] = runoff & reg[rd];
-        printf("sra\n");
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
@@ -151,14 +150,14 @@ void i(INSTRUCTION instruction,
             if (debug) printf("andi: r[%d] = r%d(%d) | (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] | imm;
         } else if (func3 == 0b111) {  // andi
-            if (debug) printf("slti: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
+            if (debug) printf("andi: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] & imm;
         } else if (func3 == 0b010) {  // slti
             if (debug) printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
             reg[rd] = (reg[rs1] < imm) ? 1 : 0;
         } else if (func3 == 0b011) {  // sltiu
             if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
-            reg[rd] = (reg[rs1] < unsigned_imm) ? 1 : 0;
+            reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
