@@ -108,6 +108,7 @@ void r(INSTRUCTION instruction) {
         uint32_t runoff = mask(reg[rs1], 0, reg[rs2]) << (32 - reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
         reg[rd] = runoff & reg[rd];
+        printf("sra\n");
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
