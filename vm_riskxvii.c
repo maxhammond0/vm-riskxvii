@@ -278,7 +278,8 @@ void s(INSTRUCTION instruction,
     int halt = 0x80c;
     int dump_pc = 0x820;
     int dump_gpr = 0x824;
-    // int heap_banks = 2088;
+    int malloc = 0x830;
+    int free = 0x834;
 
     int addy = (reg[rs1] + imm);
 
@@ -309,7 +310,11 @@ void s(INSTRUCTION instruction,
     } else if (addy == dump_gpr) {
         if (debug) printf("dump registers: \n");
         register_dump();
-    } else {
+    } else if (addy == malloc) {
+        printf("malloc\n");
+    } else if (addy == free) {
+        printf("free\n");
+    }else {
 
         uint8_t *location = data_mem;
 
