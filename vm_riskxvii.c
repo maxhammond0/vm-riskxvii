@@ -211,8 +211,7 @@ void i(INSTRUCTION instruction,
                 // sext
                 uint32_t byte = location[addy];
                 if (byte >> 8 & 1) {
-                    byte = byte | 0b11111111111111111111111110000000;
-                    print_binary(byte);
+                    byte = byte | 0b11111111111111111111111100000000;
                 }
                 reg[rd] = byte;
             } else if (func3 == 0b001) {  // lh
@@ -223,8 +222,7 @@ void i(INSTRUCTION instruction,
                 }
                 uint32_t byte2 = location[addy] | location[addy+1] << 8;
                 if (byte2 >> 16 & 1) {
-                    byte2 = byte2 | 0b11111111111111111000000000000000;
-                    print_binary(byte2);
+                    byte2 = byte2 | 0b11111111111111110000000000000000;
                 }
                 reg[rd] = byte2;
             } else if (func3 == 0b010) {  // lw
