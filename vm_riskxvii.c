@@ -210,7 +210,7 @@ void i(INSTRUCTION instruction,
                 }
                 // sext
                 uint32_t byte = location[addy];
-                if (byte >> 7 & 1) {
+                if (byte >> 8 & 1) {
                     byte = byte | 0b11111111111111111111111110000000;
                     print_binary(byte);
                 }
@@ -222,7 +222,7 @@ void i(INSTRUCTION instruction,
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
                 uint32_t byte2 = location[addy] | location[addy+1] << 8;
-                if (byte2 >> 15 & 1) {
+                if (byte2 >> 16 & 1) {
                     byte2 = byte2 | 0b11111111111111111000000000000000;
                     print_binary(byte2);
                 }
