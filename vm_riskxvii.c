@@ -234,7 +234,7 @@ void i(INSTRUCTION instruction,
                 reg[rd] = location[addy] |
                     location[addy+1] << 8 |
                     location[addy+2] << 16 |
-                    location[addy+3];
+                    location[addy+3] << 24;
             } else if (func3 == 0b100) {  // lbu
                 if (debug) {
                     printf("lbu: ");
