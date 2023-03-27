@@ -533,17 +533,21 @@ int main( int argc, char *argv[]) {
 
     get_instructions(argv[1], instructions, data_mem);
 
-    // Run program
-    for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
-        if (debug) printf("pc: %04d, ", pc);
-        process_instruction(instructions,
-                            instructions[pc],
-                            instructions[pc+1],
-                            instructions[pc+2],
-                            instructions[pc+3],
-                            data_mem);
-        if (debug) printf("\n");
+    for (int i = 0; i < INST_MEM_SIZE/4; i++) {
+        printf("%02x %02x %02x %02x\n", instructions[i+3], instructions[i+2], instructions[i+1], instructions[i+0]);
     }
+
+    // Run program
+    // for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
+    //     if (debug) printf("pc: %04d, ", pc);
+    //     process_instruction(instructions,
+    //                         instructions[pc],
+    //                         instructions[pc+1],
+    //                         instructions[pc+2],
+    //                         instructions[pc+3],
+    //                         data_mem);
+    //     if (debug) printf("\n");
+    // }
     printf("CPU Halt Requested\n");
 
     return 0;
