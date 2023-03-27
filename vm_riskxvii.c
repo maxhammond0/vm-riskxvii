@@ -11,6 +11,8 @@ int debug = 0;
 #include <stdint.h>
 #include <limits.h>
 
+#include "hbank.h"
+
 typedef uint32_t INSTRUCTION;
 
 #define R 51
@@ -28,6 +30,8 @@ int pc = 0;
 
 // 0 register and 31 general purpose registers
 uint32_t reg[32] = {0};
+
+// Initialize heap bank
 
 // helper function to check bit masking
 void print_binary(unsigned int number) {
@@ -322,9 +326,9 @@ void s(INSTRUCTION instruction,
 
         uint8_t *location = data_mem;
 
-        // TODO clean store address
         if (addy < 0x400) {
-            printf("location error");
+            // printf("location error ");
+            // printf("%d ", addy);
             location = instruction_mem;
         } else {
             addy = addy - 0x400;
@@ -547,7 +551,6 @@ int main( int argc, char *argv[]) {
                             data_mem);
         if (debug) printf("\n");
     }
-    printf("CPU Halt Requested\n");
 
     return 0;
 }
