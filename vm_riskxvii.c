@@ -60,7 +60,7 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     }
 
     read(fd, instructions, INST_MEM_SIZE);
-    read(fd, data_mem, DATA_MEM_SIZE);
+    // read(fd, data_mem, DATA_MEM_SIZE);
 }
 
 void tmp_get_instructions(char *filepath, uint8_t *instructions) {
@@ -551,21 +551,21 @@ int main( int argc, char *argv[]) {
     for (int i = 0; i < INST_MEM_SIZE; i+=4) {
         printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
     }
-    for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
-        printf("%d %02x%02x%02x%02x\n", i, data_mem[i+0], data_mem[i+1], data_mem[i+2], data_mem[i+3]);
-    }
+    // for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
+    //     printf("%d %02x%02x%02x%02x\n", i, data_mem[i+0], data_mem[i+1], data_mem[i+2], data_mem[i+3]);
+    // }
 
     // Run program
-    // for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
-    //     if (debug) printf("pc: %04d, ", pc);
-    //     process_instruction(instructions,
-    //                         instructions[pc],
-    //                         instructions[pc+1],
-    //                         instructions[pc+2],
-    //                         instructions[pc+3],
-    //                         data_mem);
-    //     if (debug) printf("\n");
-    // }
+    for ( ; pc < INST_MEM_SIZE; pc+=4) {
+        if (debug) printf("pc: %04d, ", pc);
+        process_instruction(instructions,
+                            instructions[pc],
+                            instructions[pc+1],
+                            instructions[pc+2],
+                            instructions[pc+3],
+                            data_mem);
+        if (debug) printf("\n");
+    }
     printf("CPU Halt Requested\n");
 
     return 0;
