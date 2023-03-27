@@ -533,7 +533,7 @@ int main( int argc, char *argv[]) {
 
     get_instructions(argv[1], instructions, data_mem);
 
-    for (int i = 0; i < INST_MEM_SIZE/4; i++) {
+    for (int i = 130; i < INST_MEM_SIZE/4; i++) {
         printf("%d %02x %02x %02x %02x\n", i, instructions[i+3], instructions[i+2], instructions[i+1], instructions[i+0]);
     }
 
