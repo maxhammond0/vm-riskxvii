@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 0;
+int debug = 1;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -548,12 +548,12 @@ int main( int argc, char *argv[]) {
 
     tmp_get_instructions(argv[1], instructions);
 
-    for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
-        printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
-    }
-    for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
-        printf("%d %02x%02x%02x%02x\n", i, data_mem[i+0], data_mem[i+1], data_mem[i+2], data_mem[i+3]);
-    }
+    // for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
+    //     printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
+    // }
+    // for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
+    //     printf("%d %02x%02x%02x%02x\n", i, data_mem[i+0], data_mem[i+1], data_mem[i+2], data_mem[i+3]);
+    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
