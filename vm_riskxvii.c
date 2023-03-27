@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 1;
+int debug = 0;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +27,6 @@ typedef uint32_t INSTRUCTION;
 int pc = 0;
 
 // 0 register and 31 general purpose registers
-const int r0 = 0;
 uint32_t reg[32] = {0};
 
 // helper function to check bit masking
