@@ -101,11 +101,11 @@ void r(INSTRUCTION instruction) {
         reg[rd] = reg[rs1] >> reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0100000) {  // sra
-        // TODO read spec and fix
         if (debug) printf("sra: r[%d] = r%d(%d) >> r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         uint32_t runoff = mask(reg[rs1], 0, reg[rs2]) << (32 - reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
         reg[rd] = runoff & reg[rd];
+        printf("sra");
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
@@ -310,7 +310,7 @@ void s(INSTRUCTION instruction,
         return;
     } else if (addy == dump_pc) {
         if (debug) printf("dump program counter: ");
-        printf("%x", pc*4);
+        printf("%x", pc);
     } else if (addy == dump_gpr) {
         if (debug) printf("dump registers: \n");
         register_dump();
