@@ -150,19 +150,15 @@ void i(INSTRUCTION instruction,
         } else if (func3 == 0b110) {  // ori
             if (debug) printf("andi: r[%d] = r%d(%d) | (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] | imm;
-            printf("xori");
         } else if (func3 == 0b111) {  // andi
             if (debug) printf("andi: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] & imm;
-            printf("andi");
         } else if (func3 == 0b010) {  // slti
             if (debug) printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
             reg[rd] = ((int32_t)reg[rs1] < (int32_t)imm) ? 1 : 0;
-            printf("slti");
         } else if (func3 == 0b011) {  // sltiu
             if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
             reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
-            printf("sltiu");
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
@@ -181,6 +177,7 @@ void i(INSTRUCTION instruction,
             int32_t input;
             if (debug) printf("Enter integer: ");
             scanf("%d", &input);
+            printf("%d", input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else if (addy == read_c) {
