@@ -111,7 +111,7 @@ void r(INSTRUCTION instruction) {
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        reg[rd] = (reg[rs1] < reg[rs2]) ? 1 : 0;
+        reg[rd] = ((int32_t)reg[rs1] < (int32_t)reg[rs2]) ? 1 : 0;
     }
     else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
         if (debug) printf("sltu: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
@@ -119,6 +119,9 @@ void r(INSTRUCTION instruction) {
             (uint32_t)reg[rs2]) ?
             1 :
             0;
+    } else {
+        printf("type r func3 and func7 don't match\n");
+        printf("func3: %d, func7: %d", func3, func7);
     }
 }
 
@@ -154,7 +157,7 @@ void i(INSTRUCTION instruction,
             reg[rd] = reg[rs1] & imm;
         } else if (func3 == 0b010) {  // slti
             if (debug) printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
-            reg[rd] = (reg[rs1] < imm) ? 1 : 0;
+            reg[rd] = ((int32_t)reg[rs1] < (int32_t)imm) ? 1 : 0;
         } else if (func3 == 0b011) {  // sltiu
             if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
             reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
@@ -318,11 +321,9 @@ void s(INSTRUCTION instruction,
 
         uint8_t *location = data_mem;
 
-        // TODO clean store address 
+        // TODO clean store address
         if (addy < 0x400) {
-            // address points to instruction memory
-            // printf("INSTRUCTION MEM\n");
-            // printf("%d\n", addy);
+            printf("location error");
             location = instruction_mem;
         } else {
             addy = addy - 0x400;
@@ -420,11 +421,12 @@ void sb(INSTRUCTION instruction) {
         }
     } else if (func3 == 0b111) {  // bgeu
         if (debug) printf("if (r%d(%d) >= r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
-        if ((uint32_t)reg[rs1] >= reg[rs2]) {
+        if ((uint32_t)reg[rs1] >= (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else {
-        // TODO error message
+        printf("Type SB, invalid operation\n");
+        printf("func3: %d", func3);
     }
 }
 
@@ -466,7 +468,7 @@ void uj(INSTRUCTION instruction) {
     pc = pc + (imm<<1) - 4;
 }
 
-void process_instruction(uint8_t instructions[INST_MEM_SIZE], 
+void process_instruction(uint8_t instructions[INST_MEM_SIZE],
                          uint8_t byte4,
                          uint8_t byte3,
                          uint8_t byte2,
