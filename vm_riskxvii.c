@@ -47,8 +47,7 @@ void register_dump() {
 
 unsigned int mask(INSTRUCTION n, int i, int j) {
     // Return the ith to the jth bits of an INSTRUCTION
-    int p = j - i + 1;
-    i++;
+    int p = j - i++ + 1;
     return (((1 << p) - 1) & (n >> (i - 1)));
 }
 
