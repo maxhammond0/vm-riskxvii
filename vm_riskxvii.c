@@ -556,7 +556,7 @@ int main( int argc, char *argv[]) {
     // }
 
     // Run program
-    for ( ; pc < INST_MEM_SIZE; pc+=4) {
+    for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
         if (debug) printf("pc: %04d, ", pc);
         process_instruction(instructions,
                             instructions[pc],
