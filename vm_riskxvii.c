@@ -120,8 +120,8 @@ void r(INSTRUCTION instruction) {
             1 :
             0;
     } else {
-        printf("type r func3 and func7 don't match\n");
-        printf("func3: %d, func7: %d", func3, func7);
+        printf("Type R, operation not recognised\n");
+        printf("func3: %d, func7: %d\n", func3, func7);
     }
 }
 
@@ -254,6 +254,9 @@ void i(INSTRUCTION instruction,
                 reg[rd] = location[addy] | location[addy] << 8;
             }
         }
+    } else {
+        printf("Type I operation not recognised\n");
+        printf("opcode: %d, func3: %d\n", opcode, func3);
     }
 }
 
@@ -317,7 +320,7 @@ void s(INSTRUCTION instruction,
         printf("malloc\n");
     } else if (addy == free) {
         printf("free\n");
-    }else {
+    } else {
 
         uint8_t *location = data_mem;
 
@@ -329,13 +332,12 @@ void s(INSTRUCTION instruction,
             addy = addy - 0x400;
         }
 
-        // if (addy < 0 || addy > DATA_MEM_SIZE) {
-        //     printf("address out of bounds on store instruction");
-        //     printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
-        //     printf("address out of bounds\n!\n");
-        //     register_dump();
-        //     exit(4);
-        // }
+        if (addy < 0 || addy > DATA_MEM_SIZE) {
+            printf("address out of bounds on store instruction");
+            printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
+            register_dump();
+            exit(4);
+        }
 
         if (func3 == 0b000) {  // sb
             if (debug) {
@@ -369,6 +371,9 @@ void s(INSTRUCTION instruction,
             location[addy+1] = low16bits;
             location[addy+2] = low24bits;
             location[addy+3] = low32bits;
+        } else {
+            printf("Type S operation not found\n");
+            printf("func3: %d", func3);
         }
     }
 }
