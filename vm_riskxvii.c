@@ -60,20 +60,7 @@ void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) 
     }
 
     read(fd, instructions, INST_MEM_SIZE);
-    // read(fd, data_mem, DATA_MEM_SIZE);
-}
-
-void tmp_get_instructions(char *filepath, uint8_t *instructions) {
-
-    FILE *fp = fopen(filepath, "r");
-
-    int i = 0;
-    while (i < 1024) {
-        instructions[i] = fgetc(fp);
-        i++;
-    }
-
-    fclose(fp);
+    read(fd, data_mem, DATA_MEM_SIZE);
 }
 
 void r(INSTRUCTION instruction) {
@@ -524,9 +511,6 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
         default:
             printf("Instruction Not Implemented: 0x%08x\n", instruction);
             printf("PC = 0x%08x;\n", pc);
-            printf("\n");
-            print_binary(instruction);
-            printf("\n");
             register_dump();
             exit(3);
     }
@@ -546,17 +530,14 @@ int main( int argc, char *argv[]) {
     uint8_t instructions[INST_MEM_SIZE] = { 0 };
     uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
-    tmp_get_instructions(argv[1], instructions);
+    get_instructions(argv[1], instructions, data_mem);
 
-    // for (int i = 0; i < INST_MEM_SIZE; i+=4) {
+    // for (int i = 160; i < INST_MEM_SIZE/4; i++) {
     //     printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
-    // }
-    // for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
-    //     printf("%d %02x%02x%02x%02x\n", i, data_mem[i+0], data_mem[i+1], data_mem[i+2], data_mem[i+3]);
     // }
 
     // Run program
-    for ( ; pc < INST_MEM_SIZE/4; pc+=4) {
+    for ( ; pc < INST_MEM_SIZE; pc+=4) {
         if (debug) printf("pc: %04d, ", pc);
         process_instruction(instructions,
                             instructions[pc],
