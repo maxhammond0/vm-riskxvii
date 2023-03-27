@@ -543,7 +543,7 @@ int main( int argc, char *argv[]) {
     }
 
     uint8_t instructions[INST_MEM_SIZE] = { 0 };
-    uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
+    // uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
     tmp_get_instructions(argv[1], instructions);
 
