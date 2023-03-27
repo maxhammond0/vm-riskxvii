@@ -109,7 +109,6 @@ void r(INSTRUCTION instruction) {
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = ((int32_t)reg[rs1] < (int32_t)reg[rs2]) ? 1 : 0;
-        printf("slt");
     }
     else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
         if (debug) printf("sltu: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
@@ -117,7 +116,6 @@ void r(INSTRUCTION instruction) {
             (uint32_t)reg[rs2]) ?
             1 :
             0;
-        printf("sltu");
     } else {
         printf("Type R, operation not recognised\n");
         printf("func3: %d, func7: %d\n", func3, func7);
@@ -148,18 +146,23 @@ void i(INSTRUCTION instruction,
         } else if (func3 == 0b100) {  // xori
             if (debug) printf("xori: r[%d] = r%d(%d) ^ (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] ^ imm;
+            printf("xori");
         } else if (func3 == 0b110) {  // ori
             if (debug) printf("andi: r[%d] = r%d(%d) | (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] | imm;
+            printf("xori");
         } else if (func3 == 0b111) {  // andi
             if (debug) printf("andi: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] & imm;
+            printf("andi");
         } else if (func3 == 0b010) {  // slti
             if (debug) printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
             reg[rd] = ((int32_t)reg[rs1] < (int32_t)imm) ? 1 : 0;
+            printf("slti");
         } else if (func3 == 0b011) {  // sltiu
             if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
             reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
+            printf("sltiu");
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
