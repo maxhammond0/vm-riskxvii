@@ -543,12 +543,12 @@ int main( int argc, char *argv[]) {
     }
 
     uint8_t instructions[INST_MEM_SIZE] = { 0 };
-    // uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
+    uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
     tmp_get_instructions(argv[1], instructions);
 
     for (int i = 0; i < INST_MEM_SIZE/4; i+=4) {
-        printf("%d %02x%02x%02x%02x\n", i, instructions[i+3], instructions[i+2], instructions[i+1], instructions[i+0]);
+        printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
     }
 
     // Run program
