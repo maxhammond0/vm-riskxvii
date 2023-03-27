@@ -177,7 +177,6 @@ void i(INSTRUCTION instruction,
             int32_t input;
             if (debug) printf("Enter integer: ");
             scanf("%d", &input);
-            printf("%d", input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else if (addy == read_c) {
