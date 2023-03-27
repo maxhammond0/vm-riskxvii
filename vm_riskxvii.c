@@ -105,11 +105,11 @@ void r(INSTRUCTION instruction) {
         uint32_t runoff = mask(reg[rs1], 0, reg[rs2]) << (32 - reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
         reg[rd] = runoff & reg[rd];
-        printf("sra");
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
         if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = ((int32_t)reg[rs1] < (int32_t)reg[rs2]) ? 1 : 0;
+        printf("slt");
     }
     else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
         if (debug) printf("sltu: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
@@ -117,6 +117,7 @@ void r(INSTRUCTION instruction) {
             (uint32_t)reg[rs2]) ?
             1 :
             0;
+        printf("sltu");
     } else {
         printf("Type R, operation not recognised\n");
         printf("func3: %d, func7: %d\n", func3, func7);
