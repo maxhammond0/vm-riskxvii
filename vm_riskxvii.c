@@ -270,7 +270,6 @@ void i(INSTRUCTION instruction,
             if (addy < 0 || addy > DATA_MEM_SIZE) {
                 printf("Address out of bounds on load instruction");
                 printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
-                printf("address out of bounds\n!\n");
                 register_dump();
                 heap_free(heap);
                 exit(4);
@@ -419,10 +418,10 @@ void s(INSTRUCTION instruction,
                 if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
+            uint8_t low8bits = mask(reg[rs2], 0, 7);
             if (heap_flag) {
-                printf("sb: store command to heap location: %d\n", addy);
+                printf("sb: store instruction to heap location: %d\n", addy);
             } else {
-                uint8_t low8bits = mask(reg[rs2], 0, 7);
                 location[addy] = low8bits;
             }
         } else if (func3 == 0b001) {  // sh
@@ -431,11 +430,11 @@ void s(INSTRUCTION instruction,
                 if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
+            uint8_t low8bits = mask(reg[rs2], 0, 7);
+            uint8_t low16bits = mask(reg[rs2], 8, 15);
             if (heap_flag) {
-                printf("sh: store command to heap location: %d\n", addy);
+                printf("sh: store instruction to heap location: %d\n", addy);
             } else {
-                uint8_t low8bits = mask(reg[rs2], 0, 7);
-                uint8_t low16bits = mask(reg[rs2], 8, 15);
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
             }
@@ -445,13 +444,13 @@ void s(INSTRUCTION instruction,
                 if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
+            uint8_t low8bits = mask(reg[rs2], 0, 7);
+            uint8_t low16bits = mask(reg[rs2], 8, 15);
+            uint8_t low24bits = mask(reg[rs2], 16, 23);
+            uint8_t low32bits = mask(reg[rs2], 24, 31);
             if (heap_flag) {
-                printf("sw: store command to heap location: %d\n", addy);
+                printf("sw: store instruction to heap location: %d\n", addy);
             } else {
-                uint8_t low8bits = mask(reg[rs2], 0, 7);
-                uint8_t low16bits = mask(reg[rs2], 8, 15);
-                uint8_t low24bits = mask(reg[rs2], 16, 23);
-                uint8_t low32bits = mask(reg[rs2], 24, 31);
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
                 location[addy+2] = low24bits;
