@@ -182,12 +182,14 @@ void i(INSTRUCTION instruction,
             int32_t input;
             if (debug) printf("Enter integer: ");
             scanf("%d", &input);
+            printf("\nread : |%d|\n", input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else if (addy == read_c) {
             char input;
             if (debug) printf("Enter character: ");
             scanf("%c", &input);
+            printf("\nread : |%c|\n", input);
             if (debug) printf("r%d(%d) = %c", rd, reg[rd], input);
             reg[rd] = input;
         } else {
@@ -537,9 +539,9 @@ int main( int argc, char *argv[]) {
 
     get_instructions(argv[1], instructions, data_mem);
 
-    for (int i = 600; i < INST_MEM_SIZE; i+=4) {
-        printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
-    }
+    // for (int i = 600; i < INST_MEM_SIZE; i+=4) {
+    //     printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
+    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc+=4) {
