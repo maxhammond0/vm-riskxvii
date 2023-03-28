@@ -23,7 +23,7 @@ typedef struct node node_t;
 
 #define INST_MEM_SIZE 1024
 #define DATA_MEM_SIZE 1024
-#define HBANK_SIZE 8
+#define HBANK_SIZE 64
 
 // program counter
 int pc = 0;
@@ -48,7 +48,7 @@ void register_dump() {
 }
 
 struct node {
-    uint8_t data[8];
+    uint8_t data[HBANK_SIZE];
     uint32_t location;
     node_t* next;
 };
@@ -128,7 +128,8 @@ void get_instructions(char *filepath,
                       uint8_t *instructions,
                       uint8_t *data_mem,
                       node_t* heap_bank) {
-    int fd;
+
+   int fd;
 
     // If file can't be read
     if ((fd = open(filepath, O_RDONLY)) < 0) {
@@ -256,14 +257,12 @@ void i(INSTRUCTION instruction,
             int32_t input;
             if (debug) printf("Enter integer: ");
             scanf("%d", &input);
-            // printf("\nread : |%d|\n", input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else if (addy == read_c) {
             char input;
             if (debug) printf("Enter character: ");
             scanf("%c", &input);
-            // printf("\nread : |%c|\n", input);
             if (debug) printf("r%d(%d) = %c", rd, reg[rd], input);
             reg[rd] = input;
         } else {
