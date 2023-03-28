@@ -5,13 +5,11 @@
 
 struct node {
     uint64_t data;
-    int name;
     node_t* next;
 };
 
 node_t* heap_init(uint64_t data) {
     node_t *head = malloc(sizeof(node_t));
-    head->name = 0;
     head->data = 0;
     head->next = NULL;
 

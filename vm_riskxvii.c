@@ -31,7 +31,8 @@ int pc = 0;
 // 0 register and 31 general purpose registers
 uint32_t reg[32] = {0};
 
-// Initialize heap bank
+// TODO Initialize heap bank
+// node_t* hbankhead = heap_init(0);
 
 // helper function to check bit masking
 void print_binary(unsigned int number) {
@@ -535,10 +536,6 @@ int main( int argc, char *argv[]) {
     uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
     get_instructions(argv[1], instructions, data_mem);
-
-    // for (int i = 160; i < INST_MEM_SIZE/4; i++) {
-    //     printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
-    // }
 
     // Run program
     for ( ; pc < INST_MEM_SIZE; pc+=4) {
