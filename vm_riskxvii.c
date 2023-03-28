@@ -11,7 +11,7 @@ int debug = 0;
 #include <stdint.h>
 #include <limits.h>
 
-#include "hbank.h"
+#include "helpers/hbank.h"
 
 typedef uint32_t INSTRUCTION;
 
