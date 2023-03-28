@@ -8,6 +8,7 @@ struct node {
     node_t* next;
 };
 
+
 node_t* heap_init(uint64_t data) {
     node_t *head = malloc(sizeof(node_t));
     head->data = 0;
