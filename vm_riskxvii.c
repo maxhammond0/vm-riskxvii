@@ -418,6 +418,7 @@ void s(INSTRUCTION instruction,
             addy = addy - 0x400;
         } else if (addy >= 0xb700) {
             heap_flag = 1;
+            addy = addy - 0xb700;
         } else {
             // TODO
             printf("address store error message\n");
@@ -434,6 +435,7 @@ void s(INSTRUCTION instruction,
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = addy / 64;
+                heap_location += 0xb700;
                 printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy] = low8bits;
@@ -449,6 +451,7 @@ void s(INSTRUCTION instruction,
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = addy / 64;
+                heap_location += 0xb700;
                 printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy+0] = low8bits;
@@ -467,6 +470,7 @@ void s(INSTRUCTION instruction,
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = addy / 64;
+                heap_location += 0xb700;
                 printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy+0] = low8bits;
