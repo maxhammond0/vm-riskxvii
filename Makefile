@@ -2,7 +2,7 @@ TARGET = vm_riskxvii
 
 CC = gcc
 
-CFLAGS     = -c -Os
+CFLAGS     = -c -Os -s
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
