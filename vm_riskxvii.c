@@ -80,7 +80,7 @@ int heap_add(node_t** head, int size) {
     for (int i = 0; i < num_of_banks; i++) {
 
         int tmp_loc = cursor->location;
-        if (tmp_loc == 0xd700) {
+        if (tmp_loc == 0xd6c0) {
             return 0;
         }
 
