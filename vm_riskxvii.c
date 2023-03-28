@@ -420,7 +420,7 @@ void s(INSTRUCTION instruction,
             }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             if (heap_flag) {
-                printf("sb: store instruction to heap location: %d\n", addy);
+                printf("sb: store instruction to heap location: %x\n", addy);
             } else {
                 location[addy] = low8bits;
             }
@@ -433,7 +433,7 @@ void s(INSTRUCTION instruction,
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             if (heap_flag) {
-                printf("sh: store instruction to heap location: %d\n", addy);
+                printf("sh: store instruction to heap location: %x\n", addy);
             } else {
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
@@ -449,7 +449,7 @@ void s(INSTRUCTION instruction,
             uint8_t low24bits = mask(reg[rs2], 16, 23);
             uint8_t low32bits = mask(reg[rs2], 24, 31);
             if (heap_flag) {
-                printf("sw: store instruction to heap location: %d\n", addy);
+                printf("sw: store instruction to heap location: %x\n", addy);
             } else {
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
