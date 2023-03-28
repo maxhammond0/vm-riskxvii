@@ -11,9 +11,8 @@ int debug = 0;
 #include <stdint.h>
 #include <limits.h>
 
-// #include "helpers/hbank.h"
-
 typedef uint32_t INSTRUCTION;
+typedef struct node node_t;
 
 #define R 51
 #define I 19
@@ -32,7 +31,6 @@ int pc = 0;
 uint32_t reg[32] = {0};
 
 // TODO Initialize heap bank
-// node_t* hbankhead = heap_init(0);
 
 // helper function to check bit masking
 void print_binary(unsigned int number) {
@@ -43,9 +41,68 @@ void print_binary(unsigned int number) {
 }
 
 void register_dump() {
-    // printf("PC = %08d\n", pc*4);
     for (int i = 0; i < 32; i++) {
         printf("R[%d] = 0x%08x;\n", i, reg[i]);
+    }
+}
+
+struct node {
+    uint64_t data;
+    uint32_t location;
+    node_t* next;
+};
+
+node_t* heap_init() {
+    node_t* head = (node_t*)malloc(sizeof(node_t));
+    head->location = 0xb700-64;
+    head->data = 0;
+    head->next = NULL;
+
+    return head;
+}
+
+int heap_add(node_t** head, int size) {
+
+    int num_of_banks;
+    if (size % 64 == 0) {
+        num_of_banks = (size / 64);
+    } else {
+        num_of_banks = (size / 60) + 1;
+    }
+
+    node_t* cursor = *head;
+    while (cursor->next) {
+        cursor = cursor->next;
+    }
+
+    int location = cursor->location + 64;
+
+    for (int i = 0; i < num_of_banks; i++) {
+
+        int tmp_loc = cursor->location;
+
+        node_t* new_node = malloc(sizeof(node_t));
+        new_node->location = tmp_loc + 64;
+        new_node->data = 0;
+        new_node->next = NULL;
+
+        cursor->next = new_node;
+        cursor = new_node;
+    }
+
+    return location;
+}
+
+void heap_delete(node_t** head, node_t* n) {
+    // node_t* cursor = *head;
+}
+
+void heap_free(node_t* head) {
+    node_t* cursor = head;
+    while (cursor) {
+        node_t* tmp = cursor->next;
+        free(cursor);
+        cursor = tmp;
     }
 }
 
@@ -55,12 +112,16 @@ unsigned int mask(INSTRUCTION n, int i, int j) {
     return (((1 << p) - 1) & (n >> (i - 1)));
 }
 
-void get_instructions(char *filepath, uint8_t *instructions, uint8_t *data_mem) {
+void get_instructions(char *filepath,
+                      uint8_t *instructions,
+                      uint8_t *data_mem,
+                      node_t* heap_bank) {
     int fd;
 
     // If file can't be read
     if ((fd = open(filepath, O_RDONLY)) < 0) {
         printf("Please provide a valid file path\n");
+        heap_free(heap_bank);
         exit(2);
     }
 
@@ -129,7 +190,8 @@ void r(INSTRUCTION instruction) {
 
 void i(INSTRUCTION instruction,
        uint8_t instruction_mem[INST_MEM_SIZE],
-       uint8_t data_mem[DATA_MEM_SIZE]) {
+       uint8_t data_mem[DATA_MEM_SIZE],
+       node_t* heap) {
 
     uint8_t opcode = mask(instruction, 0, 6);
     unsigned int rd = mask(instruction, 7, 11);
@@ -207,6 +269,7 @@ void i(INSTRUCTION instruction,
                 printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
                 printf("address out of bounds\n!\n");
                 register_dump();
+                heap_free(heap);
                 exit(4);
             }
 
@@ -267,7 +330,8 @@ void i(INSTRUCTION instruction,
 
 void s(INSTRUCTION instruction,
        uint8_t instruction_mem[INST_MEM_SIZE],
-       uint8_t data_mem[DATA_MEM_SIZE]) {
+       uint8_t data_mem[DATA_MEM_SIZE],
+       node_t* heap) {
 
     uint32_t func3 = mask(instruction, 12, 14);
     uint32_t rs1 = mask(instruction, 15, 19);
@@ -297,6 +361,7 @@ void s(INSTRUCTION instruction,
     if (addy == halt) {
         printf("CPU Halt Requested\n");
         if (debug) register_dump();
+        heap_free(heap);
         exit(0);
     }
 
@@ -321,10 +386,16 @@ void s(INSTRUCTION instruction,
     } else if (addy == dump_gpr) {
         if (debug) printf("dump registers: \n");
         register_dump();
-    } else if (addy == malloc) {
-        printf("malloc\n");
-    } else if (addy == free) {
-        printf("free\n");
+    } else if (addy == malloc || addy == free) {
+        if (addy == malloc) {
+            int size = reg[rs2];
+            if (debug) printf("malloc size: r%d(%d)", rs2, reg[rs2]);
+            int location = heap_add(&heap, size);
+            reg[28] = location;
+        } else {
+            printf("free\n");
+            // TODO free memory at reg[rs2]
+        }
     } else {
 
         uint8_t *location = data_mem;
@@ -341,6 +412,7 @@ void s(INSTRUCTION instruction,
             printf("address out of bounds on store instruction");
             printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
             register_dump();
+            heap_free(heap);
             exit(4);
         }
 
@@ -483,7 +555,8 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
                          uint8_t byte3,
                          uint8_t byte2,
                          uint8_t byte1,
-                         uint8_t data_mem[DATA_MEM_SIZE]) {
+                         uint8_t data_mem[DATA_MEM_SIZE],
+                         node_t* heap) {
 
     INSTRUCTION instruction = byte1 << 24 |
         byte2 << 16 |
@@ -499,10 +572,10 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
         case I:
         case 3:  // memory load
         case 103:  // jalr
-            i(instruction, instructions, data_mem);
+            i(instruction, instructions, data_mem, heap);
             break;
         case S:
-            s(instruction, instructions, data_mem);
+            s(instruction, instructions, data_mem, heap);
             break;
         case SB:
             sb(instruction);
@@ -519,6 +592,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
             printf("Instruction Not Implemented: 0x%08x\n", instruction);
             printf("PC = 0x%08x;\n", pc);
             register_dump();
+            heap_free(heap);
             exit(3);
     }
 
@@ -534,10 +608,13 @@ int main( int argc, char *argv[]) {
         return 1;
     }
 
+    // defining the head of the heap, not an actual value of the heap
+    node_t *heap = heap_init();
+
     uint8_t instructions[INST_MEM_SIZE] = { 0 };
     uint8_t data_mem[DATA_MEM_SIZE] = { 0 };
 
-    get_instructions(argv[1], instructions, data_mem);
+    get_instructions(argv[1], instructions, data_mem, heap);
 
     // for (int i = 600; i < INST_MEM_SIZE; i+=4) {
     //     printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
@@ -551,9 +628,12 @@ int main( int argc, char *argv[]) {
                             instructions[pc+1],
                             instructions[pc+2],
                             instructions[pc+3],
-                            data_mem);
+                            data_mem,
+                            heap);
         if (debug) printf("\n");
     }
+
+    heap_free(heap);
 
     return 0;
 }
