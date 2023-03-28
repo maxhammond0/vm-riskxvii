@@ -434,7 +434,7 @@ void s(INSTRUCTION instruction,
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = addy / 64;
-                printf("sb: store instruction to heap location: %x, hbank: %d, offset: %d\n", addy, heap_location, offset);
+                printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy] = low8bits;
             }
@@ -449,7 +449,7 @@ void s(INSTRUCTION instruction,
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = addy / 64;
-                printf("sb: store instruction to heap location: %x, hbank: %d, offset: %d\n", addy, heap_location, offset);
+                printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
@@ -467,7 +467,7 @@ void s(INSTRUCTION instruction,
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = addy / 64;
-                printf("sb: store instruction to heap location: %x, hbank: %d, offset: %d\n", addy, heap_location, offset);
+                printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
