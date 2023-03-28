@@ -420,7 +420,7 @@ void s(INSTRUCTION instruction,
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
             if (heap_flag) {
-                printf("store command to malloc location)");
+                printf("sb: store command to heap location: %d\n", addy);
             } else {
                 uint8_t low8bits = mask(reg[rs2], 0, 7);
                 location[addy] = low8bits;
@@ -432,7 +432,7 @@ void s(INSTRUCTION instruction,
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
             if (heap_flag) {
-                printf("store command to malloc location)");
+                printf("sh: store command to heap location: %d\n", addy);
             } else {
                 uint8_t low8bits = mask(reg[rs2], 0, 7);
                 uint8_t low16bits = mask(reg[rs2], 8, 15);
@@ -446,7 +446,7 @@ void s(INSTRUCTION instruction,
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
             if (heap_flag) {
-                printf("store command to malloc location)");
+                printf("sw: store command to heap location: %d\n", addy);
             } else {
                 uint8_t low8bits = mask(reg[rs2], 0, 7);
                 uint8_t low16bits = mask(reg[rs2], 8, 15);
