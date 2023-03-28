@@ -403,24 +403,13 @@ void s(INSTRUCTION instruction,
 
         uint8_t *location = data_mem;
 
-        if (addy < 0x400) {
-            // printf("location error ");
-            // printf("%d ", addy);
-            location = instruction_mem;
-        } else {
-            addy = addy - 0x400;
-        }
-
-        if ((addy < 0 || addy > DATA_MEM_SIZE) && addy < 0xb700) {
-            printf("address out of bounds on store instruction");
-            printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
-            register_dump();
-            heap_free(heap);
-            exit(4);
-        }
-
         int heap_flag = 0;
-        if (addy > 0xb700) {
+
+        if (addy < 0x400) {
+            location = instruction_mem;
+        } else if (addy >= 0x400 && addy < 0x800){
+            addy = addy - 0x400;
+        } else if (addy > 0x8ff) {
             heap_flag = 1;
         }
 
