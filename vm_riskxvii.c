@@ -23,6 +23,7 @@ typedef struct node node_t;
 
 #define INST_MEM_SIZE 1024
 #define DATA_MEM_SIZE 1024
+#define HBANK_SIZE 8
 
 // program counter
 int pc = 0;
@@ -47,7 +48,7 @@ void register_dump() {
 }
 
 struct node {
-    uint64_t data;
+    uint8_t data[8];
     uint32_t location;
     node_t* next;
 };
@@ -55,7 +56,11 @@ struct node {
 node_t* heap_init() {
     node_t* head = (node_t*)malloc(sizeof(node_t));
     head->location = 0xb700-64;
-    head->data = 0;
+
+    // Initialize new data to 0;
+    for (int i = 0; i < HBANK_SIZE; i++) {
+        head->data[i] = 0;
+    }
     head->next = NULL;
 
     return head;
@@ -86,7 +91,11 @@ int heap_add(node_t** head, int size) {
 
         node_t* new_node = malloc(sizeof(node_t));
         new_node->location = tmp_loc + 64;
-        new_node->data = 0;
+
+        // initalize new data to 0 
+        for (int i = 0; i < HBANK_SIZE; i++) {
+            new_node->data[i] = 0;
+        }
         new_node->next = NULL;
 
         cursor->next = new_node;
@@ -408,8 +417,13 @@ void s(INSTRUCTION instruction,
             location = instruction_mem;
         } else if (addy >= 0x400 && addy < 0x800){
             addy = addy - 0x400;
-        } else if (addy > 0x8ff) {
+        } else if (addy >= 0xb700) {
             heap_flag = 1;
+            addy = addy - 0xb700;
+        } else {
+            // TODO
+            printf("address store error message\n");
+            heap_free(heap);
         }
 
         if (func3 == 0b000) {  // sb
@@ -420,7 +434,9 @@ void s(INSTRUCTION instruction,
             }
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             if (heap_flag) {
-                printf("sb: store instruction to heap location: %x\n", addy);
+                int offset = addy % 64;
+                int heap_location = addy / 64;
+                printf("sb: store instruction to heap location: %x, hbank: %d, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy] = low8bits;
             }
@@ -433,7 +449,9 @@ void s(INSTRUCTION instruction,
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             if (heap_flag) {
-                printf("sh: store instruction to heap location: %x\n", addy);
+                int offset = addy % 64;
+                int heap_location = addy / 64;
+                printf("sb: store instruction to heap location: %x, hbank: %d, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
@@ -449,7 +467,9 @@ void s(INSTRUCTION instruction,
             uint8_t low24bits = mask(reg[rs2], 16, 23);
             uint8_t low32bits = mask(reg[rs2], 24, 31);
             if (heap_flag) {
-                printf("sw: store instruction to heap location: %x\n", addy);
+                int offset = addy % 64;
+                int heap_location = addy / 64;
+                printf("sb: store instruction to heap location: %x, hbank: %d, offset: %d\n", addy, heap_location, offset);
             } else {
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
