@@ -244,14 +244,14 @@ void i(INSTRUCTION instruction,
             int32_t input;
             if (debug) printf("Enter integer: ");
             scanf("%d", &input);
-            printf("\nread : |%d|\n", input);
+            // printf("\nread : |%d|\n", input);
             if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else if (addy == read_c) {
             char input;
             if (debug) printf("Enter character: ");
             scanf("%c", &input);
-            printf("\nread : |%c|\n", input);
+            // printf("\nread : |%c|\n", input);
             if (debug) printf("r%d(%d) = %c", rd, reg[rd], input);
             reg[rd] = input;
         } else {
