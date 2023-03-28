@@ -418,7 +418,6 @@ void s(INSTRUCTION instruction,
             addy = addy - 0x400;
         } else if (addy >= 0xb700) {
             heap_flag = 1;
-            addy = addy - 0xb700;
         } else {
             // TODO
             printf("address store error message\n");
