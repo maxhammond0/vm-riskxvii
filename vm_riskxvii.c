@@ -80,6 +80,9 @@ int heap_add(node_t** head, int size) {
     for (int i = 0; i < num_of_banks; i++) {
 
         int tmp_loc = cursor->location;
+        if (tmp_loc == 0xd700) {
+            return 0;
+        }
 
         node_t* new_node = malloc(sizeof(node_t));
         new_node->location = tmp_loc + 64;
