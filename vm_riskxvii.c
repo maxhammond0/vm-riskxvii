@@ -392,9 +392,9 @@ void s(INSTRUCTION instruction,
     } else if (addy == malloc || addy == free) {
         if (addy == malloc) {
             int size = reg[rs2];
-            if (debug) printf("malloc size: r%d(%d)", rs2, reg[rs2]);
             int location = heap_add(&heap, size);
             reg[28] = location;
+            if (debug) printf("malloc size: r%d(%d), r[28] = %x", rs2, reg[rs2], location);
         } else {
             printf("free\n");
             // TODO free memory at reg[rs2]
@@ -411,12 +411,17 @@ void s(INSTRUCTION instruction,
             addy = addy - 0x400;
         }
 
-        if (addy < 0 || addy > DATA_MEM_SIZE) {
+        if ((addy < 0 || addy > DATA_MEM_SIZE) && addy < 0xb700) {
             printf("address out of bounds on store instruction");
             printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
             register_dump();
             heap_free(heap);
             exit(4);
+        }
+
+        int heap_flag = 0;
+        if (addy > 0xb700) {
+            heap_flag = 1;
         }
 
         if (func3 == 0b000) {  // sb
@@ -425,32 +430,44 @@ void s(INSTRUCTION instruction,
                 if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
-            uint8_t low8bits = mask(reg[rs2], 0, 7);
-            location[addy] = low8bits;
+            if (heap_flag) {
+                printf("store command to malloc location)");
+            } else {
+                uint8_t low8bits = mask(reg[rs2], 0, 7);
+                location[addy] = low8bits;
+            }
         } else if (func3 == 0b001) {  // sh
             if (debug) {
                 printf("sh: ");
                 if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
-            uint8_t low8bits = mask(reg[rs2], 0, 7);
-            uint8_t low16bits = mask(reg[rs2], 8, 15);
-            location[addy+0] = low8bits;
-            location[addy+1] = low16bits;
+            if (heap_flag) {
+                printf("store command to malloc location)");
+            } else {
+                uint8_t low8bits = mask(reg[rs2], 0, 7);
+                uint8_t low16bits = mask(reg[rs2], 8, 15);
+                location[addy+0] = low8bits;
+                location[addy+1] = low16bits;
+            }
         } else if (func3 == 0b010) {  // sw
             if (debug) {
                 printf("sw: ");
                 if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
                 else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
             }
-            uint8_t low8bits = mask(reg[rs2], 0, 7);
-            uint8_t low16bits = mask(reg[rs2], 8, 15);
-            uint8_t low24bits = mask(reg[rs2], 16, 23);
-            uint8_t low32bits = mask(reg[rs2], 24, 31);
-            location[addy+0] = low8bits;
-            location[addy+1] = low16bits;
-            location[addy+2] = low24bits;
-            location[addy+3] = low32bits;
+            if (heap_flag) {
+                printf("store command to malloc location)");
+            } else {
+                uint8_t low8bits = mask(reg[rs2], 0, 7);
+                uint8_t low16bits = mask(reg[rs2], 8, 15);
+                uint8_t low24bits = mask(reg[rs2], 16, 23);
+                uint8_t low32bits = mask(reg[rs2], 24, 31);
+                location[addy+0] = low8bits;
+                location[addy+1] = low16bits;
+                location[addy+2] = low24bits;
+                location[addy+3] = low32bits;
+            }
         } else {
             printf("Type S operation not found\n");
             printf("func3: %d", func3);
@@ -619,11 +636,7 @@ int main( int argc, char *argv[]) {
 
     get_instructions(argv[1], instructions, data_mem, heap);
 
-    // for (int i = 600; i < INST_MEM_SIZE; i+=4) {
-    //     printf("%d %02x%02x%02x%02x\n", i, instructions[i+0], instructions[i+1], instructions[i+2], instructions[i+3]);
-    // }
-
-    // Run program
+    // Main program loop
     for ( ; pc < INST_MEM_SIZE; pc+=4) {
         if (debug) printf("pc: %04d, ", pc);
         process_instruction(instructions,
