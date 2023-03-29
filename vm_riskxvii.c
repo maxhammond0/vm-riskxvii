@@ -306,7 +306,7 @@ void i(INSTRUCTION instruction,
                         if (cursor->location == heap_location) {
                             break;
                         }
-                        node_t* cursor = cursor->next;
+                        cursor = cursor->next;
                     }
                     byte = cursor->data[offset];
 
@@ -336,7 +336,7 @@ void i(INSTRUCTION instruction,
                         if (cursor->location == heap_location) {
                             break;
                         }
-                        node_t* cursor = cursor->next;
+                        cursor = cursor->next;
                     }
 
                     byte2 = cursor->data[offset] | cursor->data[offset+1] << 8;
@@ -367,7 +367,7 @@ void i(INSTRUCTION instruction,
                         if (cursor->location == heap_location) {
                             break;
                         }
-                        node_t* cursor = cursor->next;
+                        cursor = cursor->next;
                     }
 
                     reg[rd] = cursor->data[offset] |
@@ -399,7 +399,7 @@ void i(INSTRUCTION instruction,
                         if (cursor->location == heap_location) {
                             break;
                         }
-                        node_t* cursor = cursor->next;
+                        cursor = cursor->next;
                     }
 
                     reg[rd] = cursor->data[offset];
@@ -424,7 +424,7 @@ void i(INSTRUCTION instruction,
                         if (cursor->location == heap_location) {
                             break;
                         }
-                        node_t* cursor = cursor->next;
+                        cursor = cursor->next;
                     }
                     reg[rd] = cursor->data[offset] |
                         cursor->data[offset+1] << 8;
@@ -545,7 +545,7 @@ void s(INSTRUCTION instruction,
                     if (cursor->location == heap_location) {
                         break;
                     }
-                    node_t* cursor = cursor->next;
+                    cursor = cursor->next;
                 }
 
                 cursor->data[offset+0] = low8bits;
@@ -572,7 +572,7 @@ void s(INSTRUCTION instruction,
                     if (cursor->location == heap_location) {
                         break;
                     }
-                    node_t* cursor = cursor->next;
+                    cursor = cursor->next;
                 }
 
                 cursor->data[offset+0] = low8bits;
@@ -603,12 +603,13 @@ void s(INSTRUCTION instruction,
                 if (debug) printf("heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = heap->next;
+
                 while (cursor != NULL) {
                     if (cursor->location == heap_location) {
                         break;
                     }
                     printf("\ncursor location: %x", cursor->location);
-                    node_t* cursor = cursor->next;
+                    cursor = cursor->next;
                 }
 
                 cursor->data[offset+0] = low8bits;
