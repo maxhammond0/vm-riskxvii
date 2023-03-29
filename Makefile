@@ -22,5 +22,8 @@ run:
 test:
 	echo what are we testing?!
 
+run_test:
+	bash tests.sh
+
 clean:
 	rm -f *.o *.obj $(TARGET)
