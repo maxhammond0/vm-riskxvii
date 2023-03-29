@@ -2,7 +2,7 @@
 // unikey: mham5835
 // SID: 520477289
 
-int debug = 1;
+int debug = 0;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -362,7 +362,7 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap;
+                    node_t* cursor = heap->next;
                     while (cursor != NULL) {
                         if (cursor->location == heap_location) {
                             break;
@@ -602,11 +602,12 @@ void s(INSTRUCTION instruction,
                 heap_location += 0xb700;
                 if (debug) printf("heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                node_t* cursor = heap;
+                node_t* cursor = heap->next;
                 while (cursor != NULL) {
                     if (cursor->location == heap_location) {
                         break;
                     }
+                    printf("\ncursor location: %x", cursor->location);
                     node_t* cursor = cursor->next;
                 }
 
