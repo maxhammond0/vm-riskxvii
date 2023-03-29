@@ -2,7 +2,7 @@ TARGET = vm_riskxvii
 
 CC = gcc
 
-CFLAGS     = -c -Os -s -fno-ident
+CFLAGS     = -c -Os -s -fno-ident -Wl,--file-alignment,16,--section-alignment,16
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
