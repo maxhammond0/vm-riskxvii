@@ -608,7 +608,6 @@ void s(INSTRUCTION instruction,
                     if (cursor->location == heap_location) {
                         break;
                     }
-                    printf("\ncursor location: %x", cursor->location);
                     cursor = cursor->next;
                 }
 
