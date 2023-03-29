@@ -2,7 +2,7 @@ TARGET = vm_riskxvii
 
 CC = gcc
 
-CFLAGS     = -c -Os -s -ffreestanding -Wl,--file-alignment,16,--section-alignment,16
+CFLAGS     = -c -Os -s -ffreestanding -Wl,--file-alignment,16,--section-alignment,16 -g3 -gsplit-dwarf
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
