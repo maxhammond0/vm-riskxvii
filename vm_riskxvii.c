@@ -316,7 +316,8 @@ void i(INSTRUCTION instruction,
                         cursor = cursor->next;
                     }
                     if (!cursor) {
-                        illegal_op(instruction, heap);
+                        printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                        // illegal_op(instruction, heap);
                     }
                     byte = cursor->data[offset];
 
@@ -349,7 +350,8 @@ void i(INSTRUCTION instruction,
                         cursor = cursor->next;
                     }
                     if (!cursor) {
-                        illegal_op(instruction, heap);
+                        printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                        // illegal_op(instruction, heap);
                     }
 
                     byte2 = cursor->data[offset] | cursor->data[offset+1] << 8;
@@ -416,7 +418,8 @@ void i(INSTRUCTION instruction,
                         cursor = cursor->next;
                     }
                     if (!cursor) {
-                        illegal_op(instruction, heap);
+                        printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                        // illegal_op(instruction, heap);
                     }
 
                     reg[rd] = cursor->data[offset];
@@ -444,7 +447,8 @@ void i(INSTRUCTION instruction,
                         cursor = cursor->next;
                     }
                     if (!cursor) {
-                        illegal_op(instruction, heap);
+                        printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                        // illegal_op(instruction, heap);
                     }
                     reg[rd] = cursor->data[offset] |
                         cursor->data[offset+1] << 8;
@@ -566,7 +570,8 @@ void s(INSTRUCTION instruction,
                         break;
                     }
                     if (!cursor) {
-                        illegal_op(instruction, heap);
+                        printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                        // illegal_op(instruction, heap);
                     }
                     cursor = cursor->next;
                 }
@@ -598,7 +603,8 @@ void s(INSTRUCTION instruction,
                     cursor = cursor->next;
                 }
                 if (!cursor) {
-                    illegal_op(instruction, heap);
+                    printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                    // illegal_op(instruction, heap);
                 }
 
                 cursor->data[offset+0] = low8bits;
@@ -637,7 +643,8 @@ void s(INSTRUCTION instruction,
                     cursor = cursor->next;
                 }
                 if (!cursor) {
-                    illegal_op(instruction, heap);
+                    printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                    // illegal_op(instruction, heap);
                 }
 
                 cursor->data[offset+0] = low8bits;
