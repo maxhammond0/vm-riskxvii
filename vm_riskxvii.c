@@ -2,6 +2,8 @@
 // unikey: mham5835
 // SID: 520477289
 
+int debug = 0;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -105,7 +107,7 @@ void heap_delete(node_t** head, int location) {
     node_t* cursor = *head;
 
     while (cursor->next->location != location) {
-        if (cursor->next == NULL) return; // TODO
+        if (cursor->next == NULL) return;
         cursor = cursor->next;
     }
     node_t* future = cursor->next->next;
@@ -178,35 +180,45 @@ void r(INSTRUCTION instruction) {
 
 
     if (func3 == 0b000 && func7 == 0b0000000) {  // add
+        if (debug) printf("add: r[%d] = r%d(%d) + r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = reg[rs1] + reg[rs2];
     }
     else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
+        if (debug) printf("sub: r[%d] = r%d(%d) - r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = reg[rs1] - reg[rs2];
     }
     else if (func3 == 0b100 && func7 == 0b0000000) {  // xor
+        if (debug) printf("xor: r[%d] = r%d(%d) ^ r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = reg[rs1] ^ reg[rs2];
     }
     else if (func3 == 0b110 && func7 == 0b0000000) {  // or
+        if (debug) printf("or: r[%d] = r%d(%d) | r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = reg[rs1] | reg[rs2];
     }
     else if (func3 == 0b111 && func7 == 0b0000000) {  // and
+        if (debug) printf("and: r[%d] = r%d(%d) & r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = reg[rs1] & reg[rs2];
     }
     else if (func3 == 0b001 && func7 == 0b0000000) {  // sll
+        if (debug) printf("sll: r[%d] = r%d(%u) << r%d(%u) = %d", rd, rs1, reg[rs1], rs2, reg[rs2], reg[rs1] << reg[rs2]);
         reg[rd] = reg[rs1] << reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
+        if (debug) printf("srl: r[%d] = r%d(%u) >> r%d(%u)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0100000) {  // sra
+        if (debug) printf("sra: r[%d] = r%d(%d) >> r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
         uint32_t runoff = mask(reg[rs1], 0, reg[rs2]) << (32 - reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
         reg[rd] = runoff & reg[rd];
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
+        if (debug) printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = ((int32_t)reg[rs1] < (int32_t)reg[rs2]) ? 1 : 0;
     }
     else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
+        if (debug) printf("sltu: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
         reg[rd] = ((uint32_t)reg[rs1] <
             (uint32_t)reg[rs2]) ?
             1 :
@@ -237,21 +249,28 @@ void i(INSTRUCTION instruction,
 
     if (opcode == 0b0010011) {
         if (func3 == 0b000) {  // addi
+            if (debug) printf("addi: r[%d] = r%d(%d) + (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] + imm;
         } else if (func3 == 0b100) {  // xori
+            if (debug) printf("xori: r[%d] = r%d(%d) ^ (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] ^ imm;
             printf("xori");
         } else if (func3 == 0b110) {  // ori
+            if (debug) printf("andi: r[%d] = r%d(%d) | (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] | imm;
         } else if (func3 == 0b111) {  // andi
+            if (debug) printf("andi: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
             reg[rd] = reg[rs1] & imm;
         } else if (func3 == 0b010) {  // slti
+            if (debug) printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
             reg[rd] = ((int32_t)reg[rs1] < (int32_t)imm) ? 1 : 0;
         } else if (func3 == 0b011) {  // sltiu
+            if (debug) printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
             reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
+            if (debug) printf("jalr: r[%d] = PC(%d)+4; PC=(r%d(%d)+%d)", rd, pc, rs1, reg[rs1], imm);
             reg[rd] = pc + 4;
             pc = reg[rs1] + imm - 4;
         }
@@ -264,11 +283,15 @@ void i(INSTRUCTION instruction,
 
         if (addy == read_i) {
             int32_t input;
+            if (debug) printf("Enter integer: ");
             scanf("%d", &input);
+            if (debug) printf("r%d(%d) = %d", rd, reg[rd], input);
             reg[rd] = input;
         } else if (addy == read_c) {
             char input;
+            if (debug) printf("Enter character: ");
             scanf("%c", &input);
+            if (debug) printf("r%d(%d) = %c", rd, reg[rd], input);
             reg[rd] = input;
         } else {
 
@@ -283,7 +306,6 @@ void i(INSTRUCTION instruction,
                 heap_flag = 1;
                 addy = addy - 0xb700;
             } else {
-                // TODO
                 printf("address store error message\n");
                 heap_free(heap);
             }
@@ -297,9 +319,9 @@ void i(INSTRUCTION instruction,
             }
 
             if (func3 == 0b000) {  // lb
+                if (debug) printf("lb: ");
                 uint32_t byte;
                 if (heap_flag) {
-                    // TODO
                     int offset = addy % 64;
                     int heap_location = (addy / 64) * 64;
                     heap_location += 0xb700;
@@ -319,12 +341,13 @@ void i(INSTRUCTION instruction,
                 }
                 reg[rd] = byte;
             } else if (func3 == 0b001) {  // lh
+                if (debug) printf("lh: ");
                 uint32_t byte2;
                 if (heap_flag) {
-                    // TODO
                     int offset = addy % 64;
                     int heap_location = (addy / 64) * 64;
                     heap_location += 0xb700;
+                    if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -335,6 +358,10 @@ void i(INSTRUCTION instruction,
                     byte2 = cursor->data[offset] | cursor->data[offset+1] << 8;
 
                 } else {
+                    if (debug) {
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                    }
                     byte2 = location[addy] | location[addy+1] << 8;
                 }
 
@@ -343,11 +370,12 @@ void i(INSTRUCTION instruction,
                 }
                 reg[rd] = byte2;
             } else if (func3 == 0b010) {  // lw
-                // if (debug) printf("lw: ");
+                if (debug) printf("lw: ");
                 if (heap_flag) {
                     int offset = addy % 64;
                     int heap_location = (addy / 64) * 64;
                     heap_location += 0xb700;
+                    if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -361,16 +389,22 @@ void i(INSTRUCTION instruction,
                         cursor->data[offset+3] << 24;
 
                 } else {
+                    if (debug) {
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                    }
                     reg[rd] = location[addy] |
                         location[addy+1] << 8 |
                         location[addy+2] << 16 |
                         location[addy+3] << 24;
                 }
             } else if (func3 == 0b100) {  // lbu
+                if (debug) printf("lbu: ");
                 if (heap_flag) {
                     int offset = addy % 64;
                     int heap_location = (addy / 64) * 64;
                     heap_location += 0xb700;
+                    if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -380,14 +414,19 @@ void i(INSTRUCTION instruction,
 
                     reg[rd] = cursor->data[offset];
                 } else {
+                    if (debug) {
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                    }
                     reg[rd] = location[addy];
                 }
             } else if (func3 == 0b101) {  // lhu
+                if (debug) printf("lhu: ");
                 if (heap_flag) {
-                    // TODO
                     int offset = addy % 64;
                     int heap_location = (addy / 64) * 64;
                     heap_location += 0xb700;
+                    if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -398,6 +437,10 @@ void i(INSTRUCTION instruction,
                         cursor->data[offset+1] << 8;
 
                 } else {
+                    if (debug) {
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
+                    }
                     reg[rd] = location[addy] | location[addy+1] << 8;
                 }
             }
@@ -440,33 +483,39 @@ void s(INSTRUCTION instruction,
 
     if (addy == halt) {
         printf("CPU Halt Requested\n");
+        if (debug) register_dump();
         heap_free(heap);
         exit(0);
     }
 
     if (addy == write_c) {
         uint8_t b = mask(reg[rs2], 0, 7);
+        if (debug) printf("write character from r%d(%d): ", rs2, reg[rs2]);
         printf("%c", b);
         return;
     } else if (addy == write_i) {
         int32_t b = reg[rs2];
+        if (debug) printf("write integer from r%d(%d): ", rs2, reg[rs2]);
         printf("%d", b);
         return;
     } else if (addy == write_ui) {
         uint32_t b = reg[rs2];
+        if (debug) printf("write unsigned int from r%d(%u): ", rs2, (unsigned)reg[rs2]);
         printf("%x", b);
         return;
     } else if (addy == dump_pc) {
+        if (debug) printf("dump program counter: ");
         printf("%x", pc);
     } else if (addy == dump_gpr) {
+        if (debug) printf("dump registers: \n");
         register_dump();
     } else if (addy == malloc || addy == free) {
         if (addy == malloc) {
             int size = reg[rs2];
             int location = heap_add(&heap, size);
             reg[28] = location;
+            if (debug) printf("malloc size: r%d(%d), r[28] = %x", rs2, reg[rs2], location);
         } else {
-            // TODO free memory at reg[rs2]
             int location = reg[rs2];
 
             node_t* cursor = heap->next;
@@ -495,17 +544,18 @@ void s(INSTRUCTION instruction,
             heap_flag = 1;
             addy = addy - 0xb700;
         } else {
-            // TODO
             printf("address store error message\n");
             heap_free(heap);
         }
 
         if (func3 == 0b000) {  // sb
+            if (debug) printf("sb: ");
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = (addy / 64) * 64;
                 heap_location += 0xb700;
+                if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = find_node(heap, heap_location);
 
@@ -515,16 +565,22 @@ void s(INSTRUCTION instruction,
 
                 cursor->data[offset+0] = low8bits;
             } else {
+                if (debug) {
+                    if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                    else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                }
 
                 location[addy] = low8bits;
             }
         } else if (func3 == 0b001) {  // sh
+            if (debug) printf("sh: ");
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             if (heap_flag) {
                 int offset = addy % 64;
                 int heap_location = (addy / 64) * 64;
                 heap_location += 0xb700;
+                if (debug) printf("heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = find_node(heap, heap_location);
 
@@ -537,11 +593,16 @@ void s(INSTRUCTION instruction,
 
             } else {
 
+                if (debug) {
+                    if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                    else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, addy, rs2, reg[rs2]);
+                }
                 location[addy+0] = low8bits;
                 location[addy+1] = low16bits;
             }
 
         } else if (func3 == 0b010) {  // sw
+            if (debug) printf("sw: ");
 
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
@@ -552,6 +613,7 @@ void s(INSTRUCTION instruction,
                 int offset = addy % 64;
                 int heap_location = (addy / 64) * 64;
                 heap_location += 0xb700;
+                if (debug) printf("heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = find_node(heap, heap_location);
 
@@ -599,26 +661,32 @@ void sb(INSTRUCTION instruction) {
     }
 
     if (func3 == 0b000) {  // beq
+        if (debug) printf("if (r%d(%d) == r%d(%d)) beq: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if ((int32_t)reg[rs1] == (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b001) {  // bne
+        if (debug) printf("if (r%d(%d) != r%d(%d)) bne: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if ((int32_t)reg[rs1] != (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b100) {  // blt
+        if (debug) printf("if (r%d(%d) < r%d(%d)) blt: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if ((int32_t)reg[rs1] < (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b110) {  // bltu
+        if (debug) printf("if (r%d(%d) < r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
         if ((uint32_t)reg[rs1] < (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b101) {  // bge
+        if (debug) printf("if (r%d(%d) >= r%d(%d)) bge: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
         if ((int32_t)reg[rs1] >= (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b111) {  // bgeu
+        if (debug) printf("if (r%d(%d) >= r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
         if ((uint32_t)reg[rs1] >= (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
@@ -637,6 +705,7 @@ void u(INSTRUCTION instruction) {
     imm = (imm << 12);
 
     reg[rd] = imm;
+    if (debug) printf("lui: r[%d] = %d", rd, imm);
 }
 
 void uj(INSTRUCTION instruction) {
@@ -660,6 +729,7 @@ void uj(INSTRUCTION instruction) {
         imm = imm | 0b11111111111100000000000000000000;
     }
 
+    if (debug) printf("jal: r[%d] = %d + 4; pc = %d + %d", rd, pc, pc, imm << 1);
     reg[rd] = pc + 4;
     pc = pc + (imm<<1) - 4;
 }
@@ -732,6 +802,7 @@ int main( int argc, char *argv[]) {
 
     // Main program loop
     for ( ; pc < INST_MEM_SIZE; pc+=4) {
+        if (debug) printf("pc: %04d, ", pc);
         process_instruction(instructions,
                             instructions[pc],
                             instructions[pc+1],
@@ -739,6 +810,7 @@ int main( int argc, char *argv[]) {
                             instructions[pc+3],
                             data_mem,
                             heap);
+        if (debug) printf("\n");
     }
 
     heap_free(heap);
