@@ -3,6 +3,7 @@ TARGET = vm_riskxvii
 CC = gcc
 
 CFLAGS     = -c -Os -s -ffreestanding -Wl,--file-alignment,16,--section-alignment,16
+BLOAT      = -c -Wall -Wvla -Werror -O0 -g -std=c11 -Os -ffreestanding -Wl,--file-alignment,16,--section-alignment,16
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
@@ -14,7 +15,7 @@ $(TARGET):$(OBJ)
 .SUFFIXES: .c .o
 
 .c.o:
-	 $(CC) $(CFLAGS) $<
+	 $(CC) $(BLOAT) $<
 
 compress:
 	strip --strip-all $(TARGET)
