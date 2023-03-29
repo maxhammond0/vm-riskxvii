@@ -125,6 +125,18 @@ void heap_free(node_t* head) {
     }
 }
 
+node_t* find_node(node_t* heap, int location) {
+
+    node_t* cursor = heap->next;
+    while (cursor != NULL) {
+        if (cursor->location == location) {
+            break;
+        }
+        cursor = cursor->next;
+    }
+    return cursor;
+}
+
 unsigned int mask(INSTRUCTION n, int i, int j) {
     // Return the ith to the jth bits of an INSTRUCTION
     int p = j - i++ + 1;
@@ -315,26 +327,15 @@ void i(INSTRUCTION instruction,
                     int offset = addy % 64;
                     int heap_location = (addy / 64) * 64;
                     heap_location += 0xb700;
-                    // if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+                    node_t* cursor = find_node(heap, heap_location);
 
-                    node_t* cursor = heap->next;
-                    while (cursor != NULL) {
-                        if (cursor->location == heap_location) {
-                            break;
-                        }
-                        cursor = cursor->next;
-                    }
                     if (!cursor) {
-                        // printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
                         illegal_op(instruction, heap);
                     }
+
                     byte = cursor->data[offset];
 
                 } else {
-                    // if (debug) {
-                    //     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
-                    //     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
-                    // }
                     byte = location[addy];
                 }
                 if (byte >> 8 & 1) {
@@ -351,15 +352,9 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     // if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap->next;
-                    while (cursor != NULL) {
-                        if (cursor->location == heap_location) {
-                            break;
-                        }
-                        cursor = cursor->next;
-                    }
+                    node_t* cursor = find_node(heap, heap_location);
+
                     if (!cursor) {
-                        // printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
                         illegal_op(instruction, heap);
                     }
 
@@ -386,13 +381,8 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     // if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap->next;
-                    while (cursor != NULL) {
-                        if (cursor->location == heap_location) {
-                            break;
-                        }
-                        cursor = cursor->next;
-                    }
+                    node_t* cursor = find_node(heap, heap_location);
+
                     if (!cursor) {
                         illegal_op(instruction, heap);
                     }
@@ -421,15 +411,9 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     // if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap->next;
-                    while (cursor != NULL) {
-                        if (cursor->location == heap_location) {
-                            break;
-                        }
-                        cursor = cursor->next;
-                    }
+                    node_t* cursor = find_node(heap, heap_location);
+
                     if (!cursor) {
-                        // printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
                         illegal_op(instruction, heap);
                     }
 
@@ -450,15 +434,9 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     // if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap->next;
-                    while (cursor != NULL) {
-                        if (cursor->location == heap_location) {
-                            break;
-                        }
-                        cursor = cursor->next;
-                    }
+                    node_t* cursor = find_node(heap, heap_location);
+
                     if (!cursor) {
-                        // printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
                         illegal_op(instruction, heap);
                     }
                     reg[rd] = cursor->data[offset] |
