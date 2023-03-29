@@ -6,7 +6,7 @@ CFLAGS     = -c -Os -s -ffreestanding -Wl,--file-alignment,16,--section-alignmen
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
-all:$(TARGET)
+all:$(TARGET) compress
 
 $(TARGET):$(OBJ)
 	$(CC) -o $@ $(OBJ)
@@ -15,6 +15,9 @@ $(TARGET):$(OBJ)
 
 .c.o:
 	 $(CC) $(CFLAGS) $<
+
+compress:
+	strip --strip-all $(TARGET)
 
 run:
 	./$(TARGET)
