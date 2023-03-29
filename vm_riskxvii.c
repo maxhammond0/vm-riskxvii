@@ -28,7 +28,7 @@ struct node {
     uint8_t data[HBANK_SIZE];
     uint32_t location;
     node_t* next;
-};
+}__attribute__((packed));
 
 // program counter
 int pc = 0;
