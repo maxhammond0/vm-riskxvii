@@ -2,7 +2,7 @@ TARGET = vm_riskxvii
 
 CC = gcc
 
-CFLAGS     = -c -Os -s -m32
+CFLAGS     = -c -Os -s -nostdlib -nostartfiles
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
