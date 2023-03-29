@@ -103,8 +103,17 @@ int heap_add(node_t** head, int size) {
     return location;
 }
 
-void heap_delete(node_t** head, node_t* n) {
-    // node_t* cursor = *head;
+void heap_delete(node_t** head, int location) {
+    node_t* cursor = *head;
+
+    while (cursor->next->location != location) {
+        if (cursor->next == NULL) return; // TODO
+        cursor = cursor->next;
+    }
+    node_t* future = cursor->next->next;
+    free(cursor->next);
+    cursor->next = future;
+    return;
 }
 
 void heap_free(node_t* head) {
@@ -537,6 +546,19 @@ void s(INSTRUCTION instruction,
         } else {
             printf("free\n");
             // TODO free memory at reg[rs2]
+            int location = reg[rs2];
+
+            node_t* cursor = heap->next;
+            while (cursor != NULL) {
+                if (cursor->location == location) {
+                    heap_delete(&heap, location);
+                    break;
+                }
+                cursor = cursor->next;
+            }
+            if (!cursor) {
+                illegal_op(instruction, heap);
+            }
         }
     } else {
 
@@ -571,11 +593,10 @@ void s(INSTRUCTION instruction,
                     if (cursor->location == heap_location) {
                         break;
                     }
-                    if (!cursor) {
-                        // printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
-                        illegal_op(instruction, heap);
-                    }
                     cursor = cursor->next;
+                }
+                if (!cursor) {
+                    illegal_op(instruction, heap);
                 }
 
                 cursor->data[offset+0] = low8bits;
