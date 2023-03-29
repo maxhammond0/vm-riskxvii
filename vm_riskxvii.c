@@ -301,7 +301,7 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap;
+                    node_t* cursor = heap->next;
                     while (cursor != NULL) {
                         if (cursor->location == heap_location) {
                             break;
@@ -331,7 +331,7 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap;
+                    node_t* cursor = heap->next;
                     while (cursor != NULL) {
                         if (cursor->location == heap_location) {
                             break;
@@ -394,7 +394,7 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap;
+                    node_t* cursor = heap->next;
                     while (cursor != NULL) {
                         if (cursor->location == heap_location) {
                             break;
@@ -419,7 +419,7 @@ void i(INSTRUCTION instruction,
                     heap_location += 0xb700;
                     if (debug) printf("to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                    node_t* cursor = heap;
+                    node_t* cursor = heap->next;
                     while (cursor != NULL) {
                         if (cursor->location == heap_location) {
                             break;
@@ -540,7 +540,7 @@ void s(INSTRUCTION instruction,
                 heap_location += 0xb700;
                 if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                node_t* cursor = heap;
+                node_t* cursor = heap->next;
                 while (cursor != NULL) {
                     if (cursor->location == heap_location) {
                         break;
@@ -567,7 +567,7 @@ void s(INSTRUCTION instruction,
                 heap_location += 0xb700;
                 if (debug) printf("heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
-                node_t* cursor = heap;
+                node_t* cursor = heap->next;
                 while (cursor != NULL) {
                     if (cursor->location == heap_location) {
                         break;
