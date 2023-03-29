@@ -128,6 +128,7 @@ void illegal_op(INSTRUCTION instruction, node_t *heap) {
     printf("Illegal Operation: %08x", instruction);
     printf("PC = %08x", pc);
     register_dump();
+    exit(1);
 }
 
 void get_instructions(char *filepath,
