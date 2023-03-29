@@ -267,12 +267,20 @@ void i(INSTRUCTION instruction,
             reg[rd] = input;
         } else {
 
+            int heap_flag = 0;
             uint8_t *location = data_mem;
 
             if (addy < 0x400) {
                 location = instruction_mem;
-            } else {
+            } else if (addy >= 0x400 && addy < 0x800){
                 addy = addy - 0x400;
+            } else if (addy >= 0xb700) {
+                heap_flag = 1;
+                addy = addy - 0xb700;
+            } else {
+                // TODO
+                printf("address store error message\n");
+                heap_free(heap);
             }
 
             if (addy < 0 || addy > DATA_MEM_SIZE) {
@@ -289,8 +297,26 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                // sext
-                uint32_t byte = location[addy];
+                uint32_t byte;
+                if (heap_flag) {
+                    // TODO
+                    int offset = addy % 64;
+                    int heap_location = (addy / 64) * 64;
+                    heap_location += 0xb700;
+                    if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+
+                    node_t* cursor = heap;
+                    while (cursor != NULL) {
+                        if (cursor->location == heap_location) {
+                            break;
+                        }
+                        node_t* cursor = cursor->next;
+                    }
+                    byte = cursor->data[offset];
+
+                } else {
+                    byte = location[addy];
+                }
                 if (byte >> 8 & 1) {
                     byte = byte | 0b11111111111111111111111100000000;
                 }
@@ -301,7 +327,28 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                uint32_t byte2 = location[addy] | location[addy+1] << 8;
+                uint32_t byte2;
+                if (heap_flag) {
+                    // TODO
+                    int offset = addy % 64;
+                    int heap_location = (addy / 64) * 64;
+                    heap_location += 0xb700;
+                    if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+
+                    node_t* cursor = heap;
+                    while (cursor != NULL) {
+                        if (cursor->location == heap_location) {
+                            break;
+                        }
+                        node_t* cursor = cursor->next;
+                    }
+
+                    byte2 = cursor->data[offset] | cursor->data[offset+1] << 8;
+
+                } else {
+                    byte2 = location[addy] | location[addy+1] << 8;
+                }
+
                 if (byte2 >> 16 & 1) {
                     byte2 = byte2 | 0b11111111111111110000000000000000;
                 }
@@ -312,24 +359,83 @@ void i(INSTRUCTION instruction,
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy] |
-                    location[addy+1] << 8 |
-                    location[addy+2] << 16 |
-                    location[addy+3] << 24;
+                if (heap_flag) {
+                    // TODO
+                    int offset = addy % 64;
+                    int heap_location = (addy / 64) * 64;
+                    heap_location += 0xb700;
+                    if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+
+                    node_t* cursor = heap;
+                    while (cursor != NULL) {
+                        if (cursor->location == heap_location) {
+                            break;
+                        }
+                        node_t* cursor = cursor->next;
+                    }
+
+                    reg[rd] = cursor->data[offset] |
+                        cursor->data[offset+1] << 8 |
+                        cursor->data[offset+2] << 16 |
+                        cursor->data[offset+3] << 24;
+
+                } else {
+                    reg[rd] = location[addy] |
+                        location[addy+1] << 8 |
+                        location[addy+2] << 16 |
+                        location[addy+3] << 24;
+                }
             } else if (func3 == 0b100) {  // lbu
                 if (debug) {
                     printf("lbu: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy];
+                if (heap_flag) {
+                    // TODO
+                    int offset = addy % 64;
+                    int heap_location = (addy / 64) * 64;
+                    heap_location += 0xb700;
+                    if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+
+                    node_t* cursor = heap;
+                    while (cursor != NULL) {
+                        if (cursor->location == heap_location) {
+                            break;
+                        }
+                        node_t* cursor = cursor->next;
+                    }
+
+                    reg[rd] = cursor->data[offset];
+                } else {
+                    reg[rd] = location[addy];
+                }
             } else if (func3 == 0b101) {  // lhu
                 if (debug) {
                     printf("lhu: ");
                     if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                     else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[addy]);
                 }
-                reg[rd] = location[addy] | location[addy] << 8;
+                if (heap_flag) {
+                    // TODO
+                    int offset = addy % 64;
+                    int heap_location = (addy / 64) * 64;
+                    heap_location += 0xb700;
+                    if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
+
+                    node_t* cursor = heap;
+                    while (cursor != NULL) {
+                        if (cursor->location == heap_location) {
+                            break;
+                        }
+                        node_t* cursor = cursor->next;
+                    }
+                    reg[rd] = cursor->data[offset] |
+                        cursor->data[offset+1] << 8;
+
+                } else {
+                    reg[rd] = location[addy] | location[addy+1] << 8;
+                }
             }
         }
     } else {
@@ -437,9 +543,11 @@ void s(INSTRUCTION instruction,
                 if (debug) printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = heap;
-
-                while (cursor->location != heap_location || cursor->next != NULL) {
-                    cursor = cursor->next;
+                while (cursor != NULL) {
+                    if (cursor->location == heap_location) {
+                        break;
+                    }
+                    node_t* cursor = cursor->next;
                 }
 
                 cursor->data[offset+0] = low8bits;
@@ -465,6 +573,9 @@ void s(INSTRUCTION instruction,
 
                 node_t* cursor = heap;
                 while (cursor != NULL) {
+                    if (cursor->location == heap_location) {
+                        break;
+                    }
                     node_t* cursor = cursor->next;
                 }
 
@@ -499,6 +610,9 @@ void s(INSTRUCTION instruction,
 
                 node_t* cursor = heap;
                 while (cursor != NULL) {
+                    if (cursor->location == heap_location) {
+                        break;
+                    }
                     node_t* cursor = cursor->next;
                 }
 
