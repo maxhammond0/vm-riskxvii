@@ -464,9 +464,8 @@ void s(INSTRUCTION instruction,
                 if (debug) printf("store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = heap;
-
-                while (cursor->location != heap_location || cursor->next != NULL) {
-                    cursor = cursor->next;
+                while (cursor != NULL) {
+                    node_t* cursor = cursor->next;
                 }
 
                 cursor->data[offset+0] = low8bits;
@@ -499,9 +498,8 @@ void s(INSTRUCTION instruction,
                 if (debug) printf("sw: store instruction to heap location: %x, hbank: %x, offset: %d\n", addy, heap_location, offset);
 
                 node_t* cursor = heap;
-
-                while (cursor->location != heap_location || cursor->next != NULL) {
-                    cursor = cursor->next;
+                while (cursor != NULL) {
+                    node_t* cursor = cursor->next;
                 }
 
                 cursor->data[offset+0] = low8bits;
