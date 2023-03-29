@@ -25,13 +25,17 @@ typedef struct node node_t;
 #define DATA_MEM_SIZE 1024
 #define HBANK_SIZE 64
 
+struct node {
+    uint8_t data[HBANK_SIZE];
+    uint32_t location;
+    node_t* next;
+};
+
 // program counter
 int pc = 0;
 
 // 0 register and 31 general purpose registers
 uint32_t reg[32] = {0};
-
-// TODO Initialize heap bank
 
 // helper function to check bit masking
 void print_binary(unsigned int number) {
@@ -46,12 +50,6 @@ void register_dump() {
         printf("R[%d] = 0x%08x;\n", i, reg[i]);
     }
 }
-
-struct node {
-    uint8_t data[HBANK_SIZE];
-    uint32_t location;
-    node_t* next;
-};
 
 node_t* heap_init() {
     node_t* head = (node_t*)malloc(sizeof(node_t));
@@ -122,6 +120,14 @@ unsigned int mask(INSTRUCTION n, int i, int j) {
     // Return the ith to the jth bits of an INSTRUCTION
     int p = j - i++ + 1;
     return (((1 << p) - 1) & (n >> (i - 1)));
+}
+
+void illegal_op(INSTRUCTION instruction, node_t *heap) {
+    heap_free(heap);
+
+    printf("Illegal Operation: %08x", instruction);
+    printf("PC = %08x", pc);
+    register_dump();
 }
 
 void get_instructions(char *filepath,
@@ -308,6 +314,9 @@ void i(INSTRUCTION instruction,
                         }
                         cursor = cursor->next;
                     }
+                    if (!cursor) {
+                        illegal_op(instruction, heap);
+                    }
                     byte = cursor->data[offset];
 
                 } else {
@@ -337,6 +346,9 @@ void i(INSTRUCTION instruction,
                             break;
                         }
                         cursor = cursor->next;
+                    }
+                    if (!cursor) {
+                        illegal_op(instruction, heap);
                     }
 
                     byte2 = cursor->data[offset] | cursor->data[offset+1] << 8;
@@ -369,6 +381,7 @@ void i(INSTRUCTION instruction,
                         }
                         cursor = cursor->next;
                     }
+                    illegal_op(instruction, heap);
 
                     reg[rd] = cursor->data[offset] |
                         cursor->data[offset+1] << 8 |
@@ -401,6 +414,9 @@ void i(INSTRUCTION instruction,
                         }
                         cursor = cursor->next;
                     }
+                    if (!cursor) {
+                        illegal_op(instruction, heap);
+                    }
 
                     reg[rd] = cursor->data[offset];
                 } else {
@@ -425,6 +441,9 @@ void i(INSTRUCTION instruction,
                             break;
                         }
                         cursor = cursor->next;
+                    }
+                    if (!cursor) {
+                        illegal_op(instruction, heap);
                     }
                     reg[rd] = cursor->data[offset] |
                         cursor->data[offset+1] << 8;
@@ -545,6 +564,9 @@ void s(INSTRUCTION instruction,
                     if (cursor->location == heap_location) {
                         break;
                     }
+                    if (!cursor) {
+                        illegal_op(instruction, heap);
+                    }
                     cursor = cursor->next;
                 }
 
@@ -573,6 +595,9 @@ void s(INSTRUCTION instruction,
                         break;
                     }
                     cursor = cursor->next;
+                }
+                if (!cursor) {
+                    illegal_op(instruction, heap);
                 }
 
                 cursor->data[offset+0] = low8bits;
@@ -609,6 +634,9 @@ void s(INSTRUCTION instruction,
                         break;
                     }
                     cursor = cursor->next;
+                }
+                if (!cursor) {
+                    illegal_op(instruction, heap);
                 }
 
                 cursor->data[offset+0] = low8bits;
