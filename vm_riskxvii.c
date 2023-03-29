@@ -544,7 +544,6 @@ void s(INSTRUCTION instruction,
             reg[28] = location;
             if (debug) printf("malloc size: r%d(%d), r[28] = %x", rs2, reg[rs2], location);
         } else {
-            printf("free\n");
             // TODO free memory at reg[rs2]
             int location = reg[rs2];
 
