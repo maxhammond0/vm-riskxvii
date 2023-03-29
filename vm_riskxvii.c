@@ -384,7 +384,9 @@ void i(INSTRUCTION instruction,
                         }
                         cursor = cursor->next;
                     }
-                    illegal_op(instruction, heap);
+                    if (!cursor) {
+                        illegal_op(instruction, heap);
+                    }
 
                     reg[rd] = cursor->data[offset] |
                         cursor->data[offset+1] << 8 |
