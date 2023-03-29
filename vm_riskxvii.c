@@ -125,8 +125,8 @@ unsigned int mask(INSTRUCTION n, int i, int j) {
 void illegal_op(INSTRUCTION instruction, node_t *heap) {
     heap_free(heap);
 
-    printf("Illegal Operation: %08x", instruction);
-    printf("PC = %08x", pc);
+    printf("Illegal Operation: %08x\n", instruction);
+    printf("PC = %08x\n", pc);
     register_dump();
     exit(1);
 }
