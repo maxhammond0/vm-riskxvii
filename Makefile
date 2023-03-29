@@ -2,7 +2,7 @@ TARGET = vm_riskxvii
 
 CC = gcc
 
-CFLAGS     = -c -Os
+CFLAGS     = -c -Os -ffunction-sections -fdata-sections
 SRC        = vm_riskxvii.c
 OBJ        = $(SRC:.c=.o)
 
