@@ -126,7 +126,7 @@ void illegal_op(INSTRUCTION instruction, node_t *heap) {
     heap_free(heap);
 
     printf("Illegal Operation: 0x%08x\n", instruction);
-    printf("PC = 0x%08x\n", pc);
+    printf("PC = 0x%08x;\n", pc);
     register_dump();
     exit(1);
 }
