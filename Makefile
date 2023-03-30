@@ -27,7 +27,7 @@ test:
 	echo Nothing to compile! Do make run_test
 
 run_test:
-	bash run_test.sh
+	bash run_tests.sh
 
 clean:
 	rm -f *.o *.obj $(TARGET)

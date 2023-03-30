@@ -7,7 +7,7 @@ do
     # echo $in
     # echo $out
     diff=$(cat $in | ./vm_riskxvii $binary | diff $out -)
-    # echo $diff
+    cat $in | ./vm_riskxvii $binary > $out
     if [ "$diff" == "" ]
     then
         echo "test pasted for $in"

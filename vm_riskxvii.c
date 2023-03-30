@@ -169,7 +169,7 @@ void get_instructions(char *filepath,
     read(fd, data_mem, DATA_MEM_SIZE);
 }
 
-void r(INSTRUCTION instruction) {
+void r(INSTRUCTION instruction, node_t* heap) {
 
     unsigned int rd = mask(instruction, 7, 11);
     unsigned int func3 = mask(instruction, 12, 14);
@@ -213,8 +213,10 @@ void r(INSTRUCTION instruction) {
             1 :
             0;
     } else {
-        printf("Type R, operation not recognised\n");
-        printf("func3: %d, func7: %d\n", func3, func7);
+        printf("Instruction not implemented: 0x%08x", instruction);
+        register_dump();
+        heap_free(heap);
+        exit(1);
     }
 }
 
@@ -241,7 +243,6 @@ void i(INSTRUCTION instruction,
             reg[rd] = reg[rs1] + imm;
         } else if (func3 == 0b100) {  // xori
             reg[rd] = reg[rs1] ^ imm;
-            printf("xori");
         } else if (func3 == 0b110) {  // ori
             reg[rd] = reg[rs1] | imm;
         } else if (func3 == 0b111) {  // andi
@@ -284,16 +285,11 @@ void i(INSTRUCTION instruction,
                 heap_flag = 1;
                 addy = addy - 0xb700;
             } else {
-                printf("address store error message\n");
-                heap_free(heap);
-            }
-
-            if (addy < 0 || addy > DATA_MEM_SIZE) {
-                printf("Address out of bounds on load instruction");
-                printf("\naddy = %d = r%d(%d) + %d\n", addy, rs1, reg[rs1], imm);
+                printf("Attempting to load to illegal memory location! Exiting\n");
+                printf("PC = 0x%08x;", pc);
                 register_dump();
                 heap_free(heap);
-                exit(4);
+                exit(1);
             }
 
             if (func3 == 0b000) {  // lb
@@ -417,6 +413,7 @@ void s(INSTRUCTION instruction,
     int imm5to11 = mask(instruction, 25, 31);
 
     int imm = (imm5to11 << 5) | imm0to4;
+
     // sign the immediate
     if ((imm >> 11) & 1) {
         imm = imm | 0b11111111111111111111100000000000;
@@ -482,16 +479,17 @@ void s(INSTRUCTION instruction,
 
         int heap_flag = 0;
 
-        if (addy < 0x400) {
-            location = instruction_mem;
-        } else if (addy >= 0x400 && addy < 0x800){
+        if (addy >= 0x400 && addy < 0x800){
             addy = addy - 0x400;
         } else if (addy >= 0xb700) {
             heap_flag = 1;
             addy = addy - 0xb700;
         } else {
-            printf("address store error message\n");
+            printf("Attempting to load to illegal memory location! Exiting\n");
+            printf("PC = 0x%08x;", pc);
+            register_dump();
             heap_free(heap);
+            exit(1);
         }
 
         if (func3 == 0b000) {  // sb
@@ -571,7 +569,7 @@ void s(INSTRUCTION instruction,
     }
 }
 
-void sb(INSTRUCTION instruction) {
+void sb(INSTRUCTION instruction, node_t* heap) {
 
     unsigned int func3 = mask(instruction, 12, 14);
     unsigned int rs1 = mask(instruction, 15, 19);
@@ -675,7 +673,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
 
     switch (opcode) {
         case R:
-            r(instruction);
+            r(instruction, heap);
             break;
         case I:
         case 3:  // memory load
@@ -686,7 +684,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
             s(instruction, instructions, data_mem, heap);
             break;
         case SB:
-            sb(instruction);
+            sb(instruction, heap);
             break;
         case U:
             u(instruction);
@@ -701,7 +699,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
             printf("PC = 0x%08x;\n", pc);
             register_dump();
             heap_free(heap);
-            exit(3);
+            exit(1);
     }
 
     reg[0] = 0;
@@ -713,7 +711,7 @@ int main( int argc, char *argv[]) {
     if ( argc != 2) {
         printf("Wrong number of command line arguments\n");
         printf("Exiting...\n");
-        return 1;
+        return 2;
     }
 
     // defining the head of the heap, not an actual value of the heap
