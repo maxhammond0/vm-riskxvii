@@ -24,10 +24,10 @@ run:
 	./$(TARGET)
 
 test:
-	echo what are we testing?!
+	echo Nothing to compile! Do make run_test
 
 run_test:
-	bash tests.sh
+	bash run_test.sh
 
 clean:
 	rm -f *.o *.obj $(TARGET)
