@@ -6,8 +6,10 @@ do
     # echo $binary
     # echo $in
     # echo $out
+
+    # cat $in | ./vm_riskxvii $binary > $out
+
     diff=$(cat $in | ./vm_riskxvii $binary | diff $out -)
-    cat $in | ./vm_riskxvii $binary > $out
     if [ "$diff" == "" ]
     then
         echo "test pasted for $in"
@@ -16,4 +18,7 @@ do
         echo "EXITNG!"
         exit $1
     fi
+
 done
+
+echo "Test passed for all files in ./tests/in"

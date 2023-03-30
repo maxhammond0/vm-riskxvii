@@ -1,0 +1,7 @@
+a & b = -1316134911
+a | b = -1
+a ^ b = 1316134910
+~a = 0
+a << b = -2 = fffffffe
+a >> b = 0 = 0
+CPU Halt Requested
