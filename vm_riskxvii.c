@@ -284,6 +284,7 @@ void i(INSTRUCTION instruction,
                 heap_flag = 1;
                 addy = addy - 0xb700;
             } else {
+                printf("287");
                 illegal_op(instruction, heap);
             }
 
@@ -296,6 +297,7 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
+                        printf("300");
                         illegal_op(instruction, heap);
                     }
 
@@ -318,6 +320,7 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
+                        printf("323");
                         illegal_op(instruction, heap);
                     }
 
@@ -340,6 +343,7 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
+                        printf("346");
                         illegal_op(instruction, heap);
                     }
 
@@ -363,6 +367,7 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
+                        printf("370");
                         illegal_op(instruction, heap);
                     }
 
@@ -379,6 +384,7 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
+                        printf("387");
                         illegal_op(instruction, heap);
                     }
                     reg[rd] = cursor->data[offset] |
@@ -465,6 +471,7 @@ void s(INSTRUCTION instruction,
                 cursor = cursor->next;
             }
             if (!cursor) {
+                printf("474");
                 illegal_op(instruction, heap);
             }
         }
@@ -493,6 +500,7 @@ void s(INSTRUCTION instruction,
                 node_t* cursor = find_node(heap, heap_location);
 
                 if (!cursor) {
+                    printf("504");
                     illegal_op(instruction, heap);
                 }
 
@@ -512,6 +520,7 @@ void s(INSTRUCTION instruction,
                 node_t* cursor = find_node(heap, heap_location);
 
                 if (!cursor) {
+                    printf("524");
                     illegal_op(instruction, heap);
                 }
 
@@ -539,6 +548,7 @@ void s(INSTRUCTION instruction,
                 node_t* cursor = find_node(heap, heap_location);
 
                 if (!cursor) {
+                    printf("552");
                     illegal_op(instruction, heap);
                 }
 
