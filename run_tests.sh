@@ -22,3 +22,5 @@ do
 done
 
 echo "Test passed for all files in ./tests/in"
+
+gcov vm_riskxvii.gcda
