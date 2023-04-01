@@ -150,6 +150,15 @@ void illegal_op(INSTRUCTION instruction, node_t *heap) {
     exit(1);
 }
 
+void not_implemented(INSTRUCTION instruction, node_t *heap) {
+    heap_free(heap);
+
+    printf("Instruction Not Implemented: 0x%08x\n", instruction);
+    printf("PC = 0x%08x;\n", pc);
+    register_dump();
+    exit(1);
+}
+
 void get_instructions(char *filepath,
                       uint8_t *instructions,
                       uint8_t *data_mem,
@@ -212,10 +221,7 @@ void r(INSTRUCTION instruction, node_t* heap) {
             1 :
             0;
     } else {
-        printf("Instruction not implemented: 0x%08x", instruction);
-        register_dump();
-        heap_free(heap);
-        exit(1);
+        not_implemented(instruction, heap);
     }
 }
 
@@ -284,7 +290,6 @@ void i(INSTRUCTION instruction,
                 heap_flag = 1;
                 addy = addy - 0xb700;
             } else {
-                printf("287");
                 illegal_op(instruction, heap);
             }
 
@@ -297,7 +302,6 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
-                        printf("300");
                         illegal_op(instruction, heap);
                     }
 
@@ -320,7 +324,6 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
-                        printf("323");
                         illegal_op(instruction, heap);
                     }
 
@@ -343,7 +346,6 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
-                        printf("346");
                         illegal_op(instruction, heap);
                     }
 
@@ -367,7 +369,6 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
-                        printf("370");
                         illegal_op(instruction, heap);
                     }
 
@@ -384,7 +385,6 @@ void i(INSTRUCTION instruction,
                     node_t* cursor = find_node(heap, heap_location);
 
                     if (!cursor) {
-                        printf("387");
                         illegal_op(instruction, heap);
                     }
                     reg[rd] = cursor->data[offset] |
@@ -396,8 +396,7 @@ void i(INSTRUCTION instruction,
             }
         }
     } else {
-        printf("Type I operation not recognised\n");
-        printf("opcode: %d, func3: %d\n", opcode, func3);
+        not_implemented(instruction, heap);
     }
 }
 
@@ -471,7 +470,6 @@ void s(INSTRUCTION instruction,
                 cursor = cursor->next;
             }
             if (!cursor) {
-                printf("474");
                 illegal_op(instruction, heap);
             }
         }
@@ -500,7 +498,6 @@ void s(INSTRUCTION instruction,
                 node_t* cursor = find_node(heap, heap_location);
 
                 if (!cursor) {
-                    printf("504");
                     illegal_op(instruction, heap);
                 }
 
@@ -520,7 +517,6 @@ void s(INSTRUCTION instruction,
                 node_t* cursor = find_node(heap, heap_location);
 
                 if (!cursor) {
-                    printf("524");
                     illegal_op(instruction, heap);
                 }
 
@@ -548,7 +544,6 @@ void s(INSTRUCTION instruction,
                 node_t* cursor = find_node(heap, heap_location);
 
                 if (!cursor) {
-                    printf("552");
                     illegal_op(instruction, heap);
                 }
 
@@ -564,8 +559,7 @@ void s(INSTRUCTION instruction,
                 location[addy+3] = low32bits;
             }
         } else {
-            printf("Type S operation not found\n");
-            printf("func3: %d", func3);
+            not_implemented(instruction, heap);
         }
     }
 }
@@ -616,8 +610,7 @@ void sb(INSTRUCTION instruction, node_t* heap) {
             pc = pc + (imm << 1) - 4;
         }
     } else {
-        printf("Type SB, invalid operation\n");
-        printf("func3: %d", func3);
+        not_implemented(instruction, heap);
     }
 }
 
@@ -696,11 +689,7 @@ void process_instruction(uint8_t instructions[INST_MEM_SIZE],
         case 0:
             break;
         default:
-            printf("Instruction Not Implemented: 0x%08x\n", instruction);
-            printf("PC = 0x%08x;\n", pc);
-            register_dump();
-            heap_free(heap);
-            exit(1);
+            not_implemented(instruction, heap);
     }
 
     reg[0] = 0;
