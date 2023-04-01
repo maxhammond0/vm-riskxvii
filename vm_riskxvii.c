@@ -284,11 +284,7 @@ void i(INSTRUCTION instruction,
                 heap_flag = 1;
                 addy = addy - 0xb700;
             } else {
-                printf("Attempting to load to illegal memory location! Exiting\n");
-                printf("PC = 0x%08x;", pc);
-                register_dump();
-                heap_free(heap);
-                exit(1);
+                illegal_op(instruction, heap);
             }
 
             if (func3 == 0b000) {  // lb
@@ -484,11 +480,7 @@ void s(INSTRUCTION instruction,
             heap_flag = 1;
             addy = addy - 0xb700;
         } else {
-            printf("Attempting to load to illegal memory location! Exiting\n");
-            printf("PC = 0x%08x;", pc);
-            register_dump();
-            heap_free(heap);
-            exit(1);
+            illegal_op(instruction, heap);
         }
 
         if (func3 == 0b000) {  // sb
