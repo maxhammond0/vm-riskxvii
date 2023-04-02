@@ -28,9 +28,9 @@ clean:
 run:
 	./$(TARGET)
 
-test:$(TARGET) clean
+tests:$(TARGET) clean
 	$(CC) $(TEST) $(SRC) -o $(TARGET)
 	
 
-run_test:
+run_tests:
 	bash run_tests.sh
