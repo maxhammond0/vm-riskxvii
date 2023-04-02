@@ -35,14 +35,6 @@ int pc = 0;
 // 0 register and 31 general purpose registers
 uint32_t reg[32] = {0};
 
-// helper function to check bit masking
-void print_binary(unsigned int number) {
-    if (number >> 1) {
-        print_binary(number >> 1);
-    }
-    putc((number & 1) ? '1' : '0', stdout);
-}
-
 void register_dump() {
     for (int i = 0; i < 32; i++) {
         printf("R[%d] = 0x%08x;\n", i, reg[i]);
