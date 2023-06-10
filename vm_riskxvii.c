@@ -179,6 +179,9 @@ void r(INSTRUCTION instruction, node_t* heap) {
 
 
     if (func3 == 0b000 && func7 == 0b0000000) {  // add
+        #ifdef DEBUG
+            printf("add: r[%d] = r%d(%d) + r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] + reg[rs2];
     }
     else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
