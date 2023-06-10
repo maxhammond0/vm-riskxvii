@@ -1,36 +1,28 @@
-TARGET = vm_riskxvii
+TARGET = vm_riscv
 
 CC = gcc
 
-CFLAGS     = -c -Os -s -ffreestanding -Wl,--file-alignment,16,--section-alignment,16
-BLOAT      = -c -Wall -Wvla -Werror -O0 -g -std=c11 -Os -ffreestanding -Wl,--file-alignment,16,--section-alignment,16
-TEST	   = -fprofile-arcs -ftest-coverage
-SRC        = vm_riskxvii.c
-OBJ        = $(SRC:.c=.o)
+CFLAGS     = -Wall -Wvla -Werror -Os -g
+DEBUG      = -Wall -Wvla -Werror -Os -g -DDEBUG
+TEST       = -fprofile-arcs -ftest-coverage
+SRC        = src/vm_riskxvii.c
+# OBJ        = $(SRC:.c=.o)
+RM         = rm -f
 
-all:$(TARGET) compress
+all:
+	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
-$(TARGET):$(OBJ)
-	$(CC) -o $@ $(OBJ)
-
-.SUFFIXES: .c .o
-
-.c.o:
-	 $(CC) $(BLOAT) $<
-
-compress:
-	strip --strip-all $(TARGET)
-
+debug:
+	$(CC) $(DEBUG) $(SRC) -o $(TARGET)
 
 clean:
-	rm -f *.o *.obj *.gcov *.gcno *.gcda $(TARGET)
+	$(RM) *.o *.obj *.gcov *.gcno *.gcda $(TARGET)
 
 run:
 	./$(TARGET)
 
 tests:$(TARGET) clean
 	$(CC) $(TEST) $(SRC) -o $(TARGET)
-	
 
 run_tests:
 	bash run_tests.sh

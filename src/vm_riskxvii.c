@@ -1,7 +1,3 @@
-// name: Max Hammond
-// unikey: mham5835
-// SID: 520477289
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -179,9 +175,6 @@ void r(INSTRUCTION instruction, node_t* heap) {
 
 
     if (func3 == 0b000 && func7 == 0b0000000) {  // add
-        #ifdef DEBUG
-            printf("add: r[%d] = r%d(%d) + r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
-        #endif
         reg[rd] = reg[rs1] + reg[rs2];
     }
     else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
@@ -641,6 +634,9 @@ void uj(INSTRUCTION instruction) {
         imm = imm | 0b11111111111100000000000000000000;
     }
 
+    #ifdef DEBUG
+        printf("here\n");
+    #endif
     reg[rd] = pc + 4;
     pc = pc + (imm<<1) - 4;
 }

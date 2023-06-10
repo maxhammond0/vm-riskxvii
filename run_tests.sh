@@ -1,8 +1,8 @@
 INFILES="./tests/in/*"
 for in in $INFILES
 do
-    binary=$"./tests/binaries"${in:10:-4}$".mi"
-    out=$"./tests/out"${in:10:-3}$".out"
+    binary=$"./tests/e2e/binaries"${in:10:-4}$".mi"
+    out=$"./tests/e2e/out"${in:10:-3}$".out"
 
     diff=$(cat $in | ./vm_riskxvii $binary | diff $out -)
     if [ "$diff" == "" ]
@@ -16,6 +16,6 @@ do
 
 done
 
-echo "Test passed for all files in ./tests/in"
+echo "Test passed for all files in ./tests/e2e/in"
 
 gcov vm_riskxvii.c
