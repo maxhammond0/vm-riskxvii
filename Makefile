@@ -9,10 +9,10 @@ SRC        = src/vm_riskxvii.c
 # OBJ        = $(SRC:.c=.o)
 RM         = rm -f
 
-all:
+all: clean
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
-debug:
+debug: clean
 	$(CC) $(DEBUG) $(SRC) -o $(TARGET)
 
 clean:
