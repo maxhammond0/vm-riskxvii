@@ -1,22 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <limits.h>
+#include "../include/vm_riscv.h"
+#include "../include/hbank.h"
 
 typedef uint32_t INSTRUCTION;
 typedef struct node node_t;
 
-#define R 51
-#define I 19
-#define S 35
-#define SB 99
-#define U 55
-#define UJ 111
-
-#define INST_MEM_SIZE 1024
-#define DATA_MEM_SIZE 1024
 #define HBANK_SIZE 64
 
 struct node {
@@ -175,35 +162,68 @@ void r(INSTRUCTION instruction, node_t* heap) {
 
 
     if (func3 == 0b000 && func7 == 0b0000000) {  // add
+        #ifdef DEBUG
+            printf("add: r[%d] = r%d(%d) + r%d(%d)", rd,rs1, reg[rs1], rs2,
+                   reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] + reg[rs2];
     }
     else if (func3 == 0b000 && func7 == 0b0100000) {  // sub
+        #ifdef DEBUG
+            printf("sub: r[%d] = r%d(%d) - r%d(%d)", rd, rs1, reg[rs1], rs2,
+                   reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] - reg[rs2];
     }
     else if (func3 == 0b100 && func7 == 0b0000000) {  // xor
+        #ifdef DEBUG
+            printf("xor: r[%d] = r%d(%d) ^ r%d(%d)", rd, rs1, reg[rs1], rs2,
+                   reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] ^ reg[rs2];
     }
     else if (func3 == 0b110 && func7 == 0b0000000) {  // or
+        #ifdef DEBUG
+            printf("or: r[%d] = r%d(%d) | r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] | reg[rs2];
     }
     else if (func3 == 0b111 && func7 == 0b0000000) {  // and
+        #ifdef DEBUG
+            printf("and: r[%d] = r%d(%d) & r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] & reg[rs2];
     }
     else if (func3 == 0b001 && func7 == 0b0000000) {  // sll
+        #ifdef DEBUG
+            printf("sll: r[%d] = r%d(%u) << r%d(%u) = %d", rd, rs1, reg[rs1], rs2, reg[rs2], reg[rs1] << reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] << reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0000000) {  // srl
+        #ifdef DEBUG
+            printf("srl: r[%d] = r%d(%u) >> r%d(%u)", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         reg[rd] = reg[rs1] >> reg[rs2];
     }
     else if (func3 == 0b101 && func7 == 0b0100000) {  // sra
+        #ifdef DEBUG
+            printf("sra: r[%d] = r%d(%d) >> r%d(%d)", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         uint32_t runoff = mask(reg[rs1], 0, reg[rs2]) << (32 - reg[rs2]);
         reg[rd] = reg[rs1] >> reg[rs2];
         reg[rd] = runoff & reg[rd];
     }
     else if (func3 == 0b010 && func7 == 0b0000000) {  // slt
+        #ifdef DEBUG
+            printf("slt: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         reg[rd] = ((int32_t)reg[rs1] < (int32_t)reg[rs2]) ? 1 : 0;
     }
     else if (func3 == 0b011 && func7 == 0b0000000) {  // sltu
+        #ifdef DEBUG
+            printf("sltu: r[%d] = r%d(%d) < r%d(%d) ? 1 : 0", rd, rs1, reg[rs1], rs2, reg[rs2]);
+        #endif
         reg[rd] = ((uint32_t)reg[rs1] <
             (uint32_t)reg[rs2]) ?
             1 :
@@ -233,61 +253,100 @@ void i(INSTRUCTION instruction,
 
     if (opcode == 0b0010011) {
         if (func3 == 0b000) {  // addi
+            #ifdef DEBUG
+                printf("addi: r[%d] = r%d(%d) + (%d)", rd, rs1, reg[rs1], imm);
+            #endif
             reg[rd] = reg[rs1] + imm;
         } else if (func3 == 0b100) {  // xori
+            #ifdef DEBUG
+                printf("xori: r[%d] = r%d(%d) ^ (%d)", rd, rs1, reg[rs1], imm);
+            #endif
             reg[rd] = reg[rs1] ^ imm;
         } else if (func3 == 0b110) {  // ori
+            #ifdef DEBUG
+                printf("andi: r[%d] = r%d(%d) | (%d)", rd, rs1, reg[rs1], imm);
+            #endif
             reg[rd] = reg[rs1] | imm;
         } else if (func3 == 0b111) {  // andi
+            #ifdef DEBUG
+                printf("andi: r[%d] = r%d(%d) & (%d)", rd, rs1, reg[rs1], imm);
+            #endif
             reg[rd] = reg[rs1] & imm;
         } else if (func3 == 0b010) {  // slti
+            #ifdef DEBUG
+                printf("slti: r[%d] = r%d(%d) < (%d) ? 1 : 0", rd, rs1, reg[rs1], imm);
+            #endif
             reg[rd] = ((int32_t)reg[rs1] < (int32_t)imm) ? 1 : 0;
         } else if (func3 == 0b011) {  // sltiu
+            #ifdef DEBUG
+                printf("sltiu: r[%d] = r%d(%d) < (%d) ? 1 : 0", (uint32_t)rd, rs1, reg[rs1], unsigned_imm);
+            #endif
             reg[rd] = ((uint32_t)reg[rs1] < unsigned_imm) ? 1 : 0;
         }
     } else if (opcode == 0b1100111) {
         if (func3 == 0b000) {  // jalr
+            #ifdef DEBUG
+                printf("jalr: r[%d] = PC(%d)+4; PC=(r%d(%d)+%d)", rd, pc, rs1, reg[rs1], imm);
+            #endif
             reg[rd] = pc + 4;
             pc = reg[rs1] + imm - 4;
         }
     } else if (opcode == 0b0000011) {  // memory loading
-        int addy = (reg[rs1] + imm);
+        int address = (reg[rs1] + imm);
 
         // Load virtual routines
         int read_c = 2066;
         int read_i = 2070;
 
-        if (addy == read_i) {
+        if (address == read_i) {
             int32_t input;
+            #ifdef DEBUG
+                printf("Enter integer: ");
+            #endif
             scanf("%d", &input);
+            #ifdef DEBUG
+                printf("r%d(%d) = %d", rd, reg[rd], input);
+            #endif
             reg[rd] = input;
-        } else if (addy == read_c) {
+        } else if (address == read_c) {
             char input;
+            #ifdef DEBUG
+                printf("Enter character: ");
+            #endif
             scanf("%c", &input);
+            #ifdef DEBUG
+                printf("r%d(%d) = %c", rd, reg[rd], input);
+            #endif
             reg[rd] = input;
         } else {
 
             int heap_flag = 0;
             uint8_t *location = data_mem;
 
-            if (addy < 0x400) {
+            if (address < 0x400) {
                 location = instruction_mem;
-            } else if (addy >= 0x400 && addy < 0x800){
-                addy = addy - 0x400;
-            } else if (addy >= 0xb700) {
+            } else if (address >= 0x400 && address < 0x800){
+                address = address - 0x400;
+            } else if (address >= 0xb700) {
                 heap_flag = 1;
-                addy = addy - 0xb700;
+                address = address - 0xb700;
             } else {
                 illegal_op(instruction, heap);
             }
 
             if (func3 == 0b000) {  // lb
+                #ifdef DEBUG
+                    printf("lb: ");
+                #endif
                 uint32_t byte;
                 if (heap_flag) {
-                    int offset = addy % 64;
-                    int heap_location = (addy / 64) * 64;
+                    int offset = address % 64;
+                    int heap_location = (address / 64) * 64;
                     heap_location += 0xb700;
                     node_t* cursor = find_node(heap, heap_location);
+                    #ifdef DEBUG
+                        printf("to heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                    #endif
 
                     if (!cursor) {
                         illegal_op(instruction, heap);
@@ -296,18 +355,29 @@ void i(INSTRUCTION instruction,
                     byte = cursor->data[offset];
 
                 } else {
-                    byte = location[addy];
+                    #ifdef DEBUG
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                    #endif
+                    byte = location[address];
                 }
                 if (byte >> 8 & 1) {
                     byte = byte | 0b11111111111111111111111100000000;
                 }
                 reg[rd] = byte;
             } else if (func3 == 0b001) {  // lh
+                #ifdef DEBUG
+                    printf("lh: ");
+                #endif
                 uint32_t byte2;
                 if (heap_flag) {
-                    int offset = addy % 64;
-                    int heap_location = (addy / 64) * 64;
+                    int offset = address % 64;
+                    int heap_location = (address / 64) * 64;
                     heap_location += 0xb700;
+                    #ifdef DEBUG
+                        printf("to heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                    #endif
+
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -318,7 +388,11 @@ void i(INSTRUCTION instruction,
                     byte2 = cursor->data[offset] | cursor->data[offset+1] << 8;
 
                 } else {
-                    byte2 = location[addy] | location[addy+1] << 8;
+                    #ifdef DEBUG
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                    #endif
+                    byte2 = location[address] | location[address+1] << 8;
                 }
 
                 if (byte2 >> 16 & 1) {
@@ -326,10 +400,16 @@ void i(INSTRUCTION instruction,
                 }
                 reg[rd] = byte2;
             } else if (func3 == 0b010) {  // lw
+                #ifdef DEBUG
+                printf("lw: ");
+                #endif
                 if (heap_flag) {
-                    int offset = addy % 64;
-                    int heap_location = (addy / 64) * 64;
+                    int offset = address % 64;
+                    int heap_location = (address / 64) * 64;
                     heap_location += 0xb700;
+                    #ifdef DEBUG
+                        printf("to heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                    #endif
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -343,16 +423,26 @@ void i(INSTRUCTION instruction,
                         cursor->data[offset+3] << 24;
 
                 } else {
-                    reg[rd] = location[addy] |
-                        location[addy+1] << 8 |
-                        location[addy+2] << 16 |
-                        location[addy+3] << 24;
+                    #ifdef DEBUG
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                    #endif
+                    reg[rd] = location[address] |
+                        location[address+1] << 8 |
+                        location[address+2] << 16 |
+                        location[address+3] << 24;
                 }
             } else if (func3 == 0b100) {  // lbu
+                #ifdef DEBUG
+                    printf("lbu: ");
+                #endif
                 if (heap_flag) {
-                    int offset = addy % 64;
-                    int heap_location = (addy / 64) * 64;
+                    int offset = address % 64;
+                    int heap_location = (address / 64) * 64;
                     heap_location += 0xb700;
+                    #ifdef DEBUG
+                        printf("to heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                    #endif
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -362,13 +452,23 @@ void i(INSTRUCTION instruction,
 
                     reg[rd] = cursor->data[offset];
                 } else {
-                    reg[rd] = location[addy];
+                    #ifdef DEBUG
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                    #endif
+                    reg[rd] = location[address];
                 }
             } else if (func3 == 0b101) {  // lhu
+                #ifdef DEBUG
+                    printf("lhu: ");
+                #endif
                 if (heap_flag) {
-                    int offset = addy % 64;
-                    int heap_location = (addy / 64) * 64;
+                    int offset = address % 64;
+                    int heap_location = (address / 64) * 64;
                     heap_location += 0xb700;
+                    #ifdef DEBUG
+                        printf("to heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                    #endif
 
                     node_t* cursor = find_node(heap, heap_location);
 
@@ -379,7 +479,11 @@ void i(INSTRUCTION instruction,
                         cursor->data[offset+1] << 8;
 
                 } else {
-                    reg[rd] = location[addy] | location[addy+1] << 8;
+                    #ifdef DEBUG
+                        if (location == data_mem) printf("r[%d] = data_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                        else printf("r[%d] = inst_mem[r%d(%d) + %d = %d)] = %d", rd, rs1, reg[rs1], imm, reg[rs1]+imm, location[address]);
+                    #endif
+                    reg[rd] = location[address] | location[address+1] << 8;
                 }
             }
         }
@@ -407,47 +511,61 @@ void s(INSTRUCTION instruction,
         imm = imm | 0b11111111111111111111100000000000;
     }
 
-    // Store virtual routines
-    int write_c = 0x800;
-    int write_i = 0x804;
-    int write_ui = 0x808;
-    int halt = 0x80c;
-    int dump_pc = 0x820;
-    int dump_gpr = 0x824;
-    int malloc = 0x830;
-    int free = 0x834;
+    int address = (reg[rs1] + imm);
 
-    int addy = (reg[rs1] + imm);
-
-    if (addy == halt) {
+    if (address == HALT) {
         printf("CPU Halt Requested\n");
+        #ifdef DEBUG
+            register_dump();
+        #endif
         heap_free(heap);
         exit(0);
     }
 
-    if (addy == write_c) {
+    if (address == WRITE_C) {
         uint8_t b = mask(reg[rs2], 0, 7);
+        #ifdef DEBUG
+            printf("write character from r%d(%d): ", rs2, reg[rs2]);
+        #endif
         printf("%c", b);
         return;
-    } else if (addy == write_i) {
+    } else if (address == WRITE_I) {
         int32_t b = reg[rs2];
+        #ifdef DEBUG
+            printf("write integer from r%d(%d): ", rs2, reg[rs2]);
+        #endif
         printf("%d", b);
         return;
-    } else if (addy == write_ui) {
+    } else if (address == WRITE_UI) {
         uint32_t b = reg[rs2];
+        #ifdef DEBUG
+            printf("write unsigned int from r%d(%u): ", rs2, (unsigned)reg[rs2]);
+        #endif
         printf("%x", b);
         return;
-    } else if (addy == dump_pc) {
+    } else if (address == DUMP_PC) {
+        #ifdef DEBUG
+            printf("dump program counter: ");
+        #endif
         printf("%x", pc);
-    } else if (addy == dump_gpr) {
+    } else if (address == DUMP_GPR) {
+        #ifdef DEBUG
+            printf("dump registers: \n");
+        #endif
         register_dump();
-    } else if (addy == malloc || addy == free) {
-        if (addy == malloc) {
+    } else if (address == MALLOC || address == FREE) {
+        if (address == MALLOC) {
             int size = reg[rs2];
             int location = heap_add(&heap, size);
             reg[28] = location;
+            #ifdef DEBUG
+                printf("malloc size: r%d(%d), r[28] = %x", rs2, reg[rs2], location);
+            #endif
         } else {
             int location = reg[rs2];
+            #ifdef DEBUG
+                printf("free: r%d(%d)", rs2, reg[rs2]);
+            #endif
 
             node_t* cursor = heap->next;
             while (cursor != NULL) {
@@ -467,11 +585,11 @@ void s(INSTRUCTION instruction,
 
         int heap_flag = 0;
 
-        if (addy >= 0x400 && addy < 0x800){
-            addy = addy - 0x400;
-        } else if (addy >= 0xb700) {
+        if (address >= 0x400 && address < 0x800){
+            address = address - 0x400;
+        } else if (address >= 0xb700) {
             heap_flag = 1;
-            addy = addy - 0xb700;
+            address = address - 0xb700;
         } else {
             illegal_op(instruction, heap);
         }
@@ -479,9 +597,12 @@ void s(INSTRUCTION instruction,
         if (func3 == 0b000) {  // sb
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             if (heap_flag) {
-                int offset = addy % 64;
-                int heap_location = (addy / 64) * 64;
+                int offset = address % 64;
+                int heap_location = (address / 64) * 64;
                 heap_location += 0xb700;
+                #ifdef DEBUG
+                    printf("sb: store instruction to heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                #endif
 
                 node_t* cursor = find_node(heap, heap_location);
 
@@ -491,16 +612,26 @@ void s(INSTRUCTION instruction,
 
                 cursor->data[offset+0] = low8bits;
             } else {
+                #ifdef DEBUG
+                    if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, address, rs2, reg[rs2]);
+                    else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, address, rs2, reg[rs2]);
+                #endif
 
-                location[addy] = low8bits;
+                location[address] = low8bits;
             }
         } else if (func3 == 0b001) {  // sh
+            #ifdef DEBUG
+                printf("sh: ");
+            #endif
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
             if (heap_flag) {
-                int offset = addy % 64;
-                int heap_location = (addy / 64) * 64;
+                int offset = address % 64;
+                int heap_location = (address / 64) * 64;
                 heap_location += 0xb700;
+                #ifdef DEBUG
+                    printf("heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                #endif
 
                 node_t* cursor = find_node(heap, heap_location);
 
@@ -512,12 +643,19 @@ void s(INSTRUCTION instruction,
                 cursor->data[offset+1] = low16bits;
 
             } else {
+                #ifdef DEBUG
+                    if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, address, rs2, reg[rs2]);
+                    else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, address, rs2, reg[rs2]);
+                #endif
 
-                location[addy+0] = low8bits;
-                location[addy+1] = low16bits;
+                location[address+0] = low8bits;
+                location[address+1] = low16bits;
             }
 
         } else if (func3 == 0b010) {  // sw
+            #ifdef DEBUG
+                printf("sw: ");
+            #endif
 
             uint8_t low8bits = mask(reg[rs2], 0, 7);
             uint8_t low16bits = mask(reg[rs2], 8, 15);
@@ -525,9 +663,12 @@ void s(INSTRUCTION instruction,
             uint8_t low32bits = mask(reg[rs2], 24, 31);
 
             if (heap_flag) {
-                int offset = addy % 64;
-                int heap_location = (addy / 64) * 64;
+                int offset = address % 64;
+                int heap_location = (address / 64) * 64;
                 heap_location += 0xb700;
+                #ifdef DEBUG
+                    printf("heap location: %x, hbank: %x, offset: %d", address, heap_location, offset);
+                #endif
 
                 node_t* cursor = find_node(heap, heap_location);
 
@@ -540,11 +681,15 @@ void s(INSTRUCTION instruction,
                 cursor->data[offset+2] = low24bits;
                 cursor->data[offset+3] = low32bits;
             } else {
+                #ifdef DEBUG
+                    if (location == data_mem) printf("data_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, address, rs2, reg[rs2]);
+                    else printf("inst_mem[r%d(%d) + %d = %d] = r%d(%d)", rs1, reg[rs1], imm, address, rs2, reg[rs2]);
+                #endif
 
-                location[addy+0] = low8bits;
-                location[addy+1] = low16bits;
-                location[addy+2] = low24bits;
-                location[addy+3] = low32bits;
+                location[address+0] = low8bits;
+                location[address+1] = low16bits;
+                location[address+2] = low24bits;
+                location[address+3] = low32bits;
             }
         } else {
             not_implemented(instruction, heap);
@@ -574,26 +719,44 @@ void sb(INSTRUCTION instruction, node_t* heap) {
     }
 
     if (func3 == 0b000) {  // beq
+        #ifdef DEBUG
+            printf("if (r%d(%d) == r%d(%d)) beq: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
+        #endif
         if ((int32_t)reg[rs1] == (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b001) {  // bne
+        #ifdef DEBUG
+            printf("if (r%d(%d) != r%d(%d)) bne: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
+        #endif
         if ((int32_t)reg[rs1] != (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b100) {  // blt
+        #ifdef DEBUG
+            printf("if (r%d(%d) < r%d(%d)) blt: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
+        #endif
         if ((int32_t)reg[rs1] < (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b110) {  // bltu
+        #ifdef DEBUG
+            printf("if (r%d(%d) < r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
+        #endif
         if ((uint32_t)reg[rs1] < (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b101) {  // bge
+        #ifdef DEBUG
+        printf("if (r%d(%d) >= r%d(%d)) bge: PC = PC(%d) + %d", rs1, reg[rs1], rs2, reg[rs2], pc, imm << 1);
+        #endif
         if ((int32_t)reg[rs1] >= (int32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
     } else if (func3 == 0b111) {  // bgeu
+        #ifdef DEBUG
+        printf("if (r%d(%d) >= r%d(%d)) bltu: PC = PC(%d) + %d", rs1, (uint32_t)reg[rs1], rs2, (uint32_t)reg[rs2], pc, imm << 1);
+        #endif
         if ((uint32_t)reg[rs1] >= (uint32_t)reg[rs2]) {
             pc = pc + (imm << 1) - 4;
         }
@@ -611,6 +774,9 @@ void u(INSTRUCTION instruction) {
     imm = (imm << 12);
 
     reg[rd] = imm;
+    #ifdef DEBUG
+        printf("lui: r[%d] = %d", rd, imm);
+    #endif
 }
 
 void uj(INSTRUCTION instruction) {
@@ -635,7 +801,7 @@ void uj(INSTRUCTION instruction) {
     }
 
     #ifdef DEBUG
-        printf("here\n");
+        printf("jal: r[%d] = %d + 4; pc = %d + %d", rd, pc, pc, imm << 1);
     #endif
     reg[rd] = pc + 4;
     pc = pc + (imm<<1) - 4;
@@ -705,6 +871,9 @@ int main( int argc, char *argv[]) {
 
     // Main program loop
     for ( ; pc < INST_MEM_SIZE; pc+=4) {
+        #ifdef DEBUG
+            printf("pc: %04x, ", pc);
+        #endif
         process_instruction(instructions,
                             instructions[pc],
                             instructions[pc+1],
@@ -712,6 +881,9 @@ int main( int argc, char *argv[]) {
                             instructions[pc+3],
                             data_mem,
                             heap);
+        #ifdef DEBUG
+            printf("\n");
+        #endif
     }
 
     heap_free(heap);
