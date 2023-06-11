@@ -1,0 +1,28 @@
+Enter width, height, and color depth:
+...........:::::::::::::::::::::::::::::
+..........::::::::::::::::::::::::::::::
+........:::::---------------::::::::::::
+.......:::----------===XXX===--:::::::::
+......::---------====XXXXXXX==---:::::::
+.....:---------====XXXXXXXXXXX==---:::::
+....:--------==XXXXXXXXXXXXXXXXX----::::
+....------=XXXXXXXXXXXXXXXXXXXXX=----:::
+....-====XXXXXXXXXXXXXXXXXXXXXXX==---:::
+....===XXXXXXXXXXXXXXXXXXXXXXXXX==----::
+....XXXXXXXXXXXXXXXXXXXXXXXXXXXX==----::
+....===XXXXXXXXXXXXXXXXXXXXXXXXX==----::
+....-====XXXXXXXXXXXXXXXXXXXXXXX==---:::
+....------=XXXXXXXXXXXXXXXXXXXXX=----:::
+....:--------==XXXXXXXXXXXXXXXXX=---::::
+.....::--------====XXXXXXXXXXX==---:::::
+......::---------====XXXXXXXX==---::::::
+.......:::---------===XXXXX==--:::::::::
+........:::::---------------::::::::::::
+.........:::::::::::::::::::::::::::::::
+Done!
+
+Counters: 
+  add: 833365
+  rashift: 7548
+
+CPU Halt Requested
