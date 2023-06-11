@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS     = -Wall -Wvla -Werror -Os -g
 DEBUG      = -Wall -Wvla -Werror -Os -g -DDEBUG
 TEST       = -fprofile-arcs -ftest-coverage
-SRC        = src/vm_riskxvii.c
+SRC        = src/vm_riscv.c
 # OBJ        = $(SRC:.c=.o)
 RM         = rm -f
 
@@ -21,7 +21,7 @@ clean:
 run:
 	./$(TARGET)
 
-tests:$(TARGET) clean
+tests: clean
 	$(CC) $(TEST) $(SRC) -o $(TARGET)
 
 run_tests:
